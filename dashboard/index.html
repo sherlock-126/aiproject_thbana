@@ -2,7 +2,16 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f5f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1219" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Nhiệm vụ BN">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="color-scheme" content="light dark">
 <title>Theo dõi, đánh giá nhiệm vụ · TH Bà Nà</title>
 <script>
@@ -243,7 +252,7 @@
     table.rtable, table.rtable thead, table.rtable tbody, table.rtable tr, table.rtable td { display: block; }
     table.rtable thead { display: none; }
     table.rtable tr { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; padding: 6px 0; background: var(--surface-1); }
-    table.rtable td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 6px 12px; text-align: right; }
+    table.rtable td { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 0; padding: 6px 12px; text-align: right; }
     table.rtable td:first-child { text-align: left; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 4px; }
     table.rtable td[data-label]::before { content: attr(data-label); content: attr(data-label) / attr(data-label); color: var(--text-muted); font-size: 12px; text-align: left; flex: none; }
     table.rtable tr.click:hover td { background: none; }
@@ -365,6 +374,99 @@
   .tag-admin { color: var(--accent-text); background: var(--accent-soft); }
   .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   @media (max-width: 560px) { .form-grid { grid-template-columns: minmax(0, 1fr); } .userchip .uname { display: none; } }
+  /* ---------- Giao diện điện thoại kiểu ứng dụng ---------- */
+  button, a, select, summary, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .btn:active { transform: scale(.98); }
+  .appbar, nav.tabs.tabbar { display: none; }
+  dialog.sheet {
+    margin: auto auto 0; width: 100%; max-width: 560px; max-height: 88dvh; border: 0; border-radius: 22px 22px 0 0;
+    padding: 6px 16px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--surface-1); color: var(--text-primary); box-shadow: var(--shadow-lg);
+  }
+  dialog.sheet[open] { animation: sheetUp .24s cubic-bezier(.2, .8, .2, 1); }
+  dialog.sheet::backdrop { background: rgba(8, 16, 28, .45); backdrop-filter: blur(2px); }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+  .grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--border-strong); margin: 4px auto 14px; }
+  .sheet-user { display: flex; gap: 12px; align-items: center; padding: 4px 4px 14px; border-bottom: 1px solid var(--border); }
+  .sheet-user .avatar { width: 44px; height: 44px; font-size: 16px; }
+  .sheet-user b { display: block; font-size: 16px; }
+  .sheet-list { display: grid; padding: 6px 0; }
+  .sheet-list > * {
+    display: flex; align-items: center; gap: 14px; min-height: 54px; padding: 0 6px; width: 100%;
+    font: inherit; font-size: 15.5px; color: var(--text-primary); background: none; border: 0; border-bottom: 1px solid var(--border);
+    text-decoration: none; text-align: left; cursor: pointer; border-radius: 0;
+  }
+  .sheet-list > *:last-child { border-bottom: 0; }
+  .sheet-list > *:active { background: var(--surface-2); }
+  .sheet-list svg.i { width: 22px; height: 22px; color: var(--text-secondary); }
+  .sheet-list .chev { margin-left: auto; width: 18px; height: 18px; color: var(--text-muted); }
+  .sheet-list .danger, .sheet-list .danger svg.i { color: var(--critical-text); }
+  .sheet .public-note { margin: 6px 4px 0; }
+
+  @media (max-width: 960px) {
+    body { overscroll-behavior-y: none; }
+    .app { display: block; }
+    .side { display: none; }
+    .main { padding: 0 16px calc(86px + env(safe-area-inset-bottom, 0px)); }
+    .appbar {
+      display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 30;
+      margin: 0 -16px 14px; padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 10px;
+      background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: saturate(1.6) blur(16px); -webkit-backdrop-filter: saturate(1.6) blur(16px);
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    }
+    .appbar .logo { width: 34px; height: 34px; font-size: 12.5px; background: var(--side-bg); color: #fff; text-decoration: none; }
+    .appbar-title { flex: 1; min-width: 0; display: grid; line-height: 1.2; }
+    .appbar-title b { font-size: 17px; font-weight: 700; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .appbar-title small { font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; border: 0; background: none; color: var(--text-secondary); cursor: pointer; padding: 0; flex: none; }
+    .icon-btn:active { background: var(--surface-3); }
+    .icon-btn svg.i { width: 22px; height: 22px; }
+    .icon-btn .avatar { width: 34px; height: 34px; font-size: 14px; }
+    .topbar { margin-bottom: 12px; }
+    .topbar .eyebrow, .topbar h1, .topbar .sub:not(.public-note), .top-actions { display: none; }
+    .public-note { margin-top: 0; }
+
+    nav.tabs.tabbar {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; flex-direction: row; overflow: visible; margin: 0;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+      background: color-mix(in srgb, var(--surface-1) 90%, transparent); backdrop-filter: saturate(1.6) blur(18px); -webkit-backdrop-filter: saturate(1.6) blur(18px);
+      border-top: 1px solid var(--border);
+    }
+    nav.tabs.tabbar button {
+      flex-direction: column; justify-content: center; gap: 2px; width: auto; min-height: 54px; padding: 4px 2px; border-radius: 12px;
+      font-size: 11px; font-weight: 500; color: var(--text-muted); background: none; white-space: nowrap;
+    }
+    nav.tabs.tabbar button:hover { background: none; color: var(--text-muted); }
+    nav.tabs.tabbar button svg.i { width: 54px; height: 30px; padding: 4px 15px; border-radius: 999px; transition: background .15s; }
+    nav.tabs.tabbar button[aria-selected="true"], nav.tabs.tabbar button.on { color: var(--accent-text); font-weight: 650; background: none; }
+    nav.tabs.tabbar button[aria-selected="true"] svg.i, nav.tabs.tabbar button.on svg.i { background: var(--accent-soft); stroke-width: 2.1; }
+    nav.tabs.tabbar button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+    select, input[type=text], input[type=email], input[type=password], input[type=date], input[type=number], input[type=month], input[type=search], textarea { font-size: 16px; min-height: 44px; }
+    .btn { min-height: 44px; font-size: 14.5px; border-radius: 10px; }
+    .btn.sm { min-height: 36px; font-size: 13.5px; }
+    .card { border-radius: 16px; }
+    .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+    .task { grid-template-columns: 26px minmax(0, 1fr) 36px; }
+    .task > :nth-child(3), .task > :nth-child(4) { grid-column: 2 / 3; }
+    .task > :nth-child(5) { grid-column: 3; grid-row: 1; }
+    .stickybar { position: static; margin: 0 0 14px; }
+    .card-head > .row { width: 100%; }
+    .card-head > .row > input[type=search] { flex: 1 1 100%; }
+    .card-head > .row > select { flex: 1; }
+    #view > .row > .spacer { display: none; }
+    #view > .row > .btn { flex: 1 1 40%; }
+    #view > .row > .row { flex: 1 1 100%; }
+    #view > .row > .row > select { flex: 1; }
+    .login-wrap { padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); align-items: start; }
+    .login { margin-top: 6vh; border-radius: 20px; }
+  }
+  /* Bảng có ô nhập: màn hẹp thì thành thẻ, ô nhập chiếm phần còn lại */
+  @container (width < 640px) {
+    table.rtable td > input, table.rtable td > select { flex: 1; min-width: 0 !important; width: auto !important; max-width: 68%; }
+    table.rtable td:first-child > input { max-width: 100%; }
+    table.rtable td:not([data-label]):not(:first-child) { justify-content: flex-end; flex-wrap: wrap; }
+  }
   @media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; animation: none !important; } }
   @media print { body { background: #fff; } .side { display: none; } }
 </style>
@@ -393,6 +495,12 @@
   </aside>
 
   <div class="main">
+    <header class="appbar">
+      <a class="logo" href="/" aria-label="Tất cả ứng dụng">BN</a>
+      <div class="appbar-title"><b id="mTitle">Tổng quan</b><small id="mSchool">Trường Tiểu học Bà Nà</small></div>
+      <button class="icon-btn" data-act="reload" aria-label="Tải lại dữ liệu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
+      <button class="icon-btn" data-act="moreSheet" aria-label="Tài khoản và tuỳ chọn"><span class="avatar" id="mAvatar">?</span></button>
+    </header>
     <div class="content">
       <header class="topbar">
         <div class="page-head">
@@ -415,6 +523,26 @@
     </div>
   </div>
 </div>
+<nav class="tabs tabbar" aria-label="Chức năng" hidden>
+  <button role="tab" data-tab="overview"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Tổng quan</span></button>
+  <button role="tab" data-tab="eval"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="m9 13 2 2 4-4"/></svg><span>Đánh giá</span></button>
+  <button role="tab" data-tab="person"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="m5 16 4-5 4 3 6-8"/></svg><span>Cá nhân</span></button>
+  <button role="tab" data-tab="staff"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.6.9 2.7 2.6 3 5.2"/></svg><span>Nhân sự</span></button>
+  <button class="more" data-act="moreSheet" aria-haspopup="dialog"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Thêm</span></button>
+</nav>
+<dialog class="sheet" id="sheet" closedby="any" aria-label="Tài khoản và tuỳ chọn">
+  <div class="grabber" aria-hidden="true"></div>
+  <div class="sheet-user" id="sheetUser"></div>
+  <div class="sheet-list">
+    <button data-sheet-tab="data"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V12"/></svg><span>Dữ liệu &amp; hướng dẫn</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+    <button data-sheet-tab="accounts" id="sheetAcc" hidden><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg><span>Tài khoản &amp; nhật ký</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+    <button data-act="theme"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg><span>Đổi giao diện sáng/tối</span></button>
+    <button data-act="reload"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg><span>Tải lại dữ liệu mới nhất</span></button>
+    <a href="/"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg><span>Tất cả ứng dụng của trường</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
+    <button data-act="logout" class="danger"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg><span>Đăng xuất</span></button>
+  </div>
+  <p class="public-note">Dữ liệu trên trang này đang công khai với người có link.</p>
+</dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="/lib/thbana.js"></script>
@@ -1455,17 +1583,16 @@ function renderStaff() {
   $("#view").innerHTML = `<div class="card">
     <div class="card-head"><div><h2>Danh sách cán bộ, giáo viên, nhân viên</h2><p>Loại quyết định dùng phụ lục điểm cộng/trừ nào. Sửa trực tiếp trong bảng, tự động lưu.</p></div>
       <div class="row"><button class="btn" data-act="importStaff">⬆ Nhập từ Excel</button><button class="btn primary" data-act="addStaff">+ Thêm người</button></div></div>
-    <div class="scroll"><table>
-      <thead><tr><th>#</th><th>Họ và tên</th><th>Chức vụ</th><th>Tổ</th><th>Lớp CN</th><th>Loại</th><th class="num">Số phiếu</th><th></th></tr></thead>
+    <div class="scroll"><table class="rtable">
+      <thead><tr><th>Họ và tên</th><th>Chức vụ</th><th>Tổ</th><th>Lớp CN</th><th>Loại</th><th class="num">Số phiếu</th><th></th></tr></thead>
       <tbody>${db.staff.map((s, i) => `<tr data-sid="${s.id}">
-        <td class="muted">${i + 1}</td>
-        <td><input type="text" data-s="name" value="${esc(s.name)}" aria-label="Họ và tên" style="min-width:170px;width:100%"></td>
-        <td><input type="text" data-s="chucVu" value="${esc(s.chucVu)}" aria-label="Chức vụ" style="min-width:130px;width:100%"></td>
-        <td><input type="text" data-s="to" value="${esc(s.to)}" aria-label="Tổ" style="width:110px" list="toList"></td>
-        <td><input type="text" data-s="lop" value="${esc(s.lop)}" aria-label="Lớp" style="width:64px"></td>
-        <td><select data-s="type" aria-label="Loại">${Object.entries(STAFF_TYPES).map(([k, v]) => `<option value="${k}" ${s.type === k ? "selected" : ""}>${esc(v.name)}</option>`).join("")}</select></td>
-        <td class="num">${Object.keys(db.records).filter(k => k.startsWith(s.id + "|")).length}</td>
-        <td><button class="btn ghost sm danger" data-act="delStaff" aria-label="Xoá người này">✕</button></td></tr>`).join("") || `<tr><td colspan="8" class="muted">Chưa có ai. Bấm “Thêm người” hoặc “Nhập từ Excel”.</td></tr>`}</tbody>
+        <td><input type="text" data-s="name" value="${esc(s.name)}" aria-label="Họ và tên" placeholder="Họ và tên" style="min-width:170px;width:100%"></td>
+        <td data-label="Chức vụ"><input type="text" data-s="chucVu" value="${esc(s.chucVu)}" aria-label="Chức vụ" style="min-width:130px;width:100%"></td>
+        <td data-label="Tổ"><input type="text" data-s="to" value="${esc(s.to)}" aria-label="Tổ" style="width:110px" list="toList"></td>
+        <td data-label="Lớp CN"><input type="text" data-s="lop" value="${esc(s.lop)}" aria-label="Lớp" style="width:64px"></td>
+        <td data-label="Loại"><select data-s="type" aria-label="Loại">${Object.entries(STAFF_TYPES).map(([k, v]) => `<option value="${k}" ${s.type === k ? "selected" : ""}>${esc(v.name)}</option>`).join("")}</select></td>
+        <td class="num" data-label="Số phiếu">${Object.keys(db.records).filter(k => k.startsWith(s.id + "|")).length}</td>
+        <td><button class="btn ghost sm danger" data-act="delStaff" aria-label="Xoá người này">✕ <span class="small">Xoá</span></button></td></tr>`).join("") || `<tr><td colspan="7" class="muted">Chưa có ai. Bấm “Thêm người” hoặc “Nhập từ Excel”.</td></tr>`}</tbody>
     </table></div>
     <datalist id="toList">${[...new Set(db.staff.map(s => s.to).filter(Boolean))].map(t => `<option value="${esc(t)}">`).join("")}</datalist>
     <p class="small muted" style="margin-top:10px">Nhập từ Excel: dòng đầu là tiêu đề, cần có cột <b>Họ và tên</b>; các cột tuỳ chọn: <b>Chức vụ</b>, <b>Tổ</b>, <b>Lớp</b>, <b>Loại</b> (GVCN / GVBM / CBNV).</p>
@@ -1709,10 +1836,13 @@ async function startSession(a, fresh) {
   try { localStorage.setItem(SESSION_KEY, JSON.stringify({ rid: a.rid, email: a.email })); } catch (e) {}
   if (fresh) { a.lastLogin = new Date().toISOString(); saveAccount(a).catch(() => {}); logAct("Đăng nhập"); }
   $("#login")?.remove();
-  document.querySelector(".app").hidden = false;
+  document.querySelector(".app").hidden = false; $(".tabbar").hidden = false;
   const chip = $("#userChip"); chip.hidden = false;
   chip.innerHTML = `<span class="avatar" aria-hidden="true">${esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase())}</span><span class="uname"><b>${esc(a.name)}</b>${a.role === "admin" ? ' <span class="pill tag-admin">Quản trị</span>' : ""}</span><button class="btn ghost sm" data-act="logout" title="Đăng xuất">Đăng xuất</button>`;
-  $('nav.tabs [data-tab="accounts"]').hidden = !isAdmin();
+  $('nav.tabs [data-tab="accounts"]').hidden = !isAdmin(); $("#sheetAcc").hidden = !isAdmin();
+  const initial = esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase());
+  $("#mAvatar").textContent = (a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase();
+  $("#sheetUser").innerHTML = `<span class="avatar" aria-hidden="true">${initial}</span><span><b>${esc(a.name)}</b><span class="small muted">${esc(a.email)} · ${a.role === "admin" ? "Quản trị" : "Giáo viên"}</span></span>`;
   initUi();
   setMark("Đã tải lúc " + hhmm());
   setTab(ui.tab);
@@ -1749,15 +1879,15 @@ function renderAccounts() {
   </section>
   <div class="card">
     <div class="card-head"><div><h2>Danh sách tài khoản <span class="muted">(${accounts.length})</span></h2><p>Tài khoản bị khoá không đăng nhập được nhưng nhật ký cũ vẫn giữ nguyên.</p></div></div>
-    <div class="scroll"><table>
+    <div class="scroll"><table class="rtable">
       <thead><tr><th>Họ và tên</th><th>Email</th><th>Gắn với</th><th>Vai trò</th><th>Trạng thái</th><th>Đăng nhập gần nhất</th><th></th></tr></thead>
       <tbody>${list.map(a => `<tr data-acc="${a.rid}">
         <td><b>${esc(a.name)}</b>${a.rid === me.rid ? ' <span class="pill">Bạn</span>' : ""}</td>
-        <td>${esc(a.email)}</td>
-        <td><select data-af="staffId" aria-label="Gắn với người">${staffOpts(a.staffId)}</select></td>
-        <td><select data-af="role" aria-label="Vai trò" ${a.rid === me.rid ? "disabled" : ""}>${Object.entries(ROLE).map(([k, l]) => `<option value="${k}" ${a.role === k ? "selected" : ""}>${l}</option>`).join("")}</select></td>
-        <td>${a.active ? statusHtml("good", "Đang dùng") : statusHtml("critical", "Đã khoá")}</td>
-        <td class="small muted nowrap">${a.lastLogin ? new Date(a.lastLogin).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" }) : "Chưa đăng nhập"}</td>
+        <td data-label="Email">${esc(a.email)}</td>
+        <td data-label="Gắn với"><select data-af="staffId" aria-label="Gắn với người">${staffOpts(a.staffId)}</select></td>
+        <td data-label="Vai trò"><select data-af="role" aria-label="Vai trò" ${a.rid === me.rid ? "disabled" : ""}>${Object.entries(ROLE).map(([k, l]) => `<option value="${k}" ${a.role === k ? "selected" : ""}>${l}</option>`).join("")}</select></td>
+        <td data-label="Trạng thái">${a.active ? statusHtml("good", "Đang dùng") : statusHtml("critical", "Đã khoá")}</td>
+        <td class="small muted nowrap" data-label="Đăng nhập gần nhất">${a.lastLogin ? new Date(a.lastLogin).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" }) : "Chưa đăng nhập"}</td>
         <td class="nowrap"><button class="btn ghost sm" data-act="resetPw">Đặt lại mật khẩu</button>${a.rid !== me.rid ? `<button class="btn ghost sm" data-act="toggleAcc">${a.active ? "Khoá" : "Mở khoá"}</button><button class="btn ghost sm danger" data-act="delAcc">Xoá</button>` : ""}</td>
       </tr>`).join("")}</tbody></table></div>
   </div>
@@ -1823,7 +1953,8 @@ const PAGES = {
 function setTab(t) {
   if (t === "accounts" && !isAdmin()) t = "overview";
   ui.tab = t;
-  $("#pageTitle").textContent = PAGES[t][0]; $("#pageDesc").textContent = PAGES[t][1];
+  $("#pageTitle").textContent = PAGES[t][0]; $("#pageDesc").textContent = PAGES[t][1]; $("#mTitle").textContent = PAGES[t][0];
+  $(".tabbar .more").classList.toggle("on", t === "data" || t === "accounts");
   document.title = PAGES[t][0] + " · Theo dõi nhiệm vụ · TH Bà Nà";
   try { sessionStorage.setItem("tdgv-tab", t); } catch (e) {}
   $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
@@ -1832,7 +1963,7 @@ function setTab(t) {
 }
 function render() {
   if (!loaded) return;
-  $("#schoolLine").textContent = db.school.name;
+  $("#schoolLine").textContent = db.school.name; $("#mSchool").textContent = db.school.name;
   const bn = $("#demoBanner");
   if (db.demo) bn.innerHTML = `<span>Hệ thống còn <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…). Hãy xoá trước khi nhập dữ liệu thật.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
   else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Vào <b>Danh sách CB-GV-NV</b> để thêm người hoặc nhập danh sách từ Excel.</span><span class="spacer"></span><button class="btn sm primary" data-tab-go="staff">Mở danh sách CB-GV-NV</button>`;
@@ -1840,7 +1971,20 @@ function render() {
   ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData, accounts: renderAccounts })[ui.tab]();
 }
 
-$("nav.tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); });
+$$("nav.tabs").forEach(n => n.addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); }));
+const sheet = $("#sheet");
+if (!("closedBy" in HTMLDialogElement.prototype)) {
+  sheet.addEventListener("click", ev => {
+    if (ev.target !== sheet) return;
+    const r = sheet.getBoundingClientRect();
+    if (r.top <= ev.clientY && ev.clientY <= r.bottom && r.left <= ev.clientX && ev.clientX <= r.right) return;
+    sheet.close();
+  });
+}
+sheet.addEventListener("click", ev => {
+  const t = ev.target.closest("[data-sheet-tab]"); if (t) { sheet.close(); setTab(t.dataset.sheetTab); return; }
+  if (ev.target.closest(".sheet-list > *")) sheet.close();
+});
 $("#demoBanner").addEventListener("click", e => { const b = e.target.closest("[data-tab-go]"); if (b) setTab(b.dataset.tabGo); });
 
 document.addEventListener("input", e => {
@@ -1957,6 +2101,8 @@ document.addEventListener("click", async e => {
       db.demo = false; initUi(); toast("Đang xoá dữ liệu mẫu trên máy chủ…"); await sync(); render(); break;
     }
     case "reload": reload(); break;
+    case "moreSheet": sheet.showModal(); break;
+    case "theme": toggleTheme(); break;
     case "logout": logAct("Đăng xuất"); await flushLog(); try { localStorage.removeItem(SESSION_KEY); } catch (e) {} location.reload(); break;
     case "genPw": $("#acPw").value = genPw(); break;
     case "copyPw": try { await navigator.clipboard.writeText(newPwNotice.pw); toast("Đã sao chép mật khẩu."); } catch (e) { toast("Không sao chép được, hãy ghi lại."); } break;
@@ -2001,12 +2147,13 @@ document.addEventListener("click", async e => {
 });
 
 const root = document.documentElement;
-$("#themeBtn").addEventListener("click", () => {
+function toggleTheme() {
   const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   root.dataset.theme = dark ? "light" : "dark";
   document.querySelector('meta[name="color-scheme"]').content = root.dataset.theme;
   try { localStorage.setItem("tdgv-theme", root.dataset.theme); } catch (e) {}
-});
+}
+$("#themeBtn").addEventListener("click", toggleTheme);
 let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (ui.tab === "overview") renderOverview(); if (ui.tab === "person") renderPerson(); }, 150); });
 
 $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === ui.tab));
