@@ -93,6 +93,7 @@
   :root[data-theme="light"] { color-scheme: light; }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0; background: var(--bg); color: var(--text-primary);
@@ -149,7 +150,7 @@
   /* ---------- Thành phần cơ bản ---------- */
   .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .spacer { flex: 1; }
-  select, input[type=text], input[type=number], input[type=month], input[type=search], textarea {
+  select, input[type=text], input[type=email], input[type=password], input[type=date], input[type=number], input[type=month], input[type=search], textarea {
     font: inherit; font-size: 13.5px; color: var(--text-primary); background: var(--surface-1);
     border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 0 10px; min-width: 0; min-height: 36px;
     transition: border-color .12s, box-shadow .12s;
@@ -346,6 +347,24 @@
     h1 { font-size: 19px; }
     .top-actions .btn .lbl { display: none; }
   }
+  /* ---------- Đăng nhập & tài khoản ---------- */
+  .login-wrap { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; background: var(--bg); }
+  .login { width: min(420px, 100%); padding: 28px; display: grid; gap: 18px; }
+  .login .brand-row { display: flex; gap: 12px; align-items: center; }
+  .login .logo { background: var(--side-bg); color: #fff; }
+  .login form { display: grid; gap: 14px; }
+  .field { display: grid; gap: 5px; font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .field input, .field select { width: 100%; }
+  .err { color: var(--critical-text); font-size: 13px; min-height: 1em; }
+  .btn.block { width: 100%; min-height: 42px; font-size: 14.5px; }
+  .userchip { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); padding: 0 4px 0 2px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-text); font-weight: 650; font-size: 12.5px; flex: none; }
+  .userchip b { color: var(--text-primary); font-weight: 600; }
+  .pwbox { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 14px; border-radius: var(--radius-sm); background: var(--accent-soft); font-size: 13.5px; }
+  .pwbox code { font-size: 15px; font-weight: 700; letter-spacing: .04em; background: var(--surface-1); padding: 2px 8px; border-radius: 6px; }
+  .tag-admin { color: var(--accent-text); background: var(--accent-soft); }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 560px) { .form-grid { grid-template-columns: minmax(0, 1fr); } .userchip .uname { display: none; } }
   @media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; animation: none !important; } }
   @media print { body { background: #fff; } .side { display: none; } }
 </style>
@@ -365,6 +384,7 @@
         <button role="tab" data-tab="person"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="m5 16 4-5 4 3 6-8"/></svg><span>Theo dõi cá nhân</span></button>
         <button role="tab" data-tab="staff"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.6.9 2.7 2.6 3 5.2"/></svg><span>Danh sách CB-GV-NV</span></button>
         <button role="tab" data-tab="data"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V12"/></svg><span>Dữ liệu &amp; hướng dẫn</span></button>
+        <button role="tab" data-tab="accounts" hidden><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg><span>Tài khoản &amp; nhật ký</span></button>
       </nav>
     </div>
     <div class="side-foot">
@@ -382,6 +402,7 @@
           <p class="public-note"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16.5v.01"/></svg>Dữ liệu trên trang này đang công khai với người có link.</p>
         </div>
         <div class="row top-actions">
+          <span class="userchip" id="userChip" hidden></span>
           <span class="saved" id="savedMark"></span>
           <button class="btn" data-act="reload" title="Tải lại dữ liệu mới nhất mà người khác vừa cập nhật"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg><span class="lbl">Tải lại</span></button>
           <button class="btn" id="themeBtn" aria-label="Đổi giao diện sáng/tối" title="Đổi giao diện sáng/tối"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg><span class="lbl">Giao diện</span></button>
@@ -536,20 +557,21 @@ async function sync() {
     const ops = [];
     const sj = JSON.stringify(db.school);
     if (!remote.school) ops.push(async () => { const r = await TB.create(APP, COL.school, JSON.parse(sj)); remote.school = { rid: r.id, json: sj }; });
-    else if (remote.school.json !== sj) ops.push(async () => { await TB.update(APP, COL.school, remote.school.rid, JSON.parse(sj)); remote.school.json = sj; });
+    else if (remote.school.json !== sj) ops.push(async () => { await TB.update(APP, COL.school, remote.school.rid, JSON.parse(sj)); remote.school.json = sj; logAct("Sửa thông tin trường", db.school.name, "school"); });
     db.staff.forEach((x, i) => { x.order = i; });
     for (const x of db.staff) {
       const j = JSON.stringify(x), r = remote.staff.get(x.id);
-      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.staff, JSON.parse(j)); remote.staff.set(x.id, { rid: c.id, json: j }); });
-      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.staff, r.rid, JSON.parse(j)); r.json = j; });
+      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.staff, JSON.parse(j)); remote.staff.set(x.id, { rid: c.id, json: j }); logAct("Thêm người vào danh sách", x.name || "(chưa có tên)"); });
+      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.staff, r.rid, JSON.parse(j)); r.json = j; logAct("Sửa thông tin người", x.name, "staff|" + x.id); });
     }
-    for (const [id, r] of remote.staff) if (!db.staff.some(x => x.id === id)) ops.push(async () => { await TB.remove(APP, COL.staff, r.rid); remote.staff.delete(id); });
+    for (const [id, r] of remote.staff) if (!db.staff.some(x => x.id === id)) ops.push(async () => { await TB.remove(APP, COL.staff, r.rid); remote.staff.delete(id); logAct("Xoá người khỏi danh sách", JSON.parse(r.json).name || ""); });
     for (const [k, rec] of Object.entries(db.records)) {
-      const [sid, m] = k.split("|"); const j = recJson(sid, m, rec), r = remote.recs.get(k);
-      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.rec, JSON.parse(j)); remote.recs.set(k, { rid: c.id, json: j }); });
-      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.rec, r.rid, JSON.parse(j)); r.json = j; });
+      const [sid, m] = k.split("|"); let j = recJson(sid, m, rec); const r = remote.recs.get(k);
+      if ((!r || r.json !== j) && me) { rec.suaBoi = { email: me.email, name: me.name, at: new Date().toISOString() }; j = recJson(sid, m, rec); }
+      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.rec, JSON.parse(j)); remote.recs.set(k, { rid: c.id, json: j }); logAct("Tạo phiếu đánh giá", recLabel(k)); });
+      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.rec, r.rid, JSON.parse(j)); r.json = j; logAct("Cập nhật phiếu đánh giá", recLabel(k), "rec|" + k); });
     }
-    for (const [k, r] of remote.recs) if (!db.records[k]) ops.push(async () => { await TB.remove(APP, COL.rec, r.rid); remote.recs.delete(k); });
+    for (const [k, r] of remote.recs) if (!db.records[k]) ops.push(async () => { await TB.remove(APP, COL.rec, r.rid); remote.recs.delete(k); logAct("Xoá phiếu đánh giá", recLabel(k)); });
     await pool(ops);
     lastErr = null;
     setMark(ops.length ? "Đã lưu lên máy chủ " + hhmm() : "Đã đồng bộ " + hhmm());
@@ -573,6 +595,76 @@ async function reload(quiet) {
   try { await loadAll(); initUi(true); render(); setMark("Đã tải lúc " + hhmm()); if (!quiet) toast("Đã tải dữ liệu mới nhất."); }
   catch (e) { if (!quiet) toast("Không tải được: " + e.message + infraHint(e.message)); }
 }
+
+// ---- Tài khoản đăng nhập (chỉ để phân biệt ai đang làm việc) & nhật ký hoạt động
+//   dashboard/tai-khoan – mỗi tài khoản một bản ghi (mật khẩu lưu dạng băm SHA-256 kèm muối, không lưu chữ thật)
+//   dashboard/nhat-ky   – mỗi người mỗi ngày một bản ghi, chứa danh sách việc đã làm
+const COL_ACC = "tai-khoan", COL_LOG = "nhat-ky", SESSION_KEY = "tdgv-session";
+let accounts = [], me = null;
+// SHA-256: dùng Web Crypto khi có (trang https), dự phòng bản JavaScript thuần (trang http).
+function sha256Js(bytes) {
+  const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const l = bytes.length, n = ((l + 9 + 63) >> 6) << 6, m = new Uint8Array(n);
+  m.set(bytes); m[l] = 0x80; const dv = new DataView(m.buffer); dv.setUint32(n - 4, l * 8); dv.setUint32(n - 8, Math.floor(l / 0x20000000));
+  const w = new Uint32Array(64), r = (x, k) => (x >>> k) | (x << (32 - k));
+  for (let i = 0; i < n; i += 64) {
+    for (let t = 0; t < 16; t++) w[t] = dv.getUint32(i + t * 4);
+    for (let t = 16; t < 64; t++) w[t] = (r(w[t-2],17) ^ r(w[t-2],19) ^ (w[t-2] >>> 10)) + w[t-7] + (r(w[t-15],7) ^ r(w[t-15],18) ^ (w[t-15] >>> 3)) + w[t-16];
+    let [a, b, c, d, e, f, g, h] = H;
+    for (let t = 0; t < 64; t++) {
+      const t1 = (h + (r(e,6) ^ r(e,11) ^ r(e,25)) + ((e & f) ^ (~e & g)) + K[t] + w[t]) >>> 0, t2 = ((r(a,2) ^ r(a,13) ^ r(a,22)) + ((a & b) ^ (a & c) ^ (b & c))) >>> 0;
+      h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+    }
+    H[0] = (H[0] + a) >>> 0; H[1] = (H[1] + b) >>> 0; H[2] = (H[2] + c) >>> 0; H[3] = (H[3] + d) >>> 0; H[4] = (H[4] + e) >>> 0; H[5] = (H[5] + f) >>> 0; H[6] = (H[6] + g) >>> 0; H[7] = (H[7] + h) >>> 0;
+  }
+  return H.map(x => x.toString(16).padStart(8, "0")).join("");
+}
+async function sha256(t) {
+  const bytes = new TextEncoder().encode(t);
+  if (window.crypto?.subtle) { const b = await crypto.subtle.digest("SHA-256", bytes); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+  return sha256Js(bytes);
+}
+const hashPw = (salt, pw) => sha256(salt + "|" + pw);
+const normEmail = e => String(e || "").trim().toLowerCase();
+const isAdmin = () => me?.role === "admin";
+const genPw = () => Array.from({ length: 8 }, () => "abcdefghjkmnpqrstuvwxyz23456789"[Math.floor(Math.random() * 31)]).join("");
+const localDate = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+async function loadAccounts() { accounts = (await TB.list(APP, COL_ACC)).map(r => ({ rid: r.id, ...r.data })); }
+async function createAccount({ email, name, password, role = "gv", staffId = "" }) {
+  email = normEmail(email);
+  if (!/^\S+@\S+$/.test(email)) throw new Error(`Email “${email}” không hợp lệ.`);
+  if (accounts.some(a => a.email === email)) throw new Error(`Email ${email} đã có tài khoản.`);
+  if (!password || password.length < 4) throw new Error("Mật khẩu cần ít nhất 4 ký tự.");
+  const salt = uid() + uid();
+  const data = { email, name: String(name || "").trim() || email, role, staffId, active: true, salt, hash: await hashPw(salt, password), createdAt: new Date().toISOString(), lastLogin: null };
+  const r = await TB.create(APP, COL_ACC, data);
+  const a = { rid: r.id, ...data }; accounts.push(a); return a;
+}
+async function saveAccount(a) { const { rid, ...data } = a; await TB.update(APP, COL_ACC, rid, data); }
+
+const logBuf = []; let logTimer, logDoc = null; const logLast = new Map();
+function logAct(a, d = "", throttleKey) {
+  if (!me) return;
+  if (throttleKey) { const t = logLast.get(throttleKey) || 0; if (Date.now() - t < 10 * 60000) return; logLast.set(throttleKey, Date.now()); }
+  logBuf.push({ at: new Date().toISOString(), a, d: String(d).slice(0, 300) });
+  clearTimeout(logTimer); logTimer = setTimeout(flushLog, 1500);
+}
+async function flushLog() {
+  if (!logBuf.length || !me) return;
+  const items = logBuf.splice(0), today = localDate();
+  try {
+    if (logDoc && (logDoc.data.date !== today || logDoc.data.email !== me.email || logDoc.data.entries.length > 400)) logDoc = null;
+    if (!logDoc) {
+      const f = (await TB.list(APP, COL_LOG)).find(r => r.data.email === me.email && r.data.date === today && r.data.entries.length <= 400);
+      if (f) logDoc = { rid: f.id, data: f.data };
+    }
+    if (!logDoc) { const data = { email: me.email, name: me.name, date: today, entries: items }; const r = await TB.create(APP, COL_LOG, data); logDoc = { rid: r.id, data }; }
+    else { logDoc.data.entries.push(...items); await TB.update(APP, COL_LOG, logDoc.rid, logDoc.data); }
+  } catch (e) { logBuf.unshift(...items); }
+}
+const staffNameOf = sid => staffById(sid)?.name || "(người đã xoá)";
+const recLabel = k => { const [sid, m] = k.split("|"); return `${staffNameOf(sid)} – ${monthLabel(m)}`; };
 
 // ---- Minh chứng (file, ảnh) upload qua TB.upload
 const EV_ACCEPT = "image/jpeg,image/png,image/webp,image/gif,image/heic,.heic,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt";
@@ -606,7 +698,8 @@ async function uploadEvidence(list, files) {
     setMark(`Đang tải lên “${file.name}”…`);
     try {
       const r = await TB.upload(APP, file);
-      list.push({ key: r.key, url: r.url, name: r.name, type: r.type, size: r.size, at: r.uploaded_at || new Date().toISOString(), by: r.uploaded_by || "" });
+      list.push({ key: r.key, url: r.url, name: r.name, type: r.type, size: r.size, at: r.uploaded_at || new Date().toISOString(), by: me?.name || r.uploaded_by || "" });
+      logAct("Tải minh chứng", `${r.name} – ${recLabel(rkey(ui.evalStaff, ui.evalMonth))}`);
       toast(`Đã tải lên “${r.name}”.`);
     } catch (e) { toast(`Không tải được “${f.name}”: ${e.message}${infraHint(e.message)}`); }
   }
@@ -1080,7 +1173,7 @@ function renderEval() {
       <span class="small muted">${esc(st.chucVu)}${st.lop ? " · Lớp " + esc(st.lop) : ""} · ${esc(st.to)}</span>
       <span class="spacer"></span>
       ${rec ? `<span id="eStatus">${recStatusHtml(rec.status)}</span>
-      ${rec.updatedBy ? `<span class="small muted" title="${esc(rec.updatedAt || "")}">Sửa lần cuối: ${esc(rec.updatedBy)}</span>` : ""}
+      ${rec.suaBoi ? `<span class="small muted">Sửa lần cuối: <b>${esc(rec.suaBoi.name)}</b> · ${new Date(rec.suaBoi.at).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}</span>` : ""}
       <button class="btn" data-act="print">🖨 In phiếu</button>
       <button class="btn" data-act="exportMau01">⬇ Excel Mẫu 01</button>` : ""}
     </div></div>`;
@@ -1569,6 +1662,154 @@ Chỉ dựa trên số liệu trên, không suy đoán thêm.`;
 }
 
 // =====================================================================
+// 13b. ĐĂNG NHẬP, TÀI KHOẢN & NHẬT KÝ
+// =====================================================================
+const ROLE = { admin: "Quản trị", gv: "Giáo viên" };
+let logsCache = null, logFilter = { email: "", from: "", to: "", q: "" }, newPwNotice = null;
+
+function loginScreen(bootstrap) {
+  document.querySelector(".app").hidden = true;
+  let el = $("#login");
+  if (!el) { el = document.createElement("div"); el.id = "login"; document.body.prepend(el); }
+  el.innerHTML = `<div class="login-wrap"><div class="card login">
+    <div class="brand-row"><span class="logo" aria-hidden="true">BN</span><div><b>Theo dõi nhiệm vụ</b><div class="small muted">${esc(db.school.name)}</div></div></div>
+    <div><h1>${bootstrap ? "Tạo tài khoản quản trị" : "Đăng nhập"}</h1>
+    <p class="sub" style="margin-top:4px">${bootstrap ? "Chưa có tài khoản nào. Tạo tài khoản quản trị đầu tiên để cấp tài khoản cho giáo viên." : "Dùng email và mật khẩu nhà trường đã cấp cho bạn."}</p></div>
+    <form id="loginForm" novalidate>
+      ${bootstrap ? `<label class="field">Họ và tên<input type="text" id="lgName" autocomplete="name" required></label>` : ""}
+      <label class="field">Email<input type="email" id="lgEmail" autocomplete="username" required></label>
+      <label class="field">Mật khẩu<input type="password" id="lgPw" autocomplete="${bootstrap ? "new-password" : "current-password"}" required></label>
+      ${bootstrap ? `<label class="field">Nhập lại mật khẩu<input type="password" id="lgPw2" autocomplete="new-password" required></label>` : ""}
+      <p class="err" id="lgErr" role="alert"></p>
+      <button class="btn primary block" type="submit">${bootstrap ? "Tạo tài khoản và vào trang" : "Đăng nhập"}</button>
+    </form>
+    <p class="public-note">Dữ liệu trên trang này đang công khai với người có link.</p>
+  </div></div>`;
+  $("#lgEmail").focus();
+  $("#loginForm").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const err = $("#lgErr"); err.textContent = "";
+    const email = normEmail($("#lgEmail").value), pw = $("#lgPw").value;
+    try {
+      let a;
+      if (bootstrap) {
+        if (pw !== $("#lgPw2").value) throw new Error("Hai lần nhập mật khẩu không khớp.");
+        a = await createAccount({ email, name: $("#lgName").value, password: pw, role: "admin" });
+      } else {
+        a = accounts.find(x => x.email === email);
+        if (!a || !(await hashPw(a.salt, pw) === a.hash)) throw new Error("Email hoặc mật khẩu không đúng.");
+        if (!a.active) throw new Error("Tài khoản này đã bị khoá. Liên hệ quản trị viên.");
+      }
+      await startSession(a, true);
+    } catch (e) { err.textContent = e.message + infraHint(e.message); }
+  });
+}
+async function startSession(a, fresh) {
+  me = a;
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify({ rid: a.rid, email: a.email })); } catch (e) {}
+  if (fresh) { a.lastLogin = new Date().toISOString(); saveAccount(a).catch(() => {}); logAct("Đăng nhập"); }
+  $("#login")?.remove();
+  document.querySelector(".app").hidden = false;
+  const chip = $("#userChip"); chip.hidden = false;
+  chip.innerHTML = `<span class="avatar" aria-hidden="true">${esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase())}</span><span class="uname"><b>${esc(a.name)}</b>${a.role === "admin" ? ' <span class="pill tag-admin">Quản trị</span>' : ""}</span><button class="btn ghost sm" data-act="logout" title="Đăng xuất">Đăng xuất</button>`;
+  $('nav.tabs [data-tab="accounts"]').hidden = !isAdmin();
+  initUi();
+  setMark("Đã tải lúc " + hhmm());
+  setTab(ui.tab);
+}
+
+async function loadLogs() {
+  logsCache = (await TB.list(APP, COL_LOG)).flatMap(r => (r.data.entries || []).map(e => ({ ...e, email: r.data.email, name: r.data.name }))).sort((x, y) => y.at.localeCompare(x.at));
+}
+function renderAccounts() {
+  const staffOpts = sel => `<option value="">— Không gắn —</option>${db.staff.map(s => `<option value="${s.id}" ${s.id === sel ? "selected" : ""}>${esc(s.name || "(chưa có tên)")}</option>`).join("")}`;
+  const list = accounts.slice().sort((a, b) => (a.role === b.role ? 0 : a.role === "admin" ? -1 : 1) || a.name.localeCompare(b.name, "vi"));
+  const logs = (logsCache || []).filter(l => (!logFilter.email || l.email === logFilter.email) && (!logFilter.from || localDate(new Date(l.at)) >= logFilter.from) && (!logFilter.to || localDate(new Date(l.at)) <= logFilter.to)
+    && (!logFilter.q || (l.a + " " + l.d + " " + l.name).toLowerCase().includes(logFilter.q.toLowerCase())));
+  $("#view").innerHTML = `
+  ${newPwNotice ? `<div class="pwbox" style="margin-bottom:16px"><span>${esc(newPwNotice.label)}: <b>${esc(newPwNotice.email)}</b> · mật khẩu</span><code>${esc(newPwNotice.pw)}</code><button class="btn sm" data-act="copyPw">Sao chép</button><span class="small muted">Ghi lại và gửi cho giáo viên; hệ thống không lưu mật khẩu dạng chữ nên sẽ không xem lại được.</span><span class="spacer"></span><button class="btn ghost sm" data-act="closePw">Đóng</button></div>` : ""}
+  <section class="grid g2e">
+    <div class="card">
+      <div class="card-head"><div><h2>Thêm tài khoản</h2><p>Mỗi giáo viên một email. Email chỉ dùng để phân biệt người, không cần là email thật.</p></div></div>
+      <form id="accForm" class="form-grid" novalidate>
+        <label class="field">Họ và tên<input type="text" id="acName" required></label>
+        <label class="field">Email<input type="email" id="acEmail" required></label>
+        <label class="field">Mật khẩu<span class="row" style="flex-wrap:nowrap"><input type="text" id="acPw" value="${genPw()}" style="flex:1"><button class="btn sm" type="button" data-act="genPw" title="Tạo mật khẩu ngẫu nhiên">↻</button></span></label>
+        <label class="field">Vai trò<select id="acRole"><option value="gv">Giáo viên</option><option value="admin">Quản trị</option></select></label>
+        <label class="field" style="grid-column:1/-1">Gắn với người trong danh sách CB-GV-NV<select id="acStaff">${staffOpts("")}</select></label>
+        <div style="grid-column:1/-1" class="row"><span class="spacer"></span><button class="btn primary" type="submit">+ Thêm tài khoản</button></div>
+      </form>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Thêm nhiều tài khoản</h2><p>Mỗi dòng một người: <b>email</b>, <b>họ tên</b>, <b>mật khẩu</b> (cách nhau bằng dấu phẩy hoặc Tab, có thể dán từ Excel). Bỏ trống mật khẩu để hệ thống tự tạo. Họ tên trùng với danh sách CB-GV-NV sẽ được tự gắn.</p></div></div>
+      <textarea id="bulkAcc" rows="6" placeholder="gv.a@thbana.edu.vn, Nguyễn Văn A, matkhau1&#10;gv.b@thbana.edu.vn, Trần Thị B"></textarea>
+      <div class="row" style="margin-top:10px"><span class="spacer"></span><button class="btn" data-act="bulkAcc">Thêm hàng loạt</button></div>
+      <div id="bulkResult"></div>
+    </div>
+  </section>
+  <div class="card">
+    <div class="card-head"><div><h2>Danh sách tài khoản <span class="muted">(${accounts.length})</span></h2><p>Tài khoản bị khoá không đăng nhập được nhưng nhật ký cũ vẫn giữ nguyên.</p></div></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Họ và tên</th><th>Email</th><th>Gắn với</th><th>Vai trò</th><th>Trạng thái</th><th>Đăng nhập gần nhất</th><th></th></tr></thead>
+      <tbody>${list.map(a => `<tr data-acc="${a.rid}">
+        <td><b>${esc(a.name)}</b>${a.rid === me.rid ? ' <span class="pill">Bạn</span>' : ""}</td>
+        <td>${esc(a.email)}</td>
+        <td><select data-af="staffId" aria-label="Gắn với người">${staffOpts(a.staffId)}</select></td>
+        <td><select data-af="role" aria-label="Vai trò" ${a.rid === me.rid ? "disabled" : ""}>${Object.entries(ROLE).map(([k, l]) => `<option value="${k}" ${a.role === k ? "selected" : ""}>${l}</option>`).join("")}</select></td>
+        <td>${a.active ? statusHtml("good", "Đang dùng") : statusHtml("critical", "Đã khoá")}</td>
+        <td class="small muted nowrap">${a.lastLogin ? new Date(a.lastLogin).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" }) : "Chưa đăng nhập"}</td>
+        <td class="nowrap"><button class="btn ghost sm" data-act="resetPw">Đặt lại mật khẩu</button>${a.rid !== me.rid ? `<button class="btn ghost sm" data-act="toggleAcc">${a.active ? "Khoá" : "Mở khoá"}</button><button class="btn ghost sm danger" data-act="delAcc">Xoá</button>` : ""}</td>
+      </tr>`).join("")}</tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <div><h2>Nhật ký hoạt động</h2><p>${logsCache ? `${logs.length} / ${logsCache.length} mục` : "Đang tải…"} · thời gian theo máy của người dùng</p></div>
+      <div class="row">
+        <select id="lgWho" aria-label="Lọc theo người"><option value="">Tất cả mọi người</option>${accounts.map(a => `<option value="${esc(a.email)}" ${logFilter.email === a.email ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select>
+        <input type="date" id="lgFrom" value="${logFilter.from}" aria-label="Từ ngày" title="Từ ngày">
+        <input type="date" id="lgTo" value="${logFilter.to}" aria-label="Đến ngày" title="Đến ngày">
+        <input type="search" id="lgQ" value="${esc(logFilter.q)}" placeholder="Tìm việc, tên…" aria-label="Tìm trong nhật ký">
+        <button class="btn" data-act="reloadLogs">↻</button>
+        <button class="btn" data-act="exportLogs">⬇ Excel</button>
+      </div>
+    </div>
+    <div class="scroll"><table class="rtable">
+      <thead><tr><th>Thời gian</th><th>Người</th><th>Việc</th><th>Chi tiết</th></tr></thead>
+      <tbody>${logs.slice(0, 500).map(l => `<tr><td class="nowrap">${new Date(l.at).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" })}</td>
+        <td data-label="Người"><b>${esc(l.name)}</b><span class="small muted" style="display:block">${esc(l.email)}</span></td><td data-label="Việc">${esc(l.a)}</td><td data-label="Chi tiết" class="small">${esc(l.d)}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">${logsCache ? "Không có mục nào khớp bộ lọc." : "Đang tải nhật ký…"}</td></tr>`}</tbody>
+    </table></div>
+    ${logs.length > 500 ? `<p class="small muted" style="margin-top:8px">Đang hiện 500 mục mới nhất; dùng bộ lọc hoặc xuất Excel để xem hết.</p>` : ""}
+  </div>`;
+  $("#accForm").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    try {
+      const pw = $("#acPw").value.trim();
+      const a = await createAccount({ email: $("#acEmail").value, name: $("#acName").value, password: pw, role: $("#acRole").value, staffId: $("#acStaff").value || db.staff.find(x => x.name.trim().toLowerCase() === $("#acName").value.trim().toLowerCase())?.id || "" });
+      logAct("Tạo tài khoản", `${a.name} (${a.email})`);
+      newPwNotice = { label: "Đã tạo tài khoản", email: a.email, pw }; renderAccounts(); toast("Đã tạo tài khoản " + a.email);
+    } catch (e) { toast(e.message + infraHint(e.message)); }
+  });
+  if (!logsCache) loadLogs().then(() => { if (ui.tab === "accounts") renderAccounts(); }).catch(e => toast("Không tải được nhật ký: " + e.message));
+}
+async function bulkAccounts() {
+  const lines = $("#bulkAcc").value.split(/\r?\n/).map(l => l.split(/\t|,|;/).map(x => x.trim())).filter(c => c[0]);
+  const out = [], made = [];
+  for (const [email, name = "", pw0 = ""] of lines) {
+    const pw = pw0 || genPw();
+    const st = db.staff.find(s => s.name.trim().toLowerCase() === name.trim().toLowerCase());
+    try { const a = await createAccount({ email, name, password: pw, staffId: st?.id || "" }); made.push([a.email, a.name, pw, st ? st.name : ""]); }
+    catch (e) { out.push(e.message); }
+  }
+  if (made.length) logAct("Tạo tài khoản hàng loạt", `${made.length} tài khoản`);
+  renderAccounts();
+  $("#bulkResult").innerHTML = `${made.length ? `<p class="small" style="margin-top:10px"><b>Đã tạo ${made.length} tài khoản.</b> Ghi lại mật khẩu (sẽ không xem lại được):</p>
+    <div class="scroll"><table><thead><tr><th>Email</th><th>Họ tên</th><th>Mật khẩu</th><th>Gắn với</th></tr></thead><tbody>${made.map(m => `<tr><td>${esc(m[0])}</td><td>${esc(m[1])}</td><td><code>${esc(m[2])}</code></td><td>${esc(m[3]) || '<span class="muted">–</span>'}</td></tr>`).join("")}</tbody></table></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="exportMade">⬇ Tải danh sách này (Excel)</button></div>` : ""}
+    ${out.length ? `<p class="err" style="margin-top:8px">${out.map(esc).join("<br>")}</p>` : ""}`;
+  bulkAccounts.made = made;
+}
+
+// =====================================================================
 // 14. ĐIỀU HƯỚNG & SỰ KIỆN
 // =====================================================================
 const PAGES = {
@@ -1577,8 +1818,10 @@ const PAGES = {
   person: ["Theo dõi cá nhân", "Điểm, tiến độ và xếp loại của một người qua các tháng"],
   staff: ["Danh sách CB-GV-NV", "Người được theo dõi, đánh giá và phụ lục điểm cộng/trừ áp dụng"],
   data: ["Dữ liệu & hướng dẫn", "Thông tin đơn vị, sao lưu và cách tính điểm"],
+  accounts: ["Tài khoản & nhật ký", "Cấp tài khoản cho giáo viên và xem ai đã làm gì, lúc nào"],
 };
 function setTab(t) {
+  if (t === "accounts" && !isAdmin()) t = "overview";
   ui.tab = t;
   $("#pageTitle").textContent = PAGES[t][0]; $("#pageDesc").textContent = PAGES[t][1];
   document.title = PAGES[t][0] + " · Theo dõi nhiệm vụ · TH Bà Nà";
@@ -1594,7 +1837,7 @@ function render() {
   if (db.demo) bn.innerHTML = `<span>Hệ thống còn <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…). Hãy xoá trước khi nhập dữ liệu thật.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
   else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Vào <b>Danh sách CB-GV-NV</b> để thêm người hoặc nhập danh sách từ Excel.</span><span class="spacer"></span><button class="btn sm primary" data-tab-go="staff">Mở danh sách CB-GV-NV</button>`;
   bn.classList.toggle("hidden", !(db.demo || !db.staff.length));
-  ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData })[ui.tab]();
+  ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData, accounts: renderAccounts })[ui.tab]();
 }
 
 $("nav.tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); });
@@ -1603,12 +1846,28 @@ $("#demoBanner").addEventListener("click", e => { const b = e.target.closest("[d
 document.addEventListener("input", e => {
   if (ui.tab === "eval") { onEvalInput(e); return; }
   const el = e.target;
+  if (ui.tab === "accounts" && el.id === "lgQ") { logFilter.q = el.value; const pos = el.selectionStart; renderAccounts(); const n = $("#lgQ"); n.focus(); n.setSelectionRange(pos, pos); return; }
   if (ui.tab === "overview" && el.id === "fQ") { ui.filter.q = el.value; const pos = el.selectionStart; renderOverview(); const n = $("#fQ"); n.focus(); n.setSelectionRange(pos, pos); return; }
   if (ui.tab === "staff" && el.dataset.s && el.tagName === "INPUT") { const s = staffById(el.closest("[data-sid]").dataset.sid); s[el.dataset.s] = el.value; save(); return; }
   if (ui.tab === "data" && el.dataset.school) { db.school[el.dataset.school] = el.value; $("#schoolLine").textContent = db.school.name; save(); }
 });
-document.addEventListener("change", e => {
+document.addEventListener("change", async e => {
   const el = e.target;
+  if (ui.tab === "accounts") {
+    const tr = el.closest("[data-acc]");
+    if (tr && el.dataset.af) {
+      const a = accounts.find(x => x.rid === tr.dataset.acc);
+      if (el.dataset.af === "role" && el.value !== "admin" && accounts.filter(x => x.role === "admin" && x.active).length <= 1 && a.role === "admin") { toast("Cần ít nhất một tài khoản quản trị."); renderAccounts(); return; }
+      a[el.dataset.af] = el.value;
+      try { await saveAccount(a); logAct(el.dataset.af === "role" ? "Đổi vai trò tài khoản" : "Gắn tài khoản với người", `${a.name}: ${el.dataset.af === "role" ? ROLE[a.role] : staffNameOf(a.staffId)}`); toast("Đã lưu."); }
+      catch (err) { toast(err.message); }
+      return;
+    }
+    if (el.id === "lgWho") { logFilter.email = el.value; renderAccounts(); }
+    if (el.id === "lgFrom") { logFilter.from = el.value; renderAccounts(); }
+    if (el.id === "lgTo") { logFilter.to = el.value; renderAccounts(); }
+    return;
+  }
   if (ui.tab === "overview") {
     if (el.id === "pType") { ui.period = { type: el.value, value: defaultValue(el.value) }; renderOverview(); }
     else if (el.id === "pValue") { ui.period.value = el.value; renderOverview(); }
@@ -1666,14 +1925,14 @@ document.addEventListener("click", async e => {
     case "setStatus": {
       const s = b.dataset.s;
       if (s !== "nhap") { const c = calc(rec); if (!rec.tasks.length) { toast("Chưa có công việc nào trong phiếu."); break; } if (c.aFilled < CRIT_ITEMS.length && !confirm(`Phần A còn ${CRIT_ITEMS.length - c.aFilled} tiêu chí chưa chấm. Vẫn chuyển trạng thái?`)) break; }
-      rec.status = s; rec.updated = new Date().toISOString(); save(); renderEval(); break;
+      rec.status = s; rec.updated = new Date().toISOString(); save(); renderEval(); logAct("Chuyển trạng thái phiếu: " + RECORD_STATUS[s].label, recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
     }
     case "delRec": if (confirm(`Xoá phiếu ${monthLabel(ui.evalMonth)} của ${staffById(ui.evalStaff).name}?`)) {
       for (const e of [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || [])]) TB.removeFile(e.key).catch(() => {});
       delete db.records[rkey(ui.evalStaff, ui.evalMonth)]; save(); renderEval(); } break;
-    case "print": printRecord(); break;
-    case "exportMau01": exportMau01(); break;
-    case "exportSummary": exportSummary(); break;
+    case "print": printRecord(); logAct("In phiếu", recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
+    case "exportMau01": exportMau01(); logAct("Xuất Excel Mẫu 01", recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
+    case "exportSummary": exportSummary(); logAct("Xuất Excel tổng hợp", periodLabel(ui.period)); break;
     case "copyAI": {
       const text = aiPrompt();
       try { await navigator.clipboard.writeText(text); toast("Đã sao chép. Mở Gemini/ChatGPT/NotebookLM và dán (Ctrl+V)."); }
@@ -1698,6 +1957,35 @@ document.addEventListener("click", async e => {
       db.demo = false; initUi(); toast("Đang xoá dữ liệu mẫu trên máy chủ…"); await sync(); render(); break;
     }
     case "reload": reload(); break;
+    case "logout": logAct("Đăng xuất"); await flushLog(); try { localStorage.removeItem(SESSION_KEY); } catch (e) {} location.reload(); break;
+    case "genPw": $("#acPw").value = genPw(); break;
+    case "copyPw": try { await navigator.clipboard.writeText(newPwNotice.pw); toast("Đã sao chép mật khẩu."); } catch (e) { toast("Không sao chép được, hãy ghi lại."); } break;
+    case "closePw": newPwNotice = null; renderAccounts(); break;
+    case "bulkAcc": await bulkAccounts(); break;
+    case "exportMade": writeSheet("Tai_khoan_moi", [["Email", "Họ tên", "Mật khẩu", "Gắn với"], ...(bulkAccounts.made || [])], null, [30, 26, 14, 26]); break;
+    case "reloadLogs": logsCache = null; renderAccounts(); break;
+    case "exportLogs": {
+      const rows = (logsCache || []).filter(l => (!logFilter.email || l.email === logFilter.email) && (!logFilter.from || localDate(new Date(l.at)) >= logFilter.from) && (!logFilter.to || localDate(new Date(l.at)) <= logFilter.to));
+      writeSheet("Nhat_ky_hoat_dong", [["Thời gian", "Họ tên", "Email", "Việc", "Chi tiết"], ...rows.map(l => [new Date(l.at).toLocaleString("vi-VN"), l.name, l.email, l.a, l.d])], null, [20, 24, 28, 30, 60]); break;
+    }
+    case "resetPw": case "toggleAcc": case "delAcc": {
+      const a = accounts.find(x => x.rid === b.closest("[data-acc]").dataset.acc); if (!a) break;
+      try {
+        if (act === "resetPw") {
+          const pw = prompt(`Mật khẩu mới cho ${a.name} (${a.email}):`, genPw()); if (!pw) break;
+          if (pw.length < 4) { toast("Mật khẩu cần ít nhất 4 ký tự."); break; }
+          a.salt = uid() + uid(); a.hash = await hashPw(a.salt, pw); await saveAccount(a);
+          logAct("Đặt lại mật khẩu", `${a.name} (${a.email})`); newPwNotice = { label: "Đã đặt lại mật khẩu", email: a.email, pw };
+        } else if (act === "toggleAcc") {
+          a.active = !a.active; await saveAccount(a); logAct(a.active ? "Mở khoá tài khoản" : "Khoá tài khoản", `${a.name} (${a.email})`);
+        } else {
+          if (!confirm(`Xoá tài khoản ${a.email}? Nhật ký cũ của người này vẫn giữ.`)) break;
+          await TB.remove(APP, COL_ACC, a.rid); accounts = accounts.filter(x => x !== a); logAct("Xoá tài khoản", `${a.name} (${a.email})`);
+        }
+        renderAccounts();
+      } catch (e) { toast(e.message + infraHint(e.message)); }
+      break;
+    }
     case "upEv": {
       const files = await pickFiles(EV_ACCEPT); if (!files.length) break;
       await uploadEvidence(evList(rec, b.dataset.scope), files); renderEval(); break;
@@ -1707,7 +1995,7 @@ document.addEventListener("click", async e => {
       if (!e || !confirm(`Xoá minh chứng “${e.name}”?`)) break;
       try { await TB.removeFile(e.key); }
       catch (err) { if (!/Không tìm thấy/.test(err.message)) { toast(err.message); break; } }
-      list.splice(+it.dataset.ei, 1); save(true); renderEval(); toast("Đã xoá minh chứng."); break;
+      list.splice(+it.dataset.ei, 1); save(true); renderEval(); toast("Đã xoá minh chứng."); logAct("Xoá minh chứng", `${e.name} – ${recLabel(rkey(ui.evalStaff, ui.evalMonth))}`); break;
     }
   }
 });
@@ -1725,15 +2013,17 @@ $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab
 (async () => {
   try {
     if (!window.TB) throw new Error("Không nạp được thư viện dùng chung /lib/thbana.js.");
-    await loadAll();
-    initUi();
-    setMark("Đã tải lúc " + hhmm());
-    setTab(ui.tab);
+    await Promise.all([loadAll(), loadAccounts()]);
+    let sess = null; try { sess = JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); } catch (e) {}
+    const a = sess && accounts.find(x => x.rid === sess.rid && x.email === sess.email && x.active);
+    if (a) await startSession(a, false);
+    else loginScreen(!accounts.length);
   } catch (e) {
     $("#view").innerHTML = `<div class="card"><h2>Chưa tải được dữ liệu</h2><p style="margin-top:6px">${esc(e.message)}${esc(infraHint(e.message))}</p><p class="small muted">Hãy tải lại trang. Nếu vẫn lỗi, báo quản trị viên kèm thông báo trên.</p><button class="btn" onclick="location.reload()">Tải lại trang</button></div>`;
   }
 })();
-addEventListener("focus", () => { if (loaded) reload(true); });
+addEventListener("focus", () => { if (loaded && me) reload(true); });
+addEventListener("pagehide", () => { flushLog(); });
 addEventListener("beforeunload", e => { if (loaded && (syncing || hasLocalChanges())) { sync(); e.preventDefault(); e.returnValue = ""; } });
 })();
 </script>
