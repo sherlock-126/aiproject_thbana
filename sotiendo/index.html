@@ -1,0 +1,1098 @@
+<title>Sổ tiến độ nhiệm vụ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one working column, max 1180px; a quiet top bar, then tool panels. Ledger-green accent, warm green-grey neutrals. */
+:root {
+  --bg: #f4f6f2;
+  --surface: #ffffff;
+  --surface-2: #edf0ea;
+  --line: #dde2d9;
+  --ink: #15201b;
+  --ink-2: #47524c;
+  --ink-3: #6e7a73;
+  --accent: #1d6b57;
+  --accent-ink: #ffffff;
+  --accent-soft: #e1eee8;
+  --accent-text: #175846;
+  --good: #0ca30c; --good-text: #006300;
+  --warning: #fab219; --warning-text: #7a5300; --warning-soft: #fff4d6;
+  --serious: #ec835a; --serious-text: #a2441c;
+  --critical: #d03b3b; --critical-text: #b42f2f; --critical-soft: #fbe7e5;
+  --shadow: 0 1px 2px rgba(20, 40, 30, .05);
+  --font: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111513; --surface: #191e1c; --surface-2: #212725; --line: #2e3532;
+    --ink: #eef2ef; --ink-2: #bfc8c3; --ink-3: #8d9892;
+    --accent: #4fb595; --accent-ink: #07130e; --accent-soft: #1b2d26; --accent-text: #7fd0b4;
+    --good-text: #4cc94c; --warning-text: #fab219; --warning-soft: #2e2713; --serious-text: #f0a07f;
+    --critical-text: #ef7a7a; --critical-soft: #331c1c; --shadow: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111513; --surface: #191e1c; --surface-2: #212725; --line: #2e3532;
+  --ink: #eef2ef; --ink-2: #bfc8c3; --ink-3: #8d9892;
+  --accent: #4fb595; --accent-ink: #07130e; --accent-soft: #1b2d26; --accent-text: #7fd0b4;
+  --good-text: #4cc94c; --warning-text: #fab219; --warning-soft: #2e2713; --serious-text: #f0a07f;
+  --critical-text: #ef7a7a; --critical-soft: #331c1c; --shadow: none;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.5 var(--font); margin: 0; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 18px 64px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+h2 { font-size: 16px; font-weight: 650; }
+h3 { font-size: 14px; font-weight: 650; }
+p { margin: 0; }
+.muted { color: var(--ink-3); }
+.small { font-size: 12.5px; }
+.num { font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+
+.topbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.brand { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.brand .mark { width: 36px; height: 36px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; flex: none; }
+.brand .sub { color: var(--ink-3); font-size: 12.5px; }
+.who { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+.who img { width: 26px; height: 26px; border-radius: 50%; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 16px; overflow-x: auto; }
+.tabs button { border: 0; background: none; font: inherit; color: var(--ink-2); padding: 9px 12px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+.stack { display: grid; gap: 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.between { justify-content: space-between; }
+.spacer { flex: 1; }
+.grid-kpi { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 0; }
+.kpi .v { font-size: 24px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 12.5px; color: var(--ink-2); }
+.kpi .n { font-size: 12px; color: var(--ink-3); }
+
+input[type=text], input[type=number], input[type=date], input[type=month], input[type=search], select, textarea {
+  font: inherit; font-size: 13.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 7px 9px; min-width: 0; max-width: 100%;
+}
+textarea { width: 100%; resize: vertical; line-height: 1.45; }
+input:disabled, select:disabled, textarea:disabled { background: var(--surface-2); color: var(--ink-2); }
+label.f { display: grid; gap: 3px; font-size: 12px; color: var(--ink-3); min-width: 0; }
+label.f > * { width: 100%; }
+.btn { font: inherit; font-size: 13.5px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 7px 13px; cursor: pointer; white-space: nowrap; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.07); }
+.btn.ghost { border-color: transparent; background: none; color: var(--ink-2); }
+.btn.ghost:hover { background: var(--surface-2); }
+.btn.danger { color: var(--critical-text); }
+.btn.sm { padding: 4px 9px; font-size: 12.5px; }
+.btn:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.pill.accent { background: var(--accent-soft); color: var(--accent-text); }
+.st { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 13px; color: var(--ink-2); }
+.st svg { flex: none; }
+.notice { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); color: var(--ink-2); font-size: 13px; }
+.notice.warn { background: var(--warning-soft); }
+.notice.bad { background: var(--critical-soft); }
+.notice.ok { background: var(--accent-soft); }
+.notice svg { flex: none; margin-top: 2px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; font-weight: 500; color: var(--ink-3); white-space: nowrap; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+td.c, th.c { text-align: center; }
+tbody tr:last-child td { border-bottom: 0; }
+tr.click { cursor: pointer; }
+tr.click:hover td { background: var(--surface-2); }
+.scroll { overflow-x: auto; }
+.bar { display: inline-flex; align-items: center; gap: 6px; }
+.bar i { width: 56px; height: 6px; border-radius: 3px; background: var(--surface-2); position: relative; overflow: hidden; display: block; }
+.bar i b { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 3px; }
+
+/* Task cards */
+.group-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); font-weight: 600; font-size: 13px; }
+.task { border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 10px; background: var(--surface); }
+.task[data-tt="xong"] { border-left-color: var(--good); }
+.task[data-tt="dang"] { border-left-color: var(--accent); }
+.task[data-tt="khong"] { border-left-color: var(--critical); }
+.task.late { border-left-color: var(--critical); }
+.task-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+.task-fields { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.task-fields .w2 { grid-column: span 2; }
+.task-fields .w4 { grid-column: span 4; }
+.prog { display: flex; align-items: center; gap: 8px; }
+.prog input[type=range] { flex: 1; accent-color: var(--accent); min-width: 0; }
+.prog output { width: 42px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.ev { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.ev-item { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px 5px 5px; background: var(--surface); max-width: 100%; min-width: 0; }
+.ev-item .thumb { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; background: var(--surface-2); flex: none; cursor: zoom-in; border: 0; padding: 0; }
+.ev-item .ficon { width: 44px; height: 44px; border-radius: 6px; background: var(--surface-2); display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--ink-2); flex: none; }
+.ev-item .meta { min-width: 0; display: grid; }
+.ev-item .meta a, .ev-item .meta span.nm { font-size: 12.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+.ev-item .meta a { color: var(--accent-text); }
+.ev-item .meta small { font-size: 11.5px; color: var(--ink-3); }
+.drop { border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; color: var(--ink-3); font-size: 12.5px; cursor: pointer; background: none; font-family: inherit; }
+.drop:hover, .drop.over { border-color: var(--accent); color: var(--accent-text); }
+.review { border-radius: 8px; padding: 8px 10px; background: var(--warning-soft); font-size: 13px; color: var(--ink); }
+.review.ok { background: var(--accent-soft); }
+
+.matrix td { text-align: center; padding: 6px 4px; }
+.matrix td:first-child, .matrix th:first-child { text-align: left; white-space: nowrap; }
+.cell { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; font-size: 11px; color: var(--ink-3); }
+
+.log { list-style: none; margin: 0; padding: 0; font-size: 12.5px; }
+.log li { display: flex; gap: 10px; padding: 4px 0; border-bottom: 1px dashed var(--line); }
+.log li:last-child { border-bottom: 0; }
+.log time { color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.82); display: grid; place-items: center; z-index: 60; padding: 24px; }
+.lightbox img { max-width: 100%; max-height: 86vh; border-radius: 8px; }
+.lightbox .cap { color: #fff; margin-top: 8px; font-size: 13px; text-align: center; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 14px; border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 70; max-width: calc(100% - 32px); }
+.toast.on { opacity: 1; }
+.empty { text-align: center; padding: 28px 16px; color: var(--ink-3); }
+.empty h2 { color: var(--ink); margin-bottom: 6px; }
+.steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+
+@media (max-width: 980px) { .grid-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } .two { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 720px) {
+  .task-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .task-fields .w2, .task-fields .w4 { grid-column: span 2; }
+}
+@media (max-width: 460px) { .grid-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi .v { font-size: 20px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">TĐ</div>
+      <div style="min-width:0">
+        <h1>Sổ tiến độ nhiệm vụ</h1>
+        <p class="sub" id="schoolLine">Cập nhật tiến độ và minh chứng hằng tháng</p>
+      </div>
+    </div>
+    <div class="who" id="who"></div>
+  </header>
+  <nav class="tabs" id="tabs" hidden></nav>
+  <main id="main">
+    <div class="panel empty"><h2>Đang mở sổ…</h2><p>Đang kết nối dữ liệu dùng chung của nhà trường.</p></div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script>
+(() => {
+"use strict";
+
+// ---------------------------------------------------------------- constants
+const GROUPS = [
+  [1, "I. Nhiệm vụ theo chương trình, kế hoạch"],
+  [2, "II. Nhiệm vụ chuyên môn, thường xuyên"],
+  [3, "III. Nhiệm vụ đột xuất, phát sinh"],
+  [4, "IV. Nhiệm vụ khác (họp, tập huấn, bồi dưỡng…)"],
+];
+const TT = { chua: "Chưa bắt đầu", dang: "Đang thực hiện", xong: "Hoàn thành", khong: "Không hoàn thành" };
+const TC = { bt: "Bình thường", pt: "Phức tạp", rpt: "Rất phức tạp" };
+const MD = { chu: "Chủ trì", phoi: "Phối hợp" };
+const CL = { chua: "Chưa đảm bảo", dam: "Đảm bảo", vuot: "Vượt mức" };
+const TYPES = { gvcn: "GV chủ nhiệm", gvbm: "GV bộ môn", cbnv: "BGH, TPT, NV" };
+const ACCEPT = ["image/png", "image/jpeg", "image/gif", "image/webp", "application/pdf", "video/mp4", "video/webm", "text/plain", "text/csv"];
+const EXT_TYPE = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp", pdf: "application/pdf", mp4: "video/mp4", webm: "video/webm", txt: "text/plain", csv: "text/csv" };
+
+const ICON = {
+  good: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--good)"/><path d="M4 7.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warning: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--warning)"/><path d="M7 3.6V7l2.2 1.4" stroke="#3a2a00" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+  serious: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--serious)"/><circle cx="4.2" cy="7" r="1" fill="#fff"/><circle cx="7" cy="7" r="1" fill="#fff"/><circle cx="9.8" cy="7" r="1" fill="#fff"/></svg>',
+  critical: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--critical)"/><path d="M7 3.5v4.2" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/><circle cx="7" cy="10.2" r="1" fill="#fff"/></svg>',
+  none: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="none" stroke="var(--ink-3)" stroke-width="1.5" stroke-dasharray="2 2"/></svg>',
+};
+const STATUS = {
+  chuadk: ["none", "Chưa có tài khoản"],
+  chuatao: ["critical", "Chưa cập nhật"],
+  dang: ["serious", "Đang cập nhật"],
+  trehan: ["critical", "Quá hạn, chưa nộp"],
+  cho: ["warning", "Chờ duyệt"],
+  nopLai: ["warning", "Đã nộp lại, chờ duyệt"],
+  tralai: ["serious", "Đã trả lại để bổ sung"],
+  duyet: ["good", "Đã duyệt"],
+};
+const stHtml = k => `<span class="st">${ICON[STATUS[k][0]]}${STATUS[k][1]}</span>`;
+
+// ---------------------------------------------------------------- helpers
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const clone = o => JSON.parse(JSON.stringify(o));
+const stable = o => JSON.stringify(o, (k, v) => v && typeof v === "object" && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
+const pad = n => String(n).padStart(2, "0");
+const now = () => new Date();
+const ymOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+const todayStr = () => { const d = now(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const addMonth = (k, n) => { let [y, m] = k.split("-").map(Number); m += n; while (m > 12) { m -= 12; y++; } while (m < 1) { m += 12; y--; } return `${y}-${pad(m)}`; };
+const monthLabel = k => { const [y, m] = k.split("-").map(Number); return `Tháng ${m}/${y}`; };
+const monthShort = k => { const [y, m] = k.split("-").map(Number); return `T${m}`; };
+const lastDay = k => { const [y, m] = k.split("-").map(Number); return new Date(y, m, 0).getDate(); };
+const fmtDate = s => { if (!s) return ""; const [y, m, d] = s.split("-"); return `${+d}/${+m}/${y}`; };
+const fmtTime = iso => iso ? new Date(iso).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" }) : "";
+const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+const pct = v => v == null || isNaN(v) ? "–" : Math.round(v) + "%";
+const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+const schoolYearOf = k => { const [y, m] = k.split("-").map(Number); return m >= 9 ? y : y - 1; };
+const syMonths = y => [9, 10, 11, 12].map(m => `${y}-${pad(m)}`).concat([1, 2, 3, 4, 5, 6, 7, 8].map(m => `${y + 1}-${pad(m)}`));
+
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("on"), 3200); }
+
+// ---------------------------------------------------------------- state
+const S = {
+  ready: false, db: null, user: null, assets: null, downloads: null,
+  uid: null, me: null, isOwner: false, readOnly: false,
+  school: { name: "", donVi: "", deadlineDay: 25, deadlineNext: false },
+  roster: [], common: {},
+  myProfile: undefined, myReviewSum: null,
+  tab: "mine", month: ymOf(now()),
+  M: undefined, R: null, dirty: false, saveState: "",
+  reports: new Map(), reviews: new Map(), profiles: {},
+  mView: "month", mMonth: ymOf(now()), detail: null, detailDoc: undefined, detailReview: null, assetTimes: null,
+  setupMonth: ymOf(now()), rosterDraft: null, commonDraft: null,
+};
+const subs = {};
+function resub(key, fn) { if (subs[key]) { subs[key](); delete subs[key]; } if (fn) subs[key] = fn(); }
+
+const deadlineOf = ym => {
+  const k = S.school.deadlineNext ? addMonth(ym, 1) : ym;
+  const d = Math.min(S.school.deadlineDay || 25, lastDay(k));
+  return `${k}-${pad(d)}`;
+};
+
+// serialised writes per path
+const queues = new Map();
+function write(path, fn) {
+  const prev = queues.get(path) || Promise.resolve();
+  const p = prev.catch(() => {}).then(fn);
+  queues.set(path, p);
+  return p;
+}
+function dbError(e, what) {
+  console.warn(what, e);
+  if (e && e.code === "invalid_argument") { S.readOnly = true; toast("Tài khoản của bạn chưa được phép ghi dữ liệu. Hãy nhờ BGH cấp quyền."); render(); }
+  else if (e && e.code === "quota_exceeded") toast("Kho dữ liệu đã đầy. Hãy báo BGH.");
+  else toast("Chưa lưu được, đang thử lại khi bạn sửa tiếp. (" + (e?.code || "lỗi") + ")");
+}
+
+// ---------------------------------------------------------------- task maths
+function taskTiming(t, ym) {
+  const due = t.han || deadlineOf(ym);
+  if (t.tt === "xong") {
+    if (!t.ngayXong) return { k: "dung", d: 0 };
+    const d = daysBetween(due, t.ngayXong);
+    return d < 0 ? { k: "som", d } : d === 0 ? { k: "dung", d } : { k: "tre", d };
+  }
+  if (t.tt !== "khong" && todayStr() > due) return { k: "quahan", d: daysBetween(due, todayStr()) };
+  return { k: "", d: 0 };
+}
+function summarize(M) {
+  const s = { n: 0, xong: 0, dang: 0, chua: 0, khong: 0, som: 0, dung: 0, tre: 0, quahan: 0, ev: 0, thieuEv: 0, pctSum: 0 };
+  for (const t of M.tasks) {
+    s.n++; s[t.tt] = (s[t.tt] || 0) + 1;
+    const p = t.tt === "xong" ? 100 : (t.pct || 0); s.pctSum += p;
+    const tm = taskTiming(t, M.ym); if (tm.k) s[tm.k]++;
+    const ne = (t.ev || []).length; s.ev += ne; if (t.tt === "xong" && !ne) s.thieuEv++;
+  }
+  return { n: s.n, xong: s.xong, dang: s.dang, chua: s.chua, khong: s.khong, som: s.som, dung: s.dung, tre: s.tre, quahan: s.quahan, ev: s.ev, thieuEv: s.thieuEv,
+    pct: s.n ? Math.round(s.pctSum / s.n) : 0, status: M.status, submittedAt: M.submittedAt || null, updatedAt: M.updatedAt || null };
+}
+function statusFor(profile, ym, reviewSum) {
+  if (!profile) return "chuadk";
+  const s = profile.months?.[ym];
+  const rv = reviewSum?.months?.[ym];
+  if (!s) return todayStr() > deadlineOf(ym) ? "trehan" : "chuatao";
+  if (s.status !== "nop") {
+    if (rv?.status === "tralai") return "tralai";
+    return todayStr() > deadlineOf(ym) ? "trehan" : "dang";
+  }
+  if (rv && rv.at >= s.submittedAt) return rv.status === "duyet" ? "duyet" : "tralai";
+  return rv ? "nopLai" : "cho";
+}
+function submitTiming(sum, ym) {
+  if (!sum?.submittedAt) return null;
+  const d = daysBetween(deadlineOf(ym), sum.submittedAt.slice(0, 10));
+  return d <= 0 ? { ok: true, txt: "Đúng hạn" } : { ok: false, txt: `Trễ ${d} ngày` };
+}
+
+// ---------------------------------------------------------------- boot
+async function boot() {
+  const c = window.claude;
+  if (!c || !c.use) { renderNoAccess("Hãy mở trang này từ đường link Claude mà nhà trường đã chia sẻ cho bạn."); return; }
+  const [db, user, assets, downloads] = await Promise.all(["db", "user", "assets", "downloads"].map(n => c.use(n).catch(() => null)));
+  S.db = db; S.user = user; S.assets = assets; S.downloads = downloads;
+  if (!db) { renderNoAccess("Bạn cần đăng nhập Claude bằng đúng email mà nhà trường đã mời để dùng sổ này."); return; }
+  if (user) {
+    S.me = await user.me();
+    S.uid = S.me.id;
+    S.isOwner = S.me.isOwner;
+  }
+  S.tab = S.isOwner ? "manage" : "mine";
+  try { const t = sessionStorage.getItem("std-tab"); if (t && S.isOwner) S.tab = t; } catch (e) {}
+
+  resub("school", () => db.doc("config/school").onSnapshot(s => { if (s.exists) S.school = { ...S.school, ...s.data() }; render(); }, e => console.warn(e)));
+  resub("roster", () => db.doc("config/roster").onSnapshot(s => { S.roster = s.exists ? (s.data().staff || []) : []; render(); }, e => console.warn(e)));
+  resub("common", () => db.doc("config/common").onSnapshot(s => { S.common = s.exists ? (s.data().months || {}) : {}; if (S.tab === "setup") return; render(); }, e => console.warn(e)));
+  if (S.uid) {
+    resub("myProfile", () => db.doc(`reports/${S.uid}`).onSnapshot(s => { S.myProfile = s.exists ? s.data() : null; render(); }, e => console.warn(e)));
+    resub("myReviewSum", () => db.doc(`reviews/${S.uid}`).onSnapshot(s => { S.myReviewSum = s.exists ? s.data() : null; if (S.tab === "mine") render(); }, e => console.warn(e)));
+    subMonth();
+  }
+  if (S.isOwner) {
+    resub("reports", () => db.collection("reports").onSnapshot(q => { S.reports = new Map(q.docs.map(d => [d.id, d.data()])); refreshProfiles(); render(); }, e => console.warn(e)));
+    resub("reviews", () => db.collection("reviews").onSnapshot(q => { S.reviews = new Map(q.docs.map(d => [d.id, d.data()])); render(); }, e => console.warn(e)));
+  }
+  S.ready = true;
+  render();
+}
+async function refreshProfiles() {
+  if (!S.user) return;
+  const ids = [...S.reports.keys()];
+  if (!ids.length) return;
+  S.profiles = await S.user.profiles(ids);
+  render();
+}
+
+function subMonth() {
+  if (!S.uid) return;
+  const ym = S.month;
+  S.M = undefined; S.R = null; S.dirty = false;
+  resub("month", () => S.db.doc(`reports/${S.uid}/months/${ym}`).onSnapshot(s => {
+    if (ym !== S.month) return;
+    if (S.dirty || s.metadata.hasPendingWrites) return;
+    const data = s.exists ? s.data() : null;
+    if (S.M !== undefined && stable(data) === stable(S.M)) return;
+    S.M = data ? clone(data) : null;
+    if (S.tab === "mine") render();
+  }, e => console.warn(e)));
+  resub("review", () => S.db.doc(`reviews/${S.uid}/months/${ym}`).onSnapshot(s => {
+    if (ym !== S.month) return;
+    S.R = s.exists ? s.data() : null;
+    if (S.tab === "mine" && !document.activeElement?.closest?.(".task")) render();
+  }, e => console.warn(e)));
+}
+
+// ---------------------------------------------------------------- teacher saving
+let saveTimer;
+function scheduleSave(immediate) {
+  S.dirty = true; setSaveState("Đang lưu…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, immediate ? 0 : 900);
+}
+async function flush() {
+  if (!S.M || S.readOnly) return;
+  const ym = S.M.ym, uidv = S.uid;
+  S.M.updatedAt = now().toISOString();
+  const snap = clone(S.M);
+  const mp = `reports/${uidv}/months/${ym}`, pp = `reports/${uidv}`;
+  try {
+    await write(mp, () => S.db.doc(mp).set(snap));
+    const sum = summarize(snap);
+    await write(pp, () => S.db.doc(pp).update({ months: { [ym]: sum }, lastActive: snap.updatedAt }));
+    if (stable(snap) === stable({ ...S.M, updatedAt: snap.updatedAt })) S.dirty = false;
+    setSaveState("Đã lưu lúc " + new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }));
+  } catch (e) { setSaveState("Chưa lưu được"); dbError(e, "save"); }
+}
+function setSaveState(t) { S.saveState = t; const el = $("#saveState"); if (el) el.textContent = t; }
+function logAction(a) { S.M.log = (S.M.log || []).concat({ at: now().toISOString(), a }).slice(-200); }
+
+// ---------------------------------------------------------------- render shell
+function render() {
+  if (!S.ready) return;
+  $("#schoolLine").textContent = S.school.name ? `${S.school.name}${S.school.donVi ? " · " + S.school.donVi : ""}` : "Cập nhật tiến độ và minh chứng hằng tháng";
+  const who = $("#who");
+  if (S.me) {
+    const nm = S.me.name || (S.myProfile?.name) || "Bạn";
+    who.innerHTML = `<img alt="" src="${esc(S.me.avatarUrl)}"><span></span>${S.isOwner ? '<span class="pill accent">Quản lý</span>' : ""}`;
+    who.querySelector("span").textContent = nm;
+  }
+  const tabs = $("#tabs");
+  if (S.isOwner) {
+    tabs.hidden = false;
+    tabs.innerHTML = [["manage", "Theo dõi giáo viên"], ["setup", "Thiết lập"], ["mine", "Báo cáo của tôi"]]
+      .map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${S.tab === k}">${l}</button>`).join("");
+  } else tabs.hidden = true;
+  if (S.tab === "manage") renderManage();
+  else if (S.tab === "setup") renderSetup();
+  else renderMine();
+}
+function renderNoAccess(msg) {
+  $("#main").innerHTML = `<div class="panel empty"><h2>Chưa mở được sổ</h2><p>${esc(msg)}</p></div>`;
+}
+
+// ---------------------------------------------------------------- teacher view
+function renderMine() {
+  const main = $("#main");
+  if (!S.uid) { main.innerHTML = `<div class="panel empty"><h2>Chưa xác định được tài khoản</h2><p>Hãy đăng nhập Claude rồi mở lại đường link.</p></div>`; return; }
+  if (S.myProfile === undefined) { main.innerHTML = `<div class="panel empty"><p>Đang tải hồ sơ của bạn…</p></div>`; return; }
+  if (!S.myProfile) { renderRegister(); return; }
+  const P = S.myProfile, ym = S.month, M = S.M, R = S.R;
+  const dl = deadlineOf(ym);
+  const rvSum = S.myReviewSum?.months?.[ym];
+  const st = statusFor(P, ym, S.myReviewSum);
+  const locked = !M || M.status === "nop" && !(rvSum?.status === "tralai" && rvSum.at >= (M.submittedAt || "")) || st === "duyet";
+  const editable = M && !locked && !S.readOnly;
+
+  let head = `<div class="panel">
+    <div class="row between" style="align-items:flex-start">
+      <div class="stack" style="gap:4px">
+        <span class="eyebrow">Báo cáo tiến độ</span>
+        <h2>${esc(P.name)}</h2>
+        <p class="small muted">${esc([P.chucVu, P.to, P.lop ? "Lớp " + P.lop : ""].filter(Boolean).join(" · "))}${S.isOwner ? "" : ` · <button class="btn ghost sm" data-act="editProfile">Sửa thông tin</button>`}</p>
+      </div>
+      <div class="row">
+        <button class="btn sm" data-act="prevMonth" aria-label="Tháng trước">‹</button>
+        <input type="month" id="mMonth" value="${ym}" aria-label="Chọn tháng">
+        <button class="btn sm" data-act="nextMonth" aria-label="Tháng sau">›</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px;gap:14px">
+      ${stHtml(st)}
+      <span class="small muted">Hạn nộp: <b class="num">${fmtDate(dl)}</b>${todayStr() <= dl ? ` (còn ${daysBetween(todayStr(), dl)} ngày)` : ""}</span>
+      ${M?.submittedAt ? `<span class="small muted">Nộp lúc ${fmtTime(M.submittedAt)}</span>` : ""}
+      <span class="spacer"></span>
+      <span class="small muted" id="saveState">${esc(S.saveState)}</span>
+    </div>
+  </div>`;
+
+  if (S.readOnly) head += `<div class="notice bad">${ICON.critical}<span>Tài khoản của bạn hiện chỉ xem được, chưa ghi được dữ liệu. Hãy nhờ BGH mời lại bạn với quyền <b>Người chỉnh sửa (Editor)</b>.</span></div>`;
+  if (M === undefined) { main.innerHTML = head + `<div class="panel empty"><p>Đang tải báo cáo ${monthLabel(ym).toLowerCase()}…</p></div>`; return; }
+  if (M === null) {
+    const commons = commonFor(ym, P.type);
+    main.innerHTML = `<div class="stack">${head}<div class="panel empty">
+      <h2>Chưa có báo cáo ${monthLabel(ym).toLowerCase()}</h2>
+      <p style="margin-bottom:14px">Tạo báo cáo để liệt kê các nhiệm vụ được giao, rồi cập nhật tiến độ và tải minh chứng khi làm xong.</p>
+      <div class="row" style="justify-content:center">
+        <button class="btn primary" data-act="createMonth" ${S.readOnly ? "disabled" : ""}>Tạo báo cáo ${commons.length ? `(gồm ${commons.length} nhiệm vụ chung)` : ""}</button>
+        <button class="btn" data-act="createFromPrev" ${S.readOnly ? "disabled" : ""}>Tạo và chép nhiệm vụ từ ${monthLabel(addMonth(ym, -1)).toLowerCase()}</button>
+      </div></div></div>`;
+    return;
+  }
+
+  const sum = summarize(M);
+  let notices = "";
+  if (rvSum?.status === "tralai" && rvSum.at >= (M.submittedAt || "")) notices += `<div class="notice warn">${ICON.serious}<div><b>BGH đã trả lại báo cáo để bổ sung.</b>${R?.note ? `<div style="margin-top:4px;white-space:pre-wrap"></div>` : ""} Sửa theo góp ý rồi bấm <b>Nộp lại</b>.</div></div>`;
+  if (st === "duyet") notices += `<div class="notice ok">${ICON.good}<div><b>Báo cáo đã được duyệt</b>${R?.at ? " lúc " + fmtTime(R.at) : ""}.${R?.note ? `<div style="margin-top:4px;white-space:pre-wrap" data-fill="rnote"></div>` : ""}</div></div>`;
+  if (M.status === "nop" && locked && st !== "duyet") notices += `<div class="notice">${ICON.warning}<span>Báo cáo đã nộp và đang chờ duyệt. Nếu cần sửa, bấm <b>Rút lại để sửa</b> (việc rút lại được ghi vào lịch sử).</span></div>`;
+  if (!S.assets && !S.readOnly) notices += `<div class="notice">${ICON.none}<span>Tài khoản của bạn chưa có quyền tải minh chứng lên (cần quyền <b>Người chỉnh sửa/Editor</b>). Bạn vẫn cập nhật tiến độ được.</span></div>`;
+
+  const kpis = `<div class="grid-kpi">
+    <div class="kpi"><div class="l">Nhiệm vụ</div><div class="v">${sum.n}</div><div class="n">${sum.dang} đang làm · ${sum.chua} chưa bắt đầu</div></div>
+    <div class="kpi"><div class="l">Hoàn thành</div><div class="v">${sum.xong}/${sum.n}</div><div class="n">Tiến độ chung ${pct(sum.pct)}</div></div>
+    <div class="kpi"><div class="l">Đúng và sớm hạn</div><div class="v">${sum.som + sum.dung}</div><div class="n">${sum.tre} việc trễ hạn</div></div>
+    <div class="kpi"><div class="l">Quá hạn chưa xong</div><div class="v" style="color:${sum.quahan ? "var(--critical-text)" : "inherit"}">${sum.quahan}</div><div class="n">${sum.khong} không hoàn thành</div></div>
+    <div class="kpi"><div class="l">Minh chứng</div><div class="v">${sum.ev}</div><div class="n">tệp đã tải lên</div></div>
+    <div class="kpi"><div class="l">Xong nhưng thiếu minh chứng</div><div class="v" style="color:${sum.thieuEv ? "var(--critical-text)" : "inherit"}">${sum.thieuEv}</div><div class="n">cần bổ sung</div></div>
+  </div>`;
+
+  const groups = GROUPS.map(([g, label]) => {
+    const ts = M.tasks.filter(t => t.g === g);
+    return `<div class="group-h"><span>${label}</span>${editable ? `<button class="btn sm" data-act="addTask" data-g="${g}">+ Thêm nhiệm vụ</button>` : ""}</div>
+      ${ts.length ? ts.map(t => taskCard(t, ym, editable, R?.tasks?.[t.id])).join("") : `<p class="small muted" style="padding:2px 12px 6px">Chưa có nhiệm vụ nào.</p>`}`;
+  }).join("");
+
+  const actions = `<div class="panel row">
+    ${editable ? `<button class="btn" data-act="copyPrev">Chép nhiệm vụ từ tháng trước</button>` : ""}
+    <span class="spacer"></span>
+    ${editable ? `<button class="btn primary" data-act="submit">${M.submittedAt ? "Nộp lại báo cáo" : "Nộp báo cáo tháng"}</button>` : ""}
+    ${M.status === "nop" && locked && st !== "duyet" && !S.readOnly ? `<button class="btn" data-act="withdraw">Rút lại để sửa</button>` : ""}
+  </div>`;
+
+  const log = `<details class="panel"><summary style="cursor:pointer"><b>Lịch sử cập nhật</b> <span class="small muted">(${(M.log || []).length} mục)</span></summary>
+    <ul class="log" style="margin-top:8px">${(M.log || []).slice().reverse().map(l => `<li><time>${fmtTime(l.at)}</time><span>${esc(l.a)}</span></li>`).join("")}</ul></details>`;
+
+  main.innerHTML = `<div class="stack">${head}${notices}${kpis}<div class="panel stack">${groups}</div>${actions}${log}</div>`;
+  const rn = $('[data-fill="rnote"]'); if (rn) rn.textContent = "Nhận xét: " + R.note;
+  const rn2 = $(".notice.warn div div"); if (rn2 && R?.note) rn2.textContent = "Góp ý: " + R.note;
+}
+
+function taskCard(t, ym, editable, rv) {
+  const tm = taskTiming(t, ym);
+  const dis = editable ? "" : "disabled";
+  const o = (map, v) => Object.entries(map).map(([k, l]) => `<option value="${k}" ${v === k ? "selected" : ""}>${l}</option>`).join("");
+  const timing = tm.k === "som" ? `<span class="st">${ICON.good}Sớm ${-tm.d} ngày</span>` : tm.k === "dung" ? `<span class="st">${ICON.good}Đúng hạn</span>`
+    : tm.k === "tre" ? `<span class="st">${ICON.critical}Trễ ${tm.d} ngày</span>` : tm.k === "quahan" ? `<span class="st">${ICON.critical}Quá hạn ${tm.d} ngày</span>` : "";
+  const ev = (t.ev || []).map(e => evItem(e, editable)).join("");
+  return `<div class="task ${tm.k === "quahan" ? "late" : ""}" data-tid="${t.id}" data-tt="${t.tt}">
+    <div class="task-top">
+      <label class="f"><span>Nội dung nhiệm vụ / sản phẩm được giao ${t.chung ? '<span class="pill accent">Nhiệm vụ chung</span>' : ""}</span>
+        <textarea rows="2" data-f="nd" ${dis} placeholder="Ví dụ: Hoàn thành kế hoạch bài dạy tháng ${+ym.split("-")[1]} lớp 5/3">${esc(t.nd)}</textarea></label>
+      ${editable ? `<button class="btn ghost sm danger" data-act="delTask" title="Xoá nhiệm vụ" aria-label="Xoá nhiệm vụ">Xoá</button>` : `<span>${timing}</span>`}
+    </div>
+    <div class="task-fields">
+      <label class="f"><span>Nhóm</span><select data-f="g" ${dis}>${GROUPS.map(([g, l]) => `<option value="${g}" ${t.g === g ? "selected" : ""}>${l.split(".")[0]}</option>`).join("")}</select></label>
+      <label class="f"><span>Tính chất</span><select data-f="tc" ${dis}>${o(TC, t.tc)}</select></label>
+      <label class="f"><span>Vai trò</span><select data-f="md" ${dis}>${o(MD, t.md)}</select></label>
+      <label class="f"><span>Hạn hoàn thành</span><input type="date" data-f="han" value="${esc(t.han || "")}" ${dis}></label>
+      <label class="f"><span>Trạng thái</span><select data-f="tt" ${dis}>${o(TT, t.tt)}</select></label>
+      ${t.tt === "xong" ? `<label class="f"><span>Ngày hoàn thành</span><input type="date" data-f="ngayXong" value="${esc(t.ngayXong || "")}" ${dis}></label>`
+        : `<label class="f"><span>Mức độ hoàn thành</span><span class="prog"><input type="range" min="0" max="100" step="10" data-f="pct" value="${t.pct || 0}" ${dis} aria-label="Phần trăm hoàn thành"><output>${t.pct || 0}%</output></span></label>`}
+      <label class="f w4"><span>${t.tt === "khong" ? "Lý do chưa hoàn thành" : "Kết quả / sản phẩm đã thực hiện (ghi rõ văn bản, số liệu)"}</span>
+        <textarea rows="2" data-f="kq" ${dis}>${esc(t.kq || "")}</textarea></label>
+      ${t.tt === "xong" ? `<label class="f w2"><span>Tự đánh giá chất lượng</span><select data-f="cl" ${dis}>${o(CL, t.cl || "dam")}</select></label>` : `<div class="w2 row" style="align-items:flex-end">${timing}</div>`}
+    </div>
+    <div class="stack" style="gap:6px">
+      <span class="small muted">Minh chứng ${t.tt === "xong" && !(t.ev || []).length ? '<span class="st" style="font-size:12px">' + ICON.critical + 'Cần ít nhất 1 minh chứng</span>' : ""}</span>
+      <div class="ev">${ev}
+        ${editable && S.assets ? `<button class="drop" data-act="pick" title="Ảnh, PDF, video">⤒ Tải minh chứng (ảnh, PDF, video) hoặc kéo thả vào đây</button>` : (t.ev || []).length ? "" : `<span class="small muted">Chưa có.</span>`}
+      </div>
+    </div>
+    ${rv && (rv.note || rv.cl) ? `<div class="review ${rv.cl === "chua" ? "" : "ok"}"><b>BGH:</b> ${rv.cl ? "Chất lượng: " + CL[rv.cl] + ". " : ""}<span data-rv="${t.id}"></span></div>` : ""}
+  </div>`;
+}
+function evItem(e, editable) {
+  const url = "/_blob/" + e.id;
+  const isImg = (e.type || "").startsWith("image/");
+  const ext = (e.name.split(".").pop() || "").slice(0, 4).toUpperCase();
+  return `<div class="ev-item" data-eid="${e.id}">
+    ${isImg ? `<button class="thumb" data-act="zoom" data-src="${url}" data-name="${esc(e.name)}" style="background:center/cover no-repeat url('${url}')" aria-label="Xem ảnh ${esc(e.name)}"></button>` : `<span class="ficon">${esc(ext || "TỆP")}</span>`}
+    <span class="meta"><a href="${url}" target="_blank" rel="noopener">${esc(e.name)}</a><small>${fmtSize(e.size || 0)} · ${fmtTime(e.at)}</small></span>
+    ${editable ? `<button class="btn ghost sm danger" data-act="delEv" aria-label="Xoá minh chứng">✕</button>` : ""}
+  </div>`;
+}
+function fillReviewNotes() {
+  if (!S.R?.tasks) return;
+  $$("[data-rv]").forEach(el => { const r = S.R.tasks[el.dataset.rv]; if (r?.note) el.textContent = r.note; });
+}
+
+function renderRegister() {
+  const taken = new Set();
+  const opts = S.roster.map(r => `<option value="${esc(r.id)}">${esc(r.name)}${r.to ? " – " + esc(r.to) : ""}</option>`).join("");
+  $("#main").innerHTML = `<div class="panel" style="max-width:640px;margin:0 auto">
+    <span class="eyebrow">Lần đầu sử dụng</span>
+    <h2 style="margin:4px 0 6px">Xác nhận bạn là ai</h2>
+    <p class="muted" style="margin-bottom:14px">Chọn tên của bạn trong danh sách nhà trường. Từ nay báo cáo của bạn gắn với tài khoản Claude này; chỉ bạn và BGH xem được.</p>
+    <form id="regForm" class="stack">
+      ${S.roster.length ? `<label class="f"><span>Họ và tên</span><select id="regPick"><option value="">— Chọn tên của bạn —</option>${opts}<option value="__other">Tên tôi không có trong danh sách</option></select></label>` : ""}
+      <div id="regFree" class="stack" ${S.roster.length ? "hidden" : ""}>
+        <label class="f"><span>Họ và tên</span><input type="text" id="regName" autocomplete="name"></label>
+      </div>
+      <div class="two">
+        <label class="f"><span>Chức vụ</span><input type="text" id="regCv" placeholder="Giáo viên"></label>
+        <label class="f"><span>Tổ</span><input type="text" id="regTo" placeholder="Tổ 4-5"></label>
+        <label class="f"><span>Lớp chủ nhiệm (nếu có)</span><input type="text" id="regLop" placeholder="5/3"></label>
+        <label class="f"><span>Đối tượng</span><select id="regType">${Object.entries(TYPES).map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label>
+      </div>
+      <div class="row"><span class="spacer"></span><button class="btn primary" type="submit" ${S.readOnly ? "disabled" : ""}>Bắt đầu sử dụng</button></div>
+    </form></div>`;
+  const pick = $("#regPick");
+  if (pick) pick.addEventListener("change", () => {
+    const r = S.roster.find(x => x.id === pick.value);
+    $("#regFree").hidden = pick.value !== "__other";
+    if (r) { $("#regCv").value = r.chucVu || ""; $("#regTo").value = r.to || ""; $("#regLop").value = r.lop || ""; $("#regType").value = r.type || "gvcn"; }
+  });
+  $("#regForm").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const r = S.roster.find(x => x.id === pick?.value);
+    const name = (r ? r.name : $("#regName").value).trim();
+    if (!name) { toast("Hãy chọn hoặc nhập họ tên."); return; }
+    const prof = { rosterId: r ? r.id : null, name, chucVu: $("#regCv").value.trim(), to: $("#regTo").value.trim(), lop: $("#regLop").value.trim(), type: $("#regType").value, createdAt: S.editingProfile?.createdAt || now().toISOString(), months: S.editingProfile?.months || {} };
+    try { await write(`reports/${S.uid}`, () => S.db.doc(`reports/${S.uid}`).set(prof)); S.myProfile = prof; S.editingProfile = null; render(); toast("Đã lưu thông tin. Bây giờ hãy tạo báo cáo tháng."); }
+    catch (e) { dbError(e, "register"); }
+  });
+}
+
+function commonFor(ym, type) {
+  return (S.common[ym] || []).filter(c => !c.types || !c.types.length || c.types.includes(type));
+}
+function newTask(g, extra = {}) {
+  return { id: uid(), g, nd: "", tc: "bt", md: "chu", han: deadlineOf(S.month), tt: "chua", pct: 0, ngayXong: "", kq: "", cl: "dam", ev: [], ...extra };
+}
+
+// evidence upload
+async function prepareFile(f) {
+  let type = f.type;
+  const ext = (f.name.split(".").pop() || "").toLowerCase();
+  if (!ACCEPT.includes(type)) type = EXT_TYPE[ext] || "";
+  if (!type) throw new Error(`“${f.name}”: định dạng .${ext} chưa hỗ trợ. Hãy lưu thành PDF hoặc chụp ảnh.`);
+  if (type === "image/jpeg" || type === "image/png" || type === "image/webp") {
+    if (f.size > 900 * 1024) {
+      try {
+        const bmp = await createImageBitmap(f);
+        const k = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+        const cv = document.createElement("canvas"); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+        cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+        const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.82));
+        if (blob && blob.size < f.size) return { blob, type: "image/jpeg", name: f.name.replace(/\.\w+$/, "") + ".jpg" };
+      } catch (e) { /* keep original */ }
+    }
+  }
+  if (f.size > 20 * 1048576) throw new Error(`“${f.name}” lớn hơn 20 MB. Hãy nén hoặc chia nhỏ.`);
+  return { blob: f, type, name: f.name };
+}
+async function uploadFiles(taskId, files) {
+  if (!S.assets) { toast("Tài khoản chưa có quyền tải minh chứng."); return; }
+  for (const f of files) {
+    const t = S.M.tasks.find(x => x.id === taskId); if (!t) return;
+    let p;
+    try { p = await prepareFile(f); } catch (e) { toast(e.message); continue; }
+    setSaveState(`Đang tải “${p.name}”…`);
+    try {
+      const res = await S.assets.upload(p.blob, { type: p.type });
+      t.ev = (t.ev || []).concat({ id: res.id, name: p.name, size: res.sizeBytes, type: res.contentType, at: now().toISOString() });
+      logAction(`Tải minh chứng “${p.name}” cho nhiệm vụ: ${t.nd.slice(0, 60) || "(chưa đặt tên)"}`);
+      renderMine(); scheduleSave(true);
+    } catch (e) {
+      const m = { too_large: "tệp quá lớn (tối đa 20 MB)", unsupported_type: "định dạng không hỗ trợ", quota_or_state: "kho minh chứng đã đầy, hãy báo BGH", rate_limited: "tải quá nhanh, thử lại sau ít phút", not_granted: "chưa có quyền tải lên" }[e?.code] || "lỗi tải lên";
+      toast(`Không tải được “${p.name}”: ${m}.`); setSaveState("");
+    }
+  }
+}
+
+// ---------------------------------------------------------------- owner: monitoring
+function staffRows() {
+  const rows = [];
+  const byRoster = new Map();
+  for (const [id, p] of S.reports) if (p.rosterId) { if (!byRoster.has(p.rosterId)) byRoster.set(p.rosterId, []); byRoster.get(p.rosterId).push(id); }
+  for (const r of S.roster) {
+    const ids = byRoster.get(r.id) || [];
+    if (!ids.length) rows.push({ key: "r:" + r.id, name: r.name, chucVu: r.chucVu, to: r.to, lop: r.lop, uid: null, p: null, dup: false });
+    ids.forEach(id => { const p = S.reports.get(id); rows.push({ key: id, name: p.name, chucVu: p.chucVu || r.chucVu, to: p.to || r.to, lop: p.lop || r.lop, uid: id, p, dup: ids.length > 1 }); });
+  }
+  for (const [id, p] of S.reports) if (!p.rosterId || !S.roster.some(r => r.id === p.rosterId)) rows.push({ key: id, name: p.name, chucVu: p.chucVu, to: p.to, lop: p.lop, uid: id, p, extra: true });
+  rows.sort((a, b) => (a.to || "").localeCompare(b.to || "", "vi") || a.name.split(" ").pop().localeCompare(b.name.split(" ").pop(), "vi"));
+  return rows;
+}
+
+function renderManage() {
+  if (S.detail) { renderDetail(); return; }
+  const ym = S.mMonth, rows = staffRows();
+  const main = $("#main");
+  if (!rows.length) {
+    main.innerHTML = `<div class="panel" style="max-width:720px;margin:0 auto">
+      <span class="eyebrow">Bắt đầu</span><h2 style="margin:4px 0 10px">Chuẩn bị sổ cho giáo viên</h2>
+      <ol class="steps">
+        <li>Vào <b>Thiết lập</b>: kiểm tra tên trường và hạn nộp báo cáo hằng tháng.</li>
+        <li>Dán danh sách CB-GV-NV vào mục <b>Danh sách</b> (có thể dán thẳng từ Excel).</li>
+        <li>Thêm <b>nhiệm vụ chung</b> của tháng (nếu có) để mọi người có sẵn khi tạo báo cáo.</li>
+        <li>Bấm <b>Chia sẻ</b> ở góc trang, mời từng giáo viên bằng email với quyền <b>Người chỉnh sửa (Editor)</b>, rồi gửi đường link cho họ.</li>
+      </ol>
+      <div class="row" style="margin-top:14px"><button class="btn primary" data-tab="setup">Mở Thiết lập</button></div></div>`;
+    return;
+  }
+  const dl = deadlineOf(ym);
+  const data = rows.map(r => {
+    const sum = r.p?.months?.[ym];
+    const rv = r.uid ? S.reviews.get(r.uid) : null;
+    return { ...r, sum, st: statusFor(r.p, ym, rv), timing: submitTiming(sum, ym) };
+  });
+  const reg = data.filter(d => d.p).length;
+  const sub = data.filter(d => ["cho", "nopLai", "duyet", "tralai"].includes(d.st) && d.sum?.submittedAt).length;
+  const onTime = data.filter(d => d.timing?.ok).length;
+  const agg = data.reduce((a, d) => { if (d.sum) for (const k of ["n", "xong", "som", "dung", "tre", "quahan", "ev", "thieuEv"]) a[k] += d.sum[k] || 0; return a; }, { n: 0, xong: 0, som: 0, dung: 0, tre: 0, quahan: 0, ev: 0, thieuEv: 0 });
+
+  const ctl = `<div class="row" style="margin-bottom:12px">
+    <div class="row" role="group" aria-label="Kiểu xem">
+      <button class="btn ${S.mView === "month" ? "primary" : ""}" data-act="mView" data-v="month">Theo tháng</button>
+      <button class="btn ${S.mView === "year" ? "primary" : ""}" data-act="mView" data-v="year">Cả năm học</button>
+    </div>
+    ${S.mView === "month" ? `<button class="btn sm" data-act="mPrev" aria-label="Tháng trước">‹</button><input type="month" id="mgMonth" value="${ym}" aria-label="Tháng"><button class="btn sm" data-act="mNext" aria-label="Tháng sau">›</button>`
+      : `<select id="mgYear" aria-label="Năm học">${[0, -1, -2].map(d => { const y = schoolYearOf(ymOf(now())) + d; return `<option value="${y}" ${schoolYearOf(ym) === y ? "selected" : ""}>Năm học ${y}-${y + 1}</option>`; }).join("")}</select>`}
+    <span class="spacer"></span>
+    ${S.mView === "month" ? `<span class="small muted">Hạn nộp: <b>${fmtDate(dl)}</b></span>` : ""}
+    <button class="btn" data-act="export" ${S.downloads ? "" : "disabled title=\"Trình xem này không hỗ trợ tải tệp\""}>Xuất Excel</button>
+  </div>`;
+
+  if (S.mView === "year") { main.innerHTML = ctl + renderYear(rows); return; }
+
+  const kpi = `<div class="grid-kpi" style="margin-bottom:12px">
+    <div class="kpi"><div class="l">Đã có tài khoản</div><div class="v">${reg}/${rows.length}</div><div class="n">${rows.length - reg} người chưa đăng ký</div></div>
+    <div class="kpi"><div class="l">Đã nộp báo cáo</div><div class="v">${sub}/${reg || rows.length}</div><div class="n">${onTime} nộp đúng hạn</div></div>
+    <div class="kpi"><div class="l">Nhiệm vụ hoàn thành</div><div class="v">${agg.n ? pct(agg.xong / agg.n * 100) : "–"}</div><div class="n">${agg.xong}/${agg.n} việc</div></div>
+    <div class="kpi"><div class="l">Đúng và sớm hạn</div><div class="v">${agg.xong ? pct((agg.som + agg.dung) / agg.xong * 100) : "–"}</div><div class="n">${agg.tre} việc trễ hạn</div></div>
+    <div class="kpi"><div class="l">Quá hạn chưa xong</div><div class="v" style="color:${agg.quahan ? "var(--critical-text)" : "inherit"}">${agg.quahan}</div><div class="n">việc</div></div>
+    <div class="kpi"><div class="l">Minh chứng</div><div class="v">${agg.ev}</div><div class="n">${agg.thieuEv} việc xong thiếu minh chứng</div></div>
+  </div>`;
+
+  const table = `<div class="panel"><div class="row between" style="margin-bottom:8px"><h2>${monthLabel(ym)}</h2><span class="small muted">Bấm vào một dòng để xem nhiệm vụ, minh chứng và duyệt</span></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Họ và tên</th><th>Trạng thái</th><th>Nộp báo cáo</th><th>Hoàn thành</th><th class="r">Trễ / quá hạn</th><th class="r">Minh chứng</th><th>Cập nhật gần nhất</th></tr></thead>
+      <tbody>${data.map(d => `<tr class="${d.uid ? "click" : ""}" ${d.uid ? `data-open="${d.uid}"` : ""}>
+        <td style="min-width:180px"><b>${esc(d.name)}</b>${d.dup ? ' <span class="pill" title="Nhiều tài khoản cùng chọn tên này">Trùng tên</span>' : ""}${d.extra ? ' <span class="pill" title="Không có trong danh sách">Ngoài danh sách</span>' : ""}
+          <div class="small muted">${esc([d.chucVu, d.to, d.lop ? "Lớp " + d.lop : ""].filter(Boolean).join(" · "))}</div>
+          ${d.uid && S.profiles[d.uid]?.name && S.profiles[d.uid].name !== d.name ? `<div class="small muted">Tài khoản: ${esc(S.profiles[d.uid].name)}${S.profiles[d.uid].email ? " · " + esc(S.profiles[d.uid].email) : ""}</div>` : ""}</td>
+        <td>${stHtml(d.st)}</td>
+        <td class="small">${d.sum?.submittedAt ? `${fmtTime(d.sum.submittedAt)}<div class="st" style="font-size:12px">${d.timing.ok ? ICON.good : ICON.critical}${d.timing.txt}</div>` : '<span class="muted">–</span>'}</td>
+        <td>${d.sum ? `<span class="bar"><i><b style="width:${d.sum.n ? d.sum.xong / d.sum.n * 100 : 0}%"></b></i><span class="num">${d.sum.xong}/${d.sum.n}</span></span><div class="small muted">Tiến độ chung ${pct(d.sum.pct)}</div>` : '<span class="muted">–</span>'}</td>
+        <td class="r">${d.sum ? `${d.sum.tre} / <span style="color:${d.sum.quahan ? "var(--critical-text)" : "inherit"}">${d.sum.quahan}</span>` : "–"}</td>
+        <td class="r">${d.sum ? `${d.sum.ev}${d.sum.thieuEv ? `<div class="small" style="color:var(--critical-text)">thiếu ${d.sum.thieuEv}</div>` : ""}` : "–"}</td>
+        <td class="small muted">${d.sum?.updatedAt ? fmtTime(d.sum.updatedAt) : d.p ? "Chưa cập nhật tháng này" : "Chưa đăng ký tài khoản"}</td>
+      </tr>`).join("")}</tbody></table></div></div>`;
+  main.innerHTML = ctl + kpi + table;
+}
+
+function renderYear(rows) {
+  const y = schoolYearOf(S.mMonth), months = syMonths(y);
+  return `<div class="panel"><div class="row between" style="margin-bottom:8px"><h2>Năm học ${y}-${y + 1}</h2><span class="small muted">Mỗi ô: trạng thái và số việc hoàn thành/được giao. Bấm ô để mở tháng đó.</span></div>
+    <div class="scroll"><table class="matrix"><thead><tr><th>Họ và tên</th>${months.map(m => `<th class="c">${monthShort(m)}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r => `<tr><td><b>${esc(r.name)}</b><div class="small muted">${esc(r.to || "")}</div></td>${months.map(m => {
+      if (m > ymOf(now()) && !r.p?.months?.[m]) return `<td></td>`;
+      const st = statusFor(r.p, m, r.uid ? S.reviews.get(r.uid) : null), s = r.p?.months?.[m];
+      return `<td>${r.uid ? `<button class="btn ghost sm" data-ycell="${r.uid}" data-m="${m}" title="${esc(monthLabel(m) + ": " + STATUS[st][1])}"><span class="cell">${ICON[STATUS[st][0]]}<span class="num">${s ? s.xong + "/" + s.n : ""}</span></span></button>` : `<span class="cell" title="Chưa có tài khoản">${ICON.none}</span>`}</td>`;
+    }).join("")}</tr>`).join("")}</tbody></table></div>
+    <div class="row small muted" style="margin-top:10px;gap:14px">${Object.keys(STATUS).filter(k => k !== "nopLai").map(k => stHtml(k)).join("")}</div></div>`;
+}
+
+async function openDetail(uidv, ym) {
+  S.detail = uidv; if (ym) S.mMonth = ym; S.detailDoc = undefined; S.detailReview = null; S.assetTimes = null;
+  resub("detail", () => S.db.doc(`reports/${uidv}/months/${S.mMonth}`).onSnapshot(s => { S.detailDoc = s.exists ? s.data() : null; if (S.tab === "manage" && S.detail === uidv && !document.activeElement?.closest?.("#reviewForm, [data-rvf]")) renderDetail(); }, e => console.warn(e)));
+  try { const r = await S.db.doc(`reviews/${uidv}/months/${S.mMonth}`).get(); S.detailReview = r.exists ? r.data() : null; } catch (e) { S.detailReview = null; }
+  if (S.assets) S.assets.list().then(l => { S.assetTimes = new Map(l.assets.map(a => [a.id, a.createdAt])); S.assetUsage = l.usage; if (S.detail === uidv) renderDetail(); }).catch(() => {});
+  renderDetail();
+}
+function closeDetail() { S.detail = null; resub("detail"); renderManage(); }
+
+function renderDetail() {
+  const uidv = S.detail, p = S.reports.get(uidv), ym = S.mMonth, M = S.detailDoc, R = S.detailReview;
+  if (!p) { closeDetail(); return; }
+  const st = statusFor(p, ym, S.reviews.get(uidv));
+  const sum = M ? summarize(M) : null;
+  const prof = S.profiles[uidv];
+  const head = `<div class="panel">
+    <div class="row between" style="align-items:flex-start">
+      <div class="stack" style="gap:4px"><button class="btn ghost sm" data-act="closeDetail" style="justify-self:start">‹ Danh sách</button>
+        <h2>${esc(p.name)}</h2>
+        <p class="small muted">${esc([p.chucVu, p.to, p.lop ? "Lớp " + p.lop : ""].filter(Boolean).join(" · "))}${prof?.name ? ` · Tài khoản Claude: ${esc(prof.name)}${prof.email ? " (" + esc(prof.email) + ")" : ""}` : ""}</p></div>
+      <div class="row"><button class="btn sm" data-act="dPrev" aria-label="Tháng trước">‹</button><b>${monthLabel(ym)}</b><button class="btn sm" data-act="dNext" aria-label="Tháng sau">›</button></div>
+    </div>
+    <div class="row" style="margin-top:10px;gap:14px">${stHtml(st)}
+      <span class="small muted">Hạn nộp ${fmtDate(deadlineOf(ym))}</span>
+      ${M?.submittedAt ? `<span class="small muted">Nộp lúc ${fmtTime(M.submittedAt)} · ${submitTiming(summarize(M), ym).txt}</span>` : ""}
+      ${M?.updatedAt ? `<span class="small muted">Sửa gần nhất ${fmtTime(M.updatedAt)}</span>` : ""}</div></div>`;
+  if (M === undefined) { $("#main").innerHTML = `<div class="stack">${head}<div class="panel empty">Đang tải…</div></div>`; return; }
+  if (M === null) { $("#main").innerHTML = `<div class="stack">${head}<div class="panel empty"><h2>Chưa có báo cáo tháng này</h2><p>Giáo viên chưa tạo báo cáo ${monthLabel(ym).toLowerCase()}.</p></div></div>`; return; }
+  const canReview = M.status === "nop" || R;
+  const tasksHtml = GROUPS.map(([g, label]) => {
+    const ts = M.tasks.filter(t => t.g === g);
+    if (!ts.length) return "";
+    return `<div class="group-h"><span>${label}</span></div>` + ts.map((t, i) => {
+      const tm = taskTiming(t, ym), rv = R?.tasks?.[t.id] || {};
+      const timing = tm.k === "som" ? `${ICON.good}Sớm ${-tm.d} ngày` : tm.k === "dung" ? `${ICON.good}Đúng hạn` : tm.k === "tre" ? `${ICON.critical}Trễ ${tm.d} ngày` : tm.k === "quahan" ? `${ICON.critical}Quá hạn ${tm.d} ngày` : "";
+      return `<div class="task ${tm.k === "quahan" ? "late" : ""}" data-tt="${t.tt}" data-tid="${t.id}">
+        <div class="task-top"><div><b>${esc(t.nd || "(chưa ghi nội dung)")}</b> ${t.chung ? '<span class="pill accent">Nhiệm vụ chung</span>' : ""}
+          <div class="small muted">${TC[t.tc]} · ${MD[t.md]} · Hạn ${fmtDate(t.han) || "–"}${t.ngayXong ? " · Xong ngày " + fmtDate(t.ngayXong) : ""}</div></div>
+          <div class="stack" style="justify-items:end;gap:2px"><span class="st">${t.tt === "xong" ? ICON.good : t.tt === "khong" ? ICON.critical : t.tt === "dang" ? ICON.warning : ICON.none}${TT[t.tt]}${t.tt !== "xong" ? " · " + (t.pct || 0) + "%" : ""}</span>${timing ? `<span class="st small">${timing}</span>` : ""}</div></div>
+        ${t.kq ? `<p class="small" style="white-space:pre-wrap">${esc(t.kq)}</p>` : ""}
+        <div class="ev">${(t.ev || []).map(e => { const srv = S.assetTimes?.get(e.id); return evItem({ ...e, at: srv || e.at }, false); }).join("") || `<span class="small" style="color:${t.tt === "xong" ? "var(--critical-text)" : "var(--ink-3)"}">Chưa có minh chứng</span>`}</div>
+        ${canReview ? `<div class="row" style="gap:8px">
+          <label class="f" style="width:170px"><span>Chất lượng (BGH đánh giá)</span><select data-rvf="cl" data-tid="${t.id}"><option value="">${t.tt === "xong" ? "Theo tự đánh giá: " + CL[t.cl || "dam"] : "–"}</option>${Object.entries(CL).map(([k, l]) => `<option value="${k}" ${rv.cl === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+          <label class="f" style="flex:1;min-width:200px"><span>Góp ý cho nhiệm vụ này</span><input type="text" data-rvf="note" data-tid="${t.id}" value="${esc(rv.note || "")}"></label></div>` : ""}
+      </div>`;
+    }).join("");
+  }).join("");
+  const reviewBox = canReview ? `<div class="panel stack" id="reviewForm">
+    <h3>Nhận xét chung và quyết định</h3>
+    <textarea id="rvNote" rows="3" placeholder="Nhận xét về tiến độ, chất lượng, minh chứng…">${esc(R?.note || "")}</textarea>
+    <div class="row">${R?.at ? `<span class="small muted">Lần duyệt gần nhất: ${fmtTime(R.at)} (${R.status === "duyet" ? "Đã duyệt" : "Trả lại"})</span>` : ""}<span class="spacer"></span>
+      <button class="btn" data-act="review" data-s="tralai">Trả lại để bổ sung</button>
+      <button class="btn primary" data-act="review" data-s="duyet">Duyệt báo cáo</button></div></div>`
+    : `<div class="notice">${ICON.warning}<span>Giáo viên chưa nộp báo cáo tháng này nên chưa duyệt được. Bạn vẫn theo dõi được tiến độ đang cập nhật.</span></div>`;
+  const kp = `<div class="grid-kpi">
+    <div class="kpi"><div class="l">Hoàn thành</div><div class="v">${sum.xong}/${sum.n}</div><div class="n">Tiến độ chung ${pct(sum.pct)}</div></div>
+    <div class="kpi"><div class="l">Sớm / đúng hạn</div><div class="v">${sum.som + sum.dung}</div><div class="n">${sum.tre} trễ hạn</div></div>
+    <div class="kpi"><div class="l">Quá hạn chưa xong</div><div class="v">${sum.quahan}</div><div class="n">${sum.khong} không hoàn thành</div></div>
+    <div class="kpi"><div class="l">Đang thực hiện</div><div class="v">${sum.dang}</div><div class="n">${sum.chua} chưa bắt đầu</div></div>
+    <div class="kpi"><div class="l">Minh chứng</div><div class="v">${sum.ev}</div><div class="n">${sum.thieuEv} việc xong thiếu</div></div>
+    <div class="kpi"><div class="l">Số lần cập nhật</div><div class="v">${(M.log || []).length}</div><div class="n">theo lịch sử</div></div></div>`;
+  const log = `<details class="panel"><summary style="cursor:pointer"><b>Lịch sử cập nhật của giáo viên</b> <span class="small muted">(thời gian theo máy của giáo viên; giờ tải minh chứng lấy theo máy chủ)</span></summary>
+    <ul class="log" style="margin-top:8px">${(M.log || []).slice().reverse().map(l => `<li><time>${fmtTime(l.at)}</time><span>${esc(l.a)}</span></li>`).join("")}</ul></details>`;
+  $("#main").innerHTML = `<div class="stack">${head}${kp}<div class="panel stack">${tasksHtml || '<p class="muted">Chưa có nhiệm vụ.</p>'}</div>${reviewBox}${log}</div>`;
+}
+
+async function saveReview(status) {
+  const uidv = S.detail, ym = S.mMonth;
+  const tasks = {};
+  $$("[data-rvf]").forEach(el => { const t = tasks[el.dataset.tid] ||= {}; if (el.value) t[el.dataset.rvf] = el.value; });
+  for (const k of Object.keys(tasks)) if (!Object.keys(tasks[k]).length) delete tasks[k];
+  const at = now().toISOString();
+  const doc = { status, note: $("#rvNote").value.trim(), tasks, at };
+  const sumDoc = clone(S.reviews.get(uidv) || {}); sumDoc.months = { ...(sumDoc.months || {}), [ym]: { status, at } };
+  try {
+    await write(`reviews/${uidv}/months/${ym}`, () => S.db.doc(`reviews/${uidv}/months/${ym}`).set(doc));
+    await write(`reviews/${uidv}`, () => S.db.doc(`reviews/${uidv}`).set(sumDoc));
+    S.detailReview = doc;
+    toast(status === "duyet" ? "Đã duyệt báo cáo." : "Đã trả lại. Giáo viên sẽ thấy góp ý khi mở sổ.");
+    renderDetail();
+  } catch (e) { dbError(e, "review"); }
+}
+
+// ---------------------------------------------------------------- owner: setup
+function renderSetup() {
+  if (!S.rosterDraft) S.rosterDraft = clone(S.roster);
+  const ym = S.setupMonth;
+  if (!S.commonDraft || S.commonDraft.ym !== ym) S.commonDraft = { ym, list: clone(S.common[ym] || []) };
+  const linked = new Map(); for (const [id, p] of S.reports) if (p.rosterId) linked.set(p.rosterId, (linked.get(p.rosterId) || 0) + 1);
+  const rosterDirty = stable(S.rosterDraft) !== stable(S.roster);
+  const commonDirty = stable(S.commonDraft.list) !== stable(S.common[ym] || []);
+  $("#main").innerHTML = `<div class="stack">
+  <div class="two">
+    <form class="panel stack" id="schoolForm">
+      <h2>Thông tin và hạn nộp</h2>
+      <label class="f"><span>Tên trường</span><input type="text" id="sName" value="${esc(S.school.name)}"></label>
+      <label class="f"><span>Cơ quan chủ quản</span><input type="text" id="sDonVi" value="${esc(S.school.donVi)}"></label>
+      <div class="row" style="align-items:flex-end">
+        <label class="f" style="width:120px"><span>Hạn nộp: ngày</span><input type="number" id="sDay" min="1" max="31" value="${S.school.deadlineDay || 25}"></label>
+        <label class="f" style="flex:1"><span>của</span><select id="sNext"><option value="0" ${!S.school.deadlineNext ? "selected" : ""}>cùng tháng báo cáo</option><option value="1" ${S.school.deadlineNext ? "selected" : ""}>tháng kế tiếp</option></select></label>
+      </div>
+      <p class="small muted">Ví dụ báo cáo ${monthLabel(ymOf(now())).toLowerCase()}: hạn nộp ${fmtDate(deadlineOf(ymOf(now())))}.</p>
+      <div class="row"><span class="spacer"></span><button class="btn primary" type="submit">Lưu</button></div>
+    </form>
+    <div class="panel stack">
+      <h2>Mời giáo viên vào sổ</h2>
+      <ol class="steps small">
+        <li>Bấm nút <b>Chia sẻ</b> của trang này trên claude.ai.</li>
+        <li>Nhập email từng giáo viên và chọn quyền <b>Người chỉnh sửa (Editor)</b>. Quyền này cần để giáo viên tải được minh chứng.</li>
+        <li><b>Không</b> bật chia sẻ bằng đường link công khai: khi bật, giáo viên mời từ bên ngoài sẽ mất quyền ghi.</li>
+        <li>Gửi đường link cho giáo viên. Lần đầu mở, mỗi người đăng nhập Claude và chọn tên mình trong danh sách.</li>
+      </ol>
+      <p class="small muted">Mỗi giáo viên chỉ xem được báo cáo của chính mình. Chỉ tài khoản quản lý (chủ sổ) xem được tất cả và duyệt.</p>
+      ${S.assets ? `<div class="row"><button class="btn sm" data-act="usage">Xem dung lượng minh chứng</button><span class="small muted" id="usage"></span></div>` : ""}
+    </div>
+  </div>
+
+  <div class="panel stack">
+    <div class="row between"><h2>Danh sách CB-GV-NV <span class="small muted">(${S.rosterDraft.length} người)</span></h2>
+      <div class="row">${rosterDirty ? '<span class="small" style="color:var(--warning-text)">Có thay đổi chưa lưu</span>' : ""}<button class="btn sm" data-act="rosterAdd">+ Thêm người</button><button class="btn primary sm" data-act="rosterSave" ${rosterDirty ? "" : "disabled"}>Lưu danh sách</button></div></div>
+    <details><summary class="small" style="cursor:pointer">Dán nhanh từ Excel</summary>
+      <div class="stack" style="margin-top:8px"><textarea id="paste" rows="4" placeholder="Mỗi dòng một người, các cột cách nhau bằng Tab (dán thẳng từ Excel):&#10;Họ và tên | Chức vụ | Tổ | Lớp | Đối tượng (GVCN/GVBM/CBNV)"></textarea>
+      <div class="row"><button class="btn sm" data-act="rosterPaste">Thêm vào danh sách</button></div></div></details>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Họ và tên</th><th>Chức vụ</th><th>Tổ</th><th>Lớp</th><th>Đối tượng</th><th>Tài khoản</th><th></th></tr></thead>
+      <tbody>${S.rosterDraft.map((r, i) => `<tr data-ri="${i}">
+        <td class="muted num">${i + 1}</td>
+        <td><input type="text" data-rf="name" value="${esc(r.name)}" aria-label="Họ và tên" style="min-width:170px;width:100%"></td>
+        <td><input type="text" data-rf="chucVu" value="${esc(r.chucVu || "")}" aria-label="Chức vụ" style="min-width:120px;width:100%"></td>
+        <td><input type="text" data-rf="to" value="${esc(r.to || "")}" aria-label="Tổ" style="width:100px"></td>
+        <td><input type="text" data-rf="lop" value="${esc(r.lop || "")}" aria-label="Lớp" style="width:64px"></td>
+        <td><select data-rf="type" aria-label="Đối tượng">${Object.entries(TYPES).map(([k, l]) => `<option value="${k}" ${r.type === k ? "selected" : ""}>${l}</option>`).join("")}</select></td>
+        <td>${linked.get(r.id) ? `<span class="st">${ICON.good}Đã liên kết${linked.get(r.id) > 1 ? ` (${linked.get(r.id)})` : ""}</span>` : `<span class="st">${ICON.none}Chưa</span>`}</td>
+        <td><button class="btn ghost sm danger" data-act="rosterDel" aria-label="Xoá">✕</button></td></tr>`).join("") || `<tr><td colspan="8" class="muted">Chưa có ai. Bấm “Thêm người” hoặc dán từ Excel.</td></tr>`}</tbody></table></div>
+  </div>
+
+  <div class="panel stack">
+    <div class="row between"><h2>Nhiệm vụ chung của tháng</h2>
+      <div class="row"><input type="month" id="cMonth" value="${ym}" aria-label="Tháng">${commonDirty ? '<span class="small" style="color:var(--warning-text)">Chưa lưu</span>' : ""}<button class="btn sm" data-act="commonAdd">+ Thêm</button><button class="btn primary sm" data-act="commonSave" ${commonDirty ? "" : "disabled"}>Lưu</button></div></div>
+    <p class="small muted">Các nhiệm vụ này tự có trong báo cáo khi giáo viên tạo báo cáo tháng (giáo viên đã tạo rồi thì không bị thay đổi).</p>
+    <div class="scroll"><table><thead><tr><th>Nhóm</th><th>Nội dung</th><th>Hạn</th><th>Áp dụng cho</th><th></th></tr></thead>
+      <tbody>${S.commonDraft.list.map((c, i) => `<tr data-ci="${i}">
+        <td><select data-cf="g" aria-label="Nhóm">${GROUPS.map(([g, l]) => `<option value="${g}" ${c.g === g ? "selected" : ""}>${l.split(".")[0]}</option>`).join("")}</select></td>
+        <td><input type="text" data-cf="nd" value="${esc(c.nd)}" style="min-width:260px;width:100%" aria-label="Nội dung"></td>
+        <td><input type="date" data-cf="han" value="${esc(c.han || "")}" aria-label="Hạn"></td>
+        <td><select data-cf="types" aria-label="Áp dụng cho"><option value="">Tất cả</option>${Object.entries(TYPES).map(([k, l]) => `<option value="${k}" ${c.types?.[0] === k ? "selected" : ""}>${l}</option>`).join("")}</select></td>
+        <td><button class="btn ghost sm danger" data-act="commonDel" aria-label="Xoá">✕</button></td></tr>`).join("") || `<tr><td colspan="5" class="muted">Chưa có nhiệm vụ chung cho ${monthLabel(ym).toLowerCase()}.</td></tr>`}</tbody></table></div>
+  </div></div>`;
+
+  $("#schoolForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const doc = { name: $("#sName").value.trim(), donVi: $("#sDonVi").value.trim(), deadlineDay: Math.max(1, Math.min(31, +$("#sDay").value || 25)), deadlineNext: $("#sNext").value === "1" };
+    try { await write("config/school", () => S.db.doc("config/school").set(doc)); toast("Đã lưu thông tin trường."); } catch (err) { dbError(err, "school"); }
+  });
+}
+
+// ---------------------------------------------------------------- export
+async function exportExcel() {
+  if (!window.XLSX) { toast("Chưa tải xong thư viện Excel, hãy thử lại sau vài giây."); return; }
+  const ym = S.mMonth, rows = staffRows();
+  const sheet1 = [[S.school.name || "", "", "", "", `BÁO CÁO TIẾN ĐỘ THỰC HIỆN NHIỆM VỤ – ${monthLabel(ym).toUpperCase()}`], [],
+    ["TT", "Họ và tên", "Chức vụ", "Tổ", "Trạng thái", "Nộp lúc", "Đúng hạn nộp", "Được giao", "Hoàn thành", "Đang làm", "Chưa bắt đầu", "Không HT", "Sớm hạn", "Đúng hạn", "Trễ hạn", "Quá hạn chưa xong", "Tiến độ chung (%)", "Số minh chứng", "Việc xong thiếu MC", "Cập nhật gần nhất"]];
+  rows.forEach((r, i) => {
+    const s = r.p?.months?.[ym], st = statusFor(r.p, ym, r.uid ? S.reviews.get(r.uid) : null), tm = submitTiming(s, ym);
+    sheet1.push([i + 1, r.name, r.chucVu || "", r.to || "", STATUS[st][1], s?.submittedAt ? fmtTime(s.submittedAt) : "", tm ? tm.txt : "",
+      s?.n ?? "", s?.xong ?? "", s?.dang ?? "", s?.chua ?? "", s?.khong ?? "", s?.som ?? "", s?.dung ?? "", s?.tre ?? "", s?.quahan ?? "", s?.pct ?? "", s?.ev ?? "", s?.thieuEv ?? "", s?.updatedAt ? fmtTime(s.updatedAt) : ""]);
+  });
+  const sheet2 = [["Họ và tên", "Tổ", "Nhóm", "Nội dung nhiệm vụ", "Tính chất", "Vai trò", "Hạn", "Trạng thái", "% hoàn thành", "Ngày xong", "Tiến độ", "Tự đánh giá CL", "BGH đánh giá CL", "Kết quả / lý do", "Số minh chứng"]];
+  toast("Đang tổng hợp chi tiết nhiệm vụ…");
+  for (const r of rows) {
+    if (!r.uid || !r.p?.months?.[ym]) continue;
+    try {
+      const [m, rv] = await Promise.all([S.db.doc(`reports/${r.uid}/months/${ym}`).get(), S.db.doc(`reviews/${r.uid}/months/${ym}`).get()]);
+      if (!m.exists) continue;
+      const M = m.data(), R = rv.exists ? rv.data() : null;
+      for (const t of M.tasks) {
+        const tm = taskTiming(t, ym);
+        sheet2.push([r.name, r.to || "", ["I", "II", "III", "IV"][t.g - 1], t.nd, TC[t.tc], MD[t.md], fmtDate(t.han), TT[t.tt], t.tt === "xong" ? 100 : (t.pct || 0), fmtDate(t.ngayXong),
+          { som: "Sớm hạn", dung: "Đúng hạn", tre: `Trễ ${tm.d} ngày`, quahan: `Quá hạn ${tm.d} ngày` }[tm.k] || "", t.tt === "xong" ? CL[t.cl || "dam"] : "", R?.tasks?.[t.id]?.cl ? CL[R.tasks[t.id].cl] : "", t.kq || "", (t.ev || []).length]);
+      }
+    } catch (e) { /* skip */ }
+  }
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.aoa_to_sheet(sheet1); ws1["!cols"] = [5, 24, 16, 12, 22, 16, 12, 9, 10, 9, 11, 9, 8, 8, 8, 13, 12, 11, 13, 16].map(w => ({ wch: w }));
+  const ws2 = XLSX.utils.aoa_to_sheet(sheet2); ws2["!cols"] = [22, 10, 6, 50, 12, 10, 11, 16, 10, 11, 14, 14, 14, 40, 10].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws1, "Tong hop");
+  XLSX.utils.book_append_sheet(wb, ws2, "Chi tiet nhiem vu");
+  const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  try { await S.downloads.save({ filename: `Tien_do_nhiem_vu_${ym}.xlsx`, data: new Uint8Array(buf) }); toast("Đã lưu tệp Excel."); }
+  catch (e) { if (e?.code !== "declined") toast("Không lưu được tệp (" + (e?.code || "lỗi") + ")."); }
+}
+
+// ---------------------------------------------------------------- events
+document.addEventListener("click", async ev => {
+  const tabB = ev.target.closest("[data-tab]");
+  if (tabB) { S.tab = tabB.dataset.tab; S.detail = null; resub("detail"); try { sessionStorage.setItem("std-tab", S.tab); } catch (e) {} render(); window.scrollTo(0, 0); return; }
+  const open = ev.target.closest("tr[data-open]");
+  if (open) { openDetail(open.dataset.open); window.scrollTo(0, 0); return; }
+  const yc = ev.target.closest("[data-ycell]");
+  if (yc) { S.mView = "month"; openDetail(yc.dataset.ycell, yc.dataset.m); window.scrollTo(0, 0); return; }
+  const b = ev.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act;
+  const card = b.closest("[data-tid]");
+  const task = card && S.M ? S.M.tasks.find(t => t.id === card.dataset.tid) : null;
+  switch (act) {
+    case "prevMonth": case "nextMonth": if (S.dirty) await flush(); S.month = addMonth(S.month, act === "prevMonth" ? -1 : 1); subMonth(); render(); break;
+    case "createMonth": case "createFromPrev": {
+      const P = S.myProfile, ym = S.month;
+      let tasks = commonFor(ym, P.type).map(c => newTask(c.g, { nd: c.nd, han: c.han || deadlineOf(ym), chung: true, cid: c.id }));
+      if (act === "createFromPrev") {
+        try { const p = await S.db.doc(`reports/${S.uid}/months/${addMonth(ym, -1)}`).get(); if (p.exists) tasks = tasks.concat(p.data().tasks.filter(t => !t.chung).map(t => newTask(t.g, { nd: t.nd, tc: t.tc, md: t.md }))); else toast("Tháng trước chưa có báo cáo để chép."); } catch (e) {}
+      }
+      S.M = { ym, tasks, status: "nhap", createdAt: now().toISOString(), log: [] };
+      logAction(`Tạo báo cáo ${monthLabel(ym).toLowerCase()} (${tasks.length} nhiệm vụ)`);
+      if (!tasks.length) S.M.tasks.push(newTask(1));
+      renderMine(); scheduleSave(true); break;
+    }
+    case "copyPrev": {
+      try {
+        const p = await S.db.doc(`reports/${S.uid}/months/${addMonth(S.month, -1)}`).get();
+        if (!p.exists) { toast("Tháng trước chưa có báo cáo."); break; }
+        const add = p.data().tasks.filter(t => !t.chung).map(t => newTask(t.g, { nd: t.nd, tc: t.tc, md: t.md }));
+        S.M.tasks.push(...add); logAction(`Chép ${add.length} nhiệm vụ từ tháng trước`); renderMine(); scheduleSave(); toast(`Đã chép ${add.length} nhiệm vụ.`);
+      } catch (e) { toast("Không đọc được tháng trước."); }
+      break;
+    }
+    case "addTask": { const t = newTask(+b.dataset.g); S.M.tasks.push(t); logAction("Thêm nhiệm vụ mới"); renderMine(); scheduleSave(); setTimeout(() => $(`[data-tid="${t.id}"] textarea`)?.focus(), 0); break; }
+    case "delTask": {
+      if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Bấm lần nữa để xoá"; setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ""; b.textContent = "Xoá"; } }, 3500); break; }
+      S.M.tasks = S.M.tasks.filter(t => t !== task); logAction(`Xoá nhiệm vụ: ${task.nd.slice(0, 60) || "(trống)"}`); renderMine(); scheduleSave(); break;
+    }
+    case "pick": {
+      const inp = document.createElement("input"); inp.type = "file"; inp.multiple = true; inp.accept = "image/*,application/pdf,video/mp4,video/webm,.txt,.csv";
+      inp.onchange = () => uploadFiles(card.dataset.tid, [...inp.files]); inp.click(); break;
+    }
+    case "delEv": {
+      const id = b.closest("[data-eid]").dataset.eid;
+      if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Xoá?"; setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ""; b.textContent = "✕"; } }, 3500); break; }
+      const e = task.ev.find(x => x.id === id);
+      task.ev = task.ev.filter(x => x.id !== id); logAction(`Xoá minh chứng “${e?.name || ""}”`); renderMine(); scheduleSave(true);
+      S.assets?.delete(id).catch(() => {});
+      break;
+    }
+    case "zoom": {
+      const lb = document.createElement("div"); lb.className = "lightbox"; lb.setAttribute("role", "dialog");
+      lb.innerHTML = `<div><img alt=""><div class="cap"></div></div>`; lb.querySelector("img").src = b.dataset.src; lb.querySelector(".cap").textContent = b.dataset.name + " · bấm để đóng";
+      lb.addEventListener("click", () => lb.remove()); document.body.appendChild(lb); break;
+    }
+    case "submit": {
+      const s = summarize(S.M);
+      if (!S.M.tasks.length) { toast("Báo cáo chưa có nhiệm vụ nào."); break; }
+      const empty = S.M.tasks.filter(t => !t.nd.trim()).length;
+      if (empty) { toast(`Còn ${empty} nhiệm vụ chưa ghi nội dung.`); break; }
+      if (s.thieuEv && b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = `Còn ${s.thieuEv} việc xong thiếu minh chứng – vẫn nộp`; break; }
+      const re = !!S.M.submittedAt;
+      S.M.status = "nop"; S.M.submittedAt = now().toISOString(); logAction(re ? "Nộp lại báo cáo" : "Nộp báo cáo");
+      await flush(); toast(re ? "Đã nộp lại báo cáo." : "Đã nộp báo cáo. BGH sẽ xem và duyệt."); render(); break;
+    }
+    case "withdraw": S.M.status = "nhap"; logAction("Rút lại báo cáo để sửa"); await flush(); render(); break;
+    case "editProfile": S.editingProfile = clone(S.myProfile); S.myProfile = null; render(); break;
+    case "mView": S.mView = b.dataset.v; renderManage(); break;
+    case "mPrev": case "mNext": S.mMonth = addMonth(S.mMonth, act === "mPrev" ? -1 : 1); renderManage(); break;
+    case "closeDetail": closeDetail(); break;
+    case "dPrev": case "dNext": openDetail(S.detail, addMonth(S.mMonth, act === "dPrev" ? -1 : 1)); break;
+    case "review": saveReview(b.dataset.s); break;
+    case "export": exportExcel(); break;
+    case "usage": try { const l = await S.assets.list(); $("#usage").textContent = `${l.usage.files} tệp · ${fmtSize(l.usage.bytes)} / ${fmtSize(l.usage.maxBytes)}`; } catch (e) { $("#usage").textContent = "Không đọc được."; } break;
+    case "rosterAdd": S.rosterDraft.push({ id: uid(), name: "", chucVu: "Giáo viên", to: "", lop: "", type: "gvcn" }); renderSetup(); setTimeout(() => { const i = $$('[data-rf="name"]'); i[i.length - 1]?.focus(); }, 0); break;
+    case "rosterDel": S.rosterDraft.splice(+b.closest("[data-ri]").dataset.ri, 1); renderSetup(); break;
+    case "rosterPaste": {
+      const lines = $("#paste").value.split(/\r?\n/).map(l => l.split("\t").map(x => x.trim())).filter(c => c[0] && !/họ.*tên/i.test(c[0]));
+      for (const c of lines) {
+        const k = (c[4] || "").toLowerCase();
+        const type = /bm|bộ môn/.test(k) ? "gvbm" : /cbnv|nv|bgh/.test(k) || /hiệu|kế toán|thư viện|tổng phụ trách|nhân viên|văn thư|y tế|bảo vệ/i.test(c[1] || "") ? "cbnv" : "gvcn";
+        S.rosterDraft.push({ id: uid(), name: c[0], chucVu: c[1] || "Giáo viên", to: c[2] || "", lop: c[3] || "", type });
+      }
+      toast(`Đã thêm ${lines.length} người. Nhớ bấm “Lưu danh sách”.`); renderSetup(); break;
+    }
+    case "rosterSave": {
+      const list = S.rosterDraft.filter(r => r.name.trim()).map(r => ({ ...r, name: r.name.trim() }));
+      try { await write("config/roster", () => S.db.doc("config/roster").set({ staff: list })); S.roster = clone(list); S.rosterDraft = clone(list); toast("Đã lưu danh sách."); renderSetup(); } catch (e) { dbError(e, "roster"); }
+      break;
+    }
+    case "commonAdd": S.commonDraft.list.push({ id: uid(), g: 1, nd: "", han: deadlineOf(S.setupMonth), types: [] }); renderSetup(); break;
+    case "commonDel": S.commonDraft.list.splice(+b.closest("[data-ci]").dataset.ci, 1); renderSetup(); break;
+    case "commonSave": {
+      const months = { ...S.common, [S.setupMonth]: S.commonDraft.list.filter(c => c.nd.trim()) };
+      try { await write("config/common", () => S.db.doc("config/common").set({ months })); S.common = months; S.commonDraft = null; toast("Đã lưu nhiệm vụ chung."); renderSetup(); } catch (e) { dbError(e, "common"); }
+      break;
+    }
+  }
+});
+
+document.addEventListener("input", ev => {
+  const el = ev.target;
+  if (S.tab === "mine" && S.M) {
+    const card = el.closest("[data-tid]"); if (!card || !el.dataset.f) return;
+    const t = S.M.tasks.find(x => x.id === card.dataset.tid); if (!t) return;
+    const f = el.dataset.f;
+    if (f === "pct") { t.pct = +el.value; el.nextElementSibling.textContent = el.value + "%"; if (t.pct > 0 && t.tt === "chua") t.tt = "dang"; scheduleSave(); return; }
+    if (["nd", "kq"].includes(f)) { t[f] = el.value; scheduleSave(); return; }
+  }
+  if (S.tab === "setup") {
+    const r = el.closest("[data-ri]"); if (r && el.dataset.rf) { S.rosterDraft[+r.dataset.ri][el.dataset.rf] = el.value; return; }
+    const c = el.closest("[data-ci]"); if (c && el.dataset.cf) { const it = S.commonDraft.list[+c.dataset.ci]; it[el.dataset.cf] = el.dataset.cf === "g" ? +el.value : el.dataset.cf === "types" ? (el.value ? [el.value] : []) : el.value; return; }
+  }
+});
+document.addEventListener("change", async ev => {
+  const el = ev.target;
+  if (el.id === "mMonth" && el.value) { if (S.dirty) await flush(); S.month = el.value; subMonth(); render(); return; }
+  if (el.id === "mgMonth" && el.value) { S.mMonth = el.value; renderManage(); return; }
+  if (el.id === "mgYear") { S.mMonth = `${el.value}-09`; renderManage(); return; }
+  if (el.id === "cMonth" && el.value) { S.setupMonth = el.value; S.commonDraft = null; renderSetup(); return; }
+  if (S.tab === "setup" && (el.dataset.rf || el.dataset.cf)) { renderSetup(); return; }
+  if (S.tab === "mine" && S.M) {
+    const card = el.closest("[data-tid]"); if (!card || !el.dataset.f) return;
+    const t = S.M.tasks.find(x => x.id === card.dataset.tid); if (!t) return;
+    const f = el.dataset.f;
+    if (["nd", "kq", "pct"].includes(f)) { if (f === "pct") renderMine(); return; }
+    const old = t[f];
+    t[f] = f === "g" ? +el.value : el.value;
+    if (f === "tt") {
+      if (t.tt === "xong") { t.pct = 100; if (!t.ngayXong) t.ngayXong = todayStr(); }
+      else if (old === "xong") { t.pct = Math.min(t.pct || 0, 90); t.ngayXong = ""; }
+      logAction(`Đổi trạng thái “${t.nd.slice(0, 50) || "nhiệm vụ"}”: ${TT[old]} → ${TT[t.tt]}`);
+    }
+    renderMine(); scheduleSave();
+  }
+});
+
+// drag & drop evidence
+document.addEventListener("dragover", ev => { const d = ev.target.closest?.(".task"); if (d && S.tab === "mine" && d.querySelector(".drop")) { ev.preventDefault(); d.querySelector(".drop").classList.add("over"); } });
+document.addEventListener("dragleave", ev => { const d = ev.target.closest?.(".task"); if (d) d.querySelector(".drop")?.classList.remove("over"); });
+document.addEventListener("drop", ev => {
+  const d = ev.target.closest?.(".task"); if (!d || S.tab !== "mine" || !d.querySelector(".drop")) return;
+  ev.preventDefault(); d.querySelector(".drop").classList.remove("over");
+  if (ev.dataTransfer?.files?.length) uploadFiles(d.dataset.tid, [...ev.dataTransfer.files]);
+});
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") $(".lightbox")?.remove(); });
+window.addEventListener("pagehide", () => { if (S.dirty) flush(); });
+
+const _renderMine = renderMine;
+renderMine = function () { _renderMine(); fillReviewNotes(); };
+
+boot();
+})();
+</script>
