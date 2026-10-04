@@ -198,6 +198,19 @@
   .hidden { display: none !important; }
   .help p, .help li { color: var(--text-secondary); }
   .help ol, .help ul { padding-left: 20px; }
+  .public-note { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }
+  .ev { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
+  .ev-item { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px 4px 4px; background: var(--surface-1); max-width: 100%; min-width: 0; }
+  .ev-item img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; display: block; background: var(--surface-2); }
+  .ev-item .ficon { width: 44px; height: 44px; border-radius: 6px; background: var(--surface-2); display: grid; place-items: center; font-size: 10.5px; font-weight: 700; color: var(--text-secondary); flex: none; }
+  .ev-item .meta { display: grid; min-width: 0; }
+  .ev-item .meta a { font-size: 12.5px; color: var(--accent-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+  .ev-item .meta small { font-size: 11px; color: var(--text-muted); }
+  .ev-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .ev-gallery figure { margin: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface-2); }
+  .ev-gallery img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; max-width: 100%; }
+  .ev-gallery figcaption { font-size: 11.5px; padding: 4px 6px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .loading { padding: 40px 16px; text-align: center; color: var(--text-muted); }
 
   @media (max-width: 1000px) {
     .g5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -225,9 +238,11 @@
     <div>
       <h1>Theo dõi, đánh giá nhiệm vụ CB-GV-NV</h1>
       <p class="sub" id="schoolLine"></p>
+      <p class="public-note">Dữ liệu trên trang này đang công khai với người có link.</p>
     </div>
     <div class="row">
       <span class="saved" id="savedMark"></span>
+      <button class="btn ghost" data-act="reload" title="Tải lại dữ liệu mới nhất mà người khác vừa cập nhật">↻ Tải lại</button>
       <button class="btn ghost" id="themeBtn" aria-label="Đổi giao diện sáng/tối">◐ Giao diện</button>
     </div>
   </header>
@@ -240,16 +255,13 @@
     <button role="tab" data-tab="data">Dữ liệu &amp; hướng dẫn</button>
   </nav>
 
-  <div id="demoBanner" class="banner hidden">
-    <span>Đang hiển thị <b>dữ liệu mẫu</b> (tên người là giả định) để bạn xem thử. Khi sẵn sàng nhập dữ liệu thật, hãy xoá dữ liệu mẫu.</span>
-    <span class="spacer"></span>
-    <button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>
-  </div>
+  <div id="demoBanner" class="banner hidden"></div>
 
-  <main id="view"></main>
+  <main id="view"><div class="loading">Đang tải dữ liệu chung của trường…</div></main>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="/lib/thbana.js"></script>
 <script>
 (() => {
 "use strict";
@@ -331,23 +343,153 @@ const RANKS = [
 // =====================================================================
 // 2. LƯU TRỮ
 // =====================================================================
-const STORE_KEY = "tdgv-db-v1";
-let db;
-let storageOk = true;
-function load() {
-  try { const s = localStorage.getItem(STORE_KEY); if (s) return JSON.parse(s); } catch (e) { storageOk = false; }
-  return null;
+// Dữ liệu dùng chung lưu trên máy chủ của trường qua TB (/lib/thbana.js):
+//   dashboard/truong   – 1 bản ghi: tên trường, cơ quan chủ quản
+//   dashboard/nhan-su  – mỗi CB-GV-NV một bản ghi
+//   dashboard/phieu    – mỗi người mỗi tháng một phiếu (kèm danh sách minh chứng đã upload)
+const APP = "dashboard";
+const COL = { school: "truong", staff: "nhan-su", rec: "phieu" };
+let db = { school: { name: "Trường Tiểu học Bà Nà", donVi: "UBND xã Bà Nà" }, staff: [], records: {}, demo: false };
+const remote = { school: null, staff: new Map(), recs: new Map() };
+let loaded = false, syncing = false, syncAgain = false, lastLoad = null, lastErr = null;
+
+function setMark(t) { const el = document.getElementById("savedMark"); if (el) el.textContent = t; }
+const hhmm = () => new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+function infraHint(msg) { return /\b(DB|FILES)\b|prepare/.test(msg || "") ? " – cần quản trị viên gắn D1/R2." : ""; }
+
+async function loadAll() {
+  const [sc, st, ph] = await Promise.all([TB.list(APP, COL.school), TB.list(APP, COL.staff), TB.list(APP, COL.rec)]);
+  remote.school = null; remote.staff.clear(); remote.recs.clear();
+  const next = { school: { name: "Trường Tiểu học Bà Nà", donVi: "UBND xã Bà Nà" }, staff: [], records: {}, demo: false };
+  if (sc.length) { next.school = { ...next.school, ...sc[0].data }; remote.school = { rid: sc[0].id, json: JSON.stringify(sc[0].data) }; }
+  const staffRows = st.slice().sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0) || a.created_at.localeCompare(b.created_at));
+  for (const r of staffRows) {
+    if (!r.data.id || remote.staff.has(r.data.id)) continue;
+    next.staff.push(r.data); remote.staff.set(r.data.id, { rid: r.id, json: JSON.stringify(r.data) });
+  }
+  for (const r of ph) {
+    const k = rkey(r.data.staffId, r.data.month);
+    if (!r.data.staffId || !r.data.month || remote.recs.has(k)) continue;
+    const rec = { ...r.data }; delete rec.staffId; delete rec.month;
+    rec.updatedBy = r.updated_by; rec.updatedAt = r.updated_at;
+    next.records[k] = rec;
+    remote.recs.set(k, { rid: r.id, json: recJson(r.data.staffId, r.data.month, rec) });
+  }
+  next.demo = next.staff.some(x => x.demo);
+  db = next; loaded = true; lastLoad = new Date();
+}
+function recData(sid, month, rec) { const d = { ...rec, staffId: sid, month }; delete d.updatedBy; delete d.updatedAt; return d; }
+function recJson(sid, month, rec) { return JSON.stringify(recData(sid, month, rec)); }
+function hasLocalChanges() {
+  if (JSON.stringify(db.school) !== remote.school?.json) return true;
+  if (db.staff.length !== remote.staff.size || Object.keys(db.records).length !== remote.recs.size) return true;
+  for (const x of db.staff) if (remote.staff.get(x.id)?.json !== JSON.stringify(x)) return true;
+  for (const [k, rec] of Object.entries(db.records)) { const [sid, m] = k.split("|"); if (remote.recs.get(k)?.json !== recJson(sid, m, rec)) return true; }
+  return false;
+}
+async function pool(tasks, n = 5) {
+  let i = 0, firstErr = null;
+  const run = async () => { while (i < tasks.length) { const t = tasks[i++]; try { await t(); } catch (e) { firstErr ||= e; } } };
+  await Promise.all(Array.from({ length: Math.min(n, tasks.length) }, run));
+  if (firstErr) throw firstErr;
+}
+async function sync() {
+  if (!loaded) return;
+  if (syncing) { syncAgain = true; return; }
+  syncing = true; setMark("Đang lưu…");
+  try {
+    const ops = [];
+    const sj = JSON.stringify(db.school);
+    if (!remote.school) ops.push(async () => { const r = await TB.create(APP, COL.school, JSON.parse(sj)); remote.school = { rid: r.id, json: sj }; });
+    else if (remote.school.json !== sj) ops.push(async () => { await TB.update(APP, COL.school, remote.school.rid, JSON.parse(sj)); remote.school.json = sj; });
+    db.staff.forEach((x, i) => { x.order = i; });
+    for (const x of db.staff) {
+      const j = JSON.stringify(x), r = remote.staff.get(x.id);
+      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.staff, JSON.parse(j)); remote.staff.set(x.id, { rid: c.id, json: j }); });
+      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.staff, r.rid, JSON.parse(j)); r.json = j; });
+    }
+    for (const [id, r] of remote.staff) if (!db.staff.some(x => x.id === id)) ops.push(async () => { await TB.remove(APP, COL.staff, r.rid); remote.staff.delete(id); });
+    for (const [k, rec] of Object.entries(db.records)) {
+      const [sid, m] = k.split("|"); const j = recJson(sid, m, rec), r = remote.recs.get(k);
+      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.rec, JSON.parse(j)); remote.recs.set(k, { rid: c.id, json: j }); });
+      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.rec, r.rid, JSON.parse(j)); r.json = j; });
+    }
+    for (const [k, r] of remote.recs) if (!db.records[k]) ops.push(async () => { await TB.remove(APP, COL.rec, r.rid); remote.recs.delete(k); });
+    await pool(ops);
+    lastErr = null;
+    setMark(ops.length ? "Đã lưu lên máy chủ " + hhmm() : "Đã đồng bộ " + hhmm());
+  } catch (e) {
+    lastErr = e;
+    setMark("⚠ Chưa lưu được");
+    toast("Chưa lưu được: " + e.message + infraHint(e.message));
+  } finally {
+    syncing = false;
+    if (syncAgain) { syncAgain = false; sync(); }
+  }
 }
 let saveTimer;
 function save(now) {
   clearTimeout(saveTimer);
-  const doSave = () => {
-    db.updated = new Date().toISOString();
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); storageOk = true; } catch (e) { storageOk = false; }
-    const el = document.getElementById("savedMark");
-    el.textContent = storageOk ? "Đã lưu " + new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "⚠ Trình duyệt không cho lưu – hãy xuất bản sao lưu";
-  };
-  if (now) doSave(); else saveTimer = setTimeout(doSave, 300);
+  setMark("Chưa lưu…");
+  saveTimer = setTimeout(sync, now ? 0 : 800);
+}
+async function reload(quiet) {
+  if (syncing || hasLocalChanges()) { if (!quiet) toast("Đang có thay đổi chưa lưu xong, thử lại sau vài giây."); return; }
+  try { await loadAll(); initUi(true); render(); setMark("Đã tải lúc " + hhmm()); if (!quiet) toast("Đã tải dữ liệu mới nhất."); }
+  catch (e) { if (!quiet) toast("Không tải được: " + e.message + infraHint(e.message)); }
+}
+
+// ---- Minh chứng (file, ảnh) upload qua TB.upload
+const EV_ACCEPT = "image/jpeg,image/png,image/webp,image/gif,image/heic,.heic,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt";
+const EXT_MIME = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif", heic: "image/heic", pdf: "application/pdf", csv: "text/csv", txt: "text/plain",
+  doc: "application/msword", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ppt: "application/vnd.ms-powerpoint", pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation" };
+async function prepareUpload(f) {
+  const ext = (f.name.split(".").pop() || "").toLowerCase();
+  let file = f;
+  if (!f.type && EXT_MIME[ext]) file = new File([f], f.name, { type: EXT_MIME[ext] });
+  if (/^image\/(jpeg|png|webp)$/.test(file.type) && file.size > 1.5 * 1048576) {
+    try {
+      const bmp = await createImageBitmap(file);
+      const k = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+      const cv = document.createElement("canvas"); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+      cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+      const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.82));
+      if (blob && blob.size < file.size) file = new File([blob], f.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
+    } catch (e) { /* giữ ảnh gốc */ }
+  }
+  if (file.size > 10 * 1048576) throw new Error(`“${f.name}” lớn hơn 10 MB. Hãy nén hoặc chia nhỏ.`);
+  return file;
+}
+function pickFiles(accept, multiple = true) {
+  return new Promise(res => { const i = document.createElement("input"); i.type = "file"; i.accept = accept; i.multiple = multiple; i.onchange = () => res([...i.files]); i.click(); });
+}
+async function uploadEvidence(list, files) {
+  for (const f of files) {
+    let file;
+    try { file = await prepareUpload(f); } catch (e) { toast(e.message); continue; }
+    setMark(`Đang tải lên “${file.name}”…`);
+    try {
+      const r = await TB.upload(APP, file);
+      list.push({ key: r.key, url: r.url, name: r.name, type: r.type, size: r.size, at: r.uploaded_at || new Date().toISOString(), by: r.uploaded_by || "" });
+      toast(`Đã tải lên “${r.name}”.`);
+    } catch (e) { toast(`Không tải được “${f.name}”: ${e.message}${infraHint(e.message)}`); }
+  }
+  save(true);
+}
+const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round((b || 0) / 1024)) + " KB";
+const isImg = e => /^image\/(jpeg|png|webp|gif)$/.test(e.type || "");
+function evHtml(list, scope, editable = true) {
+  return `<div class="ev">${(list || []).map((e, i) => `<div class="ev-item" data-ei="${i}" data-scope="${scope}">
+      ${isImg(e) ? `<a href="${esc(e.url)}" target="_blank" rel="noopener" title="Xem ảnh"><img src="${esc(e.url)}" alt="${esc(e.name)}" loading="lazy"></a>` : `<span class="ficon">${esc((e.name.split(".").pop() || "TỆP").slice(0, 4).toUpperCase())}</span>`}
+      <span class="meta"><a href="${esc(e.url)}" download="${esc(e.name)}" title="Tải về ${esc(e.name)}">${esc(e.name)}</a><small>${fmtSize(e.size)} · ${new Date(e.at).toLocaleDateString("vi-VN")}${e.by ? " · " + esc(e.by) : ""}</small></span>
+      ${editable ? `<button class="btn ghost sm danger" data-act="delEv" aria-label="Xoá minh chứng" title="Xoá">✕</button>` : ""}
+    </div>`).join("")}
+    ${editable ? `<button class="btn sm" data-act="upEv" data-scope="${scope}" title="Ảnh, PDF, Word, Excel… tối đa 10 MB">⤒ Tải minh chứng</button>` : ""}</div>`;
+}
+function evList(rec, scope) {
+  if (scope === "gen") return (rec.evGen ||= []);
+  const t = rec.tasks.find(x => x.id === scope); return t ? (t.ev ||= []) : [];
 }
 
 // =====================================================================
@@ -472,21 +614,15 @@ function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 10139
 function demo() {
   const r = rng(2026);
   const staff = [
-    ["Trần Thị Mai Anh", "gvcn", "Giáo viên", "Tổ 1", "1/1"],
-    ["Nguyễn Văn Bảo", "gvcn", "Giáo viên", "Tổ 1", "1/2"],
-    ["Lê Thị Cúc", "gvcn", "Tổ trưởng", "Tổ 2", "2/1"],
-    ["Phạm Thị Dung", "gvcn", "Giáo viên", "Tổ 2", "2/2"],
-    ["Hoàng Văn Em", "gvcn", "Giáo viên", "Tổ 3", "3/1"],
-    ["Võ Thị Giang", "gvcn", "Tổ trưởng", "Tổ 3", "3/2"],
-    ["Đặng Thị Hạnh", "gvcn", "Giáo viên", "Tổ 4-5", "4/1"],
-    ["Bùi Văn Khoa", "gvcn", "Tổ trưởng", "Tổ 4-5", "5/3"],
-    ["Ngô Thị Lan", "gvbm", "GV Tiếng Anh", "Tổ Bộ môn", ""],
-    ["Huỳnh Văn Minh", "gvbm", "GV Giáo dục thể chất", "Tổ Bộ môn", ""],
-    ["Phan Thị Ngọc", "cbnv", "Tổng phụ trách Đội", "Tổ Văn phòng", ""],
-    ["Dương Thị Oanh", "cbnv", "Nhân viên thư viện", "Tổ Văn phòng", ""],
-    ["Mai Văn Phúc", "cbnv", "Kế toán", "Tổ Văn phòng", ""],
-    ["Lý Thị Quỳnh", "cbnv", "Phó Hiệu trưởng", "Ban Giám hiệu", ""],
-  ].map(([name, type, chucVu, to, lop]) => ({ id: uid(), name, type, chucVu, to, lop }));
+    ["Giáo viên A", "gvcn", "Giáo viên", "Tổ 1", "1/1"],
+    ["Giáo viên B", "gvcn", "Tổ trưởng", "Tổ 1", "1/2"],
+    ["Giáo viên C", "gvcn", "Giáo viên", "Tổ 2", "2/1"],
+    ["Giáo viên D", "gvcn", "Giáo viên", "Tổ 3", "3/1"],
+    ["Giáo viên E", "gvcn", "Tổ trưởng", "Tổ 4-5", "5/3"],
+    ["Giáo viên F", "gvbm", "GV Tiếng Anh", "Tổ Bộ môn", ""],
+    ["Nhân viên G", "cbnv", "Nhân viên thư viện", "Tổ Văn phòng", ""],
+    ["Cán bộ H", "cbnv", "Phó Hiệu trưởng", "Ban Giám hiệu", ""],
+  ].map(([name, type, chucVu, to, lop]) => ({ id: uid(), name, type, chucVu, to, lop, demo: true }));
 
   const T = {
     gvcn: [
@@ -518,7 +654,7 @@ function demo() {
     ],
   };
   const months = [];
-  for (let k = "2025-09"; k <= CUR_MONTH; k = addMonth(k, 1)) {
+  for (let k = addMonth(CUR_MONTH, -9); k <= CUR_MONTH; k = addMonth(k, 1)) {
     const m = +k.split("-")[1];
     if (m >= 6 && m <= 8) continue;
     if (k === CUR_MONTH && now.getDate() < 25) continue;
@@ -529,7 +665,7 @@ function demo() {
     const skill = 0.82 + r() * 0.17;
     months.forEach((mk, mi) => {
       const isLast = mi === months.length - 1;
-      if (isLast && (si === 4 || si === 12)) return; // chưa nộp
+      if (isLast && (si === 3 || si === 6)) return; // chưa nộp
       const rec = newRecord();
       const tpl = T[st.type];
       const mName = monthLabel(mk).toLowerCase();
@@ -564,28 +700,24 @@ function demo() {
       records[rkey(st.id, mk)] = rec;
     });
   });
-  return { version: 1, demo: true, school: { name: "Trường Tiểu học Bà Nà", donVi: "UBND xã Bà Nà" }, staff, records };
+  return { staff, records };
 }
 
 // =====================================================================
 // 6. TRẠNG THÁI GIAO DIỆN
 // =====================================================================
-db = load();
-if (!db) { db = demo(); save(true); }
 const latestMonth = () => {
   const ms = Object.keys(db.records).map(k => k.split("|")[1]).sort();
   return ms.length ? ms[ms.length - 1] : CUR_MONTH;
 };
-const ui = {
-  tab: "overview",
-  period: { type: "month", value: latestMonth() },
-  evalStaff: db.staff[0]?.id || null,
-  evalMonth: latestMonth(),
-  person: db.staff[0]?.id || null,
-  personYear: schoolYearOf(latestMonth()),
-  sort: { key: "score", dir: -1 },
-  filter: { q: "", to: "", rank: "" },
-};
+const ui = { tab: "overview", sort: { key: "score", dir: -1 }, filter: { q: "", to: "", rank: "" } };
+function initUi(keep) {
+  if (!keep || !ui.period) ui.period = { type: "month", value: latestMonth() };
+  if (!keep || !staffById(ui.evalStaff)) ui.evalStaff = db.staff[0]?.id || null;
+  if (!keep || !ui.evalMonth) ui.evalMonth = latestMonth();
+  if (!keep || !staffById(ui.person)) ui.person = db.staff[0]?.id || null;
+  if (!keep || !ui.personYear) ui.personYear = schoolYearOf(latestMonth());
+}
 try { const t = sessionStorage.getItem("tdgv-tab"); if (t) ui.tab = t; } catch (e) {}
 
 function periodMonths(p) {
@@ -909,6 +1041,7 @@ function renderEval() {
       <span class="small muted">${esc(st.chucVu)}${st.lop ? " · Lớp " + esc(st.lop) : ""} · ${esc(st.to)}</span>
       <span class="spacer"></span>
       ${rec ? `<span id="eStatus">${recStatusHtml(rec.status)}</span>
+      ${rec.updatedBy ? `<span class="small muted" title="${esc(rec.updatedAt || "")}">Sửa lần cuối: ${esc(rec.updatedBy)}</span>` : ""}
       <button class="btn" data-act="print">🖨 In phiếu</button>
       <button class="btn" data-act="exportMau01">⬇ Excel Mẫu 01</button>` : ""}
     </div></div>`;
@@ -928,7 +1061,8 @@ function renderEval() {
       <div class="idx">${i + 1}</div>
       <div><textarea rows="3" data-f="nd" placeholder="Nội dung công việc/sản phẩm được giao" aria-label="Nội dung công việc">${esc(t.nd)}</textarea></div>
       <div><textarea rows="3" data-f="kqnd" placeholder="Sản phẩm đã thực hiện (ghi rõ văn bản, kết quả) hoặc lý do chưa hoàn thành" aria-label="Kết quả thực hiện">${esc(t.kqnd)}</textarea>
-        <input type="text" data-f="han" value="${esc(t.han)}" placeholder="Thời hạn yêu cầu (vd: 30/9/2026)" aria-label="Thời hạn" style="width:100%;margin-top:6px"></div>
+        <input type="text" data-f="han" value="${esc(t.han)}" placeholder="Thời hạn yêu cầu (vd: 30/9/2026)" aria-label="Thời hạn" style="width:100%;margin-top:6px">
+        ${evHtml(t.ev, t.id)}</div>
       <div class="opts">
         <label>Tính chất<select data-f="tc">${opt(TINH_CHAT, t.tc)}</select></label>
         <label>Vai trò<select data-f="md">${opt(MUC_DO, t.md)}</select></label>
@@ -996,6 +1130,10 @@ function renderEval() {
         <td class="c"><input type="checkbox" data-p="ok" ${e.ok !== false ? "checked" : ""} aria-label="Được duyệt"></td>
         <td><button class="btn ghost sm danger" data-act="delPl" aria-label="Xoá mục">✕</button></td></tr>`; }).join("") || `<tr><td colspan="7" class="muted">Chưa có mục điểm cộng/trừ nào.</td></tr>`}</tbody>
     </table></div>
+    <h3 style="margin:16px 0 6px">Minh chứng chung của phiếu</h3>
+    <p class="small muted" style="margin:0">Giấy khen, quyết định, ảnh hoạt động… dùng làm căn cứ cho điểm cộng/trừ. Minh chứng của từng công việc tải ở mục 1.</p>
+    ${evHtml(rec.evGen, "gen")}
+    ${(() => { const imgs = [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || [])].filter(isImg); return imgs.length ? `<h3 style="margin:16px 0 6px">Ảnh minh chứng trong phiếu (${imgs.length})</h3><div class="ev-gallery">${imgs.map(e => `<figure><a href="${esc(e.url)}" target="_blank" rel="noopener"><img src="${esc(e.url)}" alt="${esc(e.name)}" loading="lazy"></a><figcaption>${esc(e.name)}</figcaption></figure>`).join("")}</div>` : ""; })()}
     <h3 style="margin:16px 0 6px">Khống chế (mỗi mục vi phạm → hạ 1 bậc xếp loại)</h3>
     ${cat.filter(x => x.s === "VII").map(x => `<label class="row small" style="margin:4px 0;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" data-kc="${x.i}" ${rec.kc.includes(x.i) ? "checked" : ""}> <span>${esc(x.t)}</span></label>`).join("")}
   </div>
@@ -1125,7 +1263,7 @@ function onEvalInput(ev) {
 }
 
 function copyTasksFrom(prevRec) {
-  return prevRec.tasks.map(t => ({ ...t, id: uid(), kq: "done", td: "dung", tre: 0, cl: "dam", ah: false, kqnd: "", han: monthLabel(ui.evalMonth) }));
+  return prevRec.tasks.map(t => ({ ...t, id: uid(), kq: "done", td: "dung", tre: 0, cl: "dam", ah: false, kqnd: "", han: monthLabel(ui.evalMonth), ev: [] }));
 }
 
 // =====================================================================
@@ -1214,16 +1352,16 @@ function renderData() {
       <label class="small muted">Tên trường<input type="text" data-school="name" value="${esc(db.school.name)}" style="width:100%"></label>
       <label class="small muted">Cơ quan chủ quản<input type="text" data-school="donVi" value="${esc(db.school.donVi)}" style="width:100%"></label>
     </div>
-    <h2 style="margin-top:20px">Sao lưu và khôi phục</h2>
-    <p class="small muted">Dữ liệu (${db.staff.length} người, ${nRec} phiếu) đang lưu trong trình duyệt của máy này. Hãy xuất bản sao lưu định kỳ, và dùng nó để chuyển dữ liệu sang máy khác.</p>
+    <h2 style="margin-top:20px">Dữ liệu dùng chung</h2>
+    <p class="small muted">Dữ liệu (${db.staff.length} người, ${nRec} phiếu) lưu trên máy chủ của trường; mọi người mở trang đều xem và sửa được. ${lastLoad ? "Tải lần cuối lúc " + lastLoad.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + "." : ""} Bấm “↻ Tải lại” để xem thay đổi người khác vừa nhập.</p>
     <div class="row">
-      <button class="btn primary" data-act="backup">⬇ Xuất bản sao lưu (.json)</button>
-      <button class="btn" data-act="restore">⬆ Khôi phục từ bản sao lưu</button>
+      <button class="btn" data-act="backup">⬇ Xuất bản sao lưu (.json)</button>
     </div>
-    <h2 style="margin-top:20px">Xoá dữ liệu</h2>
+    <h2 style="margin-top:20px">Dữ liệu mẫu</h2>
+    <p class="small muted">Dữ liệu mẫu dùng tên giả (Giáo viên A, B…) để xem thử; xoá đi trước khi nhập dữ liệu thật.</p>
     <div class="row" style="margin-top:8px">
-      ${db.demo ? `<button class="btn" data-act="clearDemo">Xoá dữ liệu mẫu</button>` : `<button class="btn" data-act="loadDemo">Nạp lại dữ liệu mẫu</button>`}
-      <button class="btn danger" data-act="clearRecords">Xoá toàn bộ phiếu đánh giá</button>
+      <button class="btn" data-act="loadDemo">Nạp dữ liệu mẫu</button>
+      ${db.demo ? `<button class="btn danger" data-act="clearDemo">Xoá dữ liệu mẫu</button>` : ""}
     </div>
   </div>
   <div class="card help">
@@ -1330,7 +1468,7 @@ function printRecord() {
   <p>Họ và tên: <b>${esc(st.name)}</b> &nbsp;·&nbsp; Chức vụ, chức danh: ${esc(st.chucVu)} &nbsp;·&nbsp; Đơn vị: ${esc(db.school.name)}</p>
   <h3>I. Thống kê công việc (Mẫu 01TKNV)</h3>
   <table><tr><th>TT</th><th>Nội dung công việc</th><th>Kết quả</th><th>Tiến độ</th><th>Chất lượng</th></tr>
-  ${GROUPS.map(G => `<tr><td colspan="5"><b>${esc(G.t)}</b></td></tr>` + rec.tasks.filter(t => t.g === G.g).map((t, i) => `<tr>${td(i + 1, "cc")}${td(esc(t.nd) + (t.kqnd ? `<br><i>${esc(t.kqnd)}</i>` : ""))}${td(KET_QUA[t.kq])}${td(t.kq === "done" ? TIEN_DO[t.td] + (t.td === "tre" && t.tre ? ` (${t.tre} ngày)` : "") : "–")}${td(t.kq === "done" ? CHAT_LUONG[t.cl] : "–")}</tr>`).join("")).join("")}
+  ${GROUPS.map(G => `<tr><td colspan="5"><b>${esc(G.t)}</b></td></tr>` + rec.tasks.filter(t => t.g === G.g).map((t, i) => `<tr>${td(i + 1, "cc")}${td(esc(t.nd) + (t.kqnd ? `<br><i>${esc(t.kqnd)}</i>` : "") + ((t.ev || []).length ? `<br><small>Minh chứng: ${t.ev.map(e => esc(e.name)).join("; ")}</small>` : ""))}${td(KET_QUA[t.kq])}${td(t.kq === "done" ? TIEN_DO[t.td] + (t.td === "tre" && t.tre ? ` (${t.tre} ngày)` : "") : "–")}${td(t.kq === "done" ? CHAT_LUONG[t.cl] : "–")}</tr>`).join("")).join("")}
   </table>
   <p>Được giao: ${s.n} · Hoàn thành: ${s.done} (${pct(s.rHT)}) · Đúng/sớm hạn: ${s.som + s.dung} (${pct(s.rTD)}) · Đảm bảo chất lượng trở lên: ${s.dam + s.vuot} (${pct(s.rCL)})</p>
   <h3>II. Tổng hợp điểm</h3>
@@ -1405,8 +1543,12 @@ function setTab(t) {
   window.scrollTo({ top: 0 });
 }
 function render() {
+  if (!loaded) return;
   $("#schoolLine").textContent = `${db.school.name} · ${db.school.donVi}`;
-  $("#demoBanner").classList.toggle("hidden", !db.demo);
+  const bn = $("#demoBanner");
+  if (db.demo) bn.innerHTML = `<span>Đang có <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…) để xem thử. Trước khi nhập dữ liệu thật, hãy xoá dữ liệu mẫu.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
+  else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Nạp dữ liệu mẫu để xem thử, hoặc vào <b>Danh sách CB-GV-NV</b> để nhập danh sách thật.</span><span class="spacer"></span><button class="btn sm primary" data-act="loadDemo">Nạp dữ liệu mẫu</button>`;
+  bn.classList.toggle("hidden", !(db.demo || !db.staff.length));
   ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData })[ui.tab]();
 }
 
@@ -1480,7 +1622,9 @@ document.addEventListener("click", async e => {
       if (s !== "nhap") { const c = calc(rec); if (!rec.tasks.length) { toast("Chưa có công việc nào trong phiếu."); break; } if (c.aFilled < CRIT_ITEMS.length && !confirm(`Phần A còn ${CRIT_ITEMS.length - c.aFilled} tiêu chí chưa chấm. Vẫn chuyển trạng thái?`)) break; }
       rec.status = s; rec.updated = new Date().toISOString(); save(); renderEval(); break;
     }
-    case "delRec": if (confirm(`Xoá phiếu ${monthLabel(ui.evalMonth)} của ${staffById(ui.evalStaff).name}?`)) { delete db.records[rkey(ui.evalStaff, ui.evalMonth)]; save(); renderEval(); } break;
+    case "delRec": if (confirm(`Xoá phiếu ${monthLabel(ui.evalMonth)} của ${staffById(ui.evalStaff).name}?`)) {
+      for (const e of [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || [])]) TB.removeFile(e.key).catch(() => {});
+      delete db.records[rkey(ui.evalStaff, ui.evalMonth)]; save(); renderEval(); } break;
     case "print": printRecord(); break;
     case "exportMau01": exportMau01(); break;
     case "exportSummary": exportSummary(); break;
@@ -1500,15 +1644,31 @@ document.addEventListener("click", async e => {
     }
     case "importStaff": importStaff(); break;
     case "backup": download(`sao_luu_danh_gia_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(db, null, 1), "application/json"); break;
-    case "restore": {
-      const f = await pickFile(".json"); if (!f) break;
-      try { const d = JSON.parse(await f.text()); if (!d.staff || !d.records) throw new Error("File không đúng định dạng"); if (!confirm(`Khôi phục ${d.staff.length} người, ${Object.keys(d.records).length} phiếu? Dữ liệu hiện tại sẽ bị thay thế.`)) break; db = d; save(true); ui.period = { type: "month", value: latestMonth() }; render(); toast("Đã khôi phục dữ liệu."); }
-      catch (err) { toast("Không đọc được bản sao lưu: " + err.message); }
-      break;
+    case "clearDemo": {
+      if (!confirm("Xoá dữ liệu mẫu (những người tên giả và phiếu của họ)? Dữ liệu thật không bị ảnh hưởng.")) break;
+      const ids = new Set(db.staff.filter(x => x.demo).map(x => x.id));
+      db.staff = db.staff.filter(x => !ids.has(x.id));
+      for (const k of Object.keys(db.records)) if (ids.has(k.split("|")[0])) delete db.records[k];
+      db.demo = false; initUi(); toast("Đang xoá dữ liệu mẫu trên máy chủ…"); await sync(); render(); break;
     }
-    case "clearDemo": if (confirm("Xoá toàn bộ dữ liệu mẫu (người và phiếu) để bắt đầu nhập dữ liệu thật?")) { db = { version: 1, demo: false, school: db.school, staff: [], records: {} }; save(true); setTab("staff"); toast("Đã xoá dữ liệu mẫu. Hãy thêm danh sách CB-GV-NV."); } break;
-    case "loadDemo": if (confirm("Thay dữ liệu hiện tại bằng dữ liệu mẫu? Nên xuất bản sao lưu trước.")) { db = demo(); save(true); ui.period = { type: "month", value: latestMonth() }; ui.evalStaff = db.staff[0].id; ui.person = db.staff[0].id; render(); } break;
-    case "clearRecords": if (confirm("Xoá TẤT CẢ phiếu đánh giá (giữ danh sách người)? Không thể hoàn tác.")) { db.records = {}; save(true); render(); } break;
+    case "loadDemo": {
+      if (db.demo && !confirm("Đã có dữ liệu mẫu. Nạp thêm một bộ nữa?")) break;
+      const d = demo();
+      db.staff.push(...d.staff); Object.assign(db.records, d.records); db.demo = true;
+      initUi(); render(); toast(`Đang lưu ${d.staff.length} người và ${Object.keys(d.records).length} phiếu mẫu lên máy chủ…`); await sync(); render(); break;
+    }
+    case "reload": reload(); break;
+    case "upEv": {
+      const files = await pickFiles(EV_ACCEPT); if (!files.length) break;
+      await uploadEvidence(evList(rec, b.dataset.scope), files); renderEval(); break;
+    }
+    case "delEv": {
+      const it = b.closest("[data-ei]"); const list = evList(rec, it.dataset.scope); const e = list[+it.dataset.ei];
+      if (!e || !confirm(`Xoá minh chứng “${e.name}”?`)) break;
+      try { await TB.removeFile(e.key); }
+      catch (err) { if (!/Không tìm thấy/.test(err.message)) { toast(err.message); break; } }
+      list.splice(+it.dataset.ei, 1); save(true); renderEval(); toast("Đã xoá minh chứng."); break;
+    }
   }
 });
 
@@ -1521,8 +1681,20 @@ $("#themeBtn").addEventListener("click", () => {
 });
 let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (ui.tab === "overview") renderOverview(); if (ui.tab === "person") renderPerson(); }, 150); });
 
-setTab(ui.tab);
-if (!storageOk) $("#savedMark").textContent = "⚠ Trình duyệt không cho lưu – hãy xuất bản sao lưu";
+$$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === ui.tab));
+(async () => {
+  try {
+    if (!window.TB) throw new Error("Không nạp được thư viện dùng chung /lib/thbana.js.");
+    await loadAll();
+    initUi();
+    setMark("Đã tải lúc " + hhmm());
+    setTab(ui.tab);
+  } catch (e) {
+    $("#view").innerHTML = `<div class="card"><h2>Chưa tải được dữ liệu</h2><p style="margin-top:6px">${esc(e.message)}${esc(infraHint(e.message))}</p><p class="small muted">Hãy tải lại trang. Nếu vẫn lỗi, báo quản trị viên kèm thông báo trên.</p><button class="btn" onclick="location.reload()">Tải lại trang</button></div>`;
+  }
+})();
+addEventListener("focus", () => { if (loaded) reload(true); });
+addEventListener("beforeunload", e => { if (loaded && (syncing || hasLocalChanges())) { sync(); e.preventDefault(); e.returnValue = ""; } });
 })();
 </script>
 </body>
