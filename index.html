@@ -25,8 +25,7 @@
 <body>
 <div class="wrap">
   <h1>Ứng dụng AI của Trường Tiểu học Bà Nà</h1>
-  <p class="sub">Các công cụ do giáo viên tự xây dựng bằng AI. Dữ liệu dùng chung trong trường, chỉ người có email được cấp quyền mới truy cập được.</p>
-  <div class="who" id="who">Đang kiểm tra đăng nhập…</div>
+  <p class="sub">Các công cụ do giáo viên tự xây dựng bằng AI. Dữ liệu dùng chung trong trường. Lưu ý: trang đang công khai với người có link, không nhập dữ liệu cá nhân thật.</p>
 
   <!-- DANH SÁCH ỨNG DỤNG: mỗi ứng dụng mới thêm một thẻ <a class="app"> vào đây -->
   <div class="grid">
@@ -37,14 +36,5 @@
     </a>
   </div>
 </div>
-<script src="/lib/thbana.js"></script>
-<script>
-  TB.me().then(function (r) {
-    document.getElementById("who").innerHTML = "Đang đăng nhập: <b></b>";
-    document.querySelector("#who b").textContent = r.email;
-  }).catch(function (e) {
-    document.getElementById("who").textContent = e.message;
-  });
-</script>
 </body>
 </html>

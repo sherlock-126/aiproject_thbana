@@ -6,12 +6,12 @@ Luật cho AI nằm trong `CLAUDE.md`.
 ## Hạ tầng (quản trị viên)
 | Thành phần | Bản chính | Bản xem thử |
 |---|---|---|
-| Cloudflare Pages | project `thbana`, nhánh `main` | mọi nhánh khác |
+| Cloudflare Pages | project `aiproject-thbana`, nhánh `main` | mọi nhánh khác |
 | D1 (binding `DB`) | `thbana-db` | `thbana-db-preview` |
 | R2 (binding `FILES`) | `thbana-files` | `thbana-files-preview` |
-| Đăng nhập | Cloudflare Access (email OTP) | như bản chính |
+| Đăng nhập | **Chưa bật** (trang công khai, người dùng ghi là `khach`). Bật Access + đặt 2 biến dưới là tự bắt đăng nhập | như bản chính |
 
-Biến môi trường trên Pages: `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` (bắt buộc, thiếu thì API từ chối mọi request), `ADMIN_EMAILS` (danh sách email quản trị, phân tách bằng dấu phẩy).
+Biến môi trường tùy chọn trên Pages: `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` (có đủ hai biến thì API bắt đăng nhập qua Cloudflare Access), `ADMIN_EMAILS` (email quản trị, phân tách bằng dấu phẩy).
 
 - `functions/_middleware.js`: chặn file nội bộ, xác thực JWT của Access, gắn email người dùng.
 - `functions/api/records`: dữ liệu dùng chung (JSON) theo `app/collection`.

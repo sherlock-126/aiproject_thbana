@@ -41,7 +41,7 @@ export async function onRequest({ request, env, params, data }) {
     if (request.method === "DELETE") {
       const meta = await env.DB.prepare("SELECT uploaded_by FROM files WHERE key=?").bind(key).first();
       if (!meta) return err(404, "Không tìm thấy file.");
-      if (meta.uploaded_by !== data.email && !isAdmin(env, data.email)) return err(403, "Chỉ người upload hoặc quản trị viên được xóa file này.");
+      if (data.accessOn && meta.uploaded_by !== data.email && !isAdmin(env, data.email)) return err(403, "Chỉ người upload hoặc quản trị viên được xóa file này.");
       await env.FILES.delete(key);
       await env.DB.prepare("DELETE FROM files WHERE key=?").bind(key).run();
       return Response.json({ ok: true });
