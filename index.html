@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ứng dụng AI · TH Bà Nà</title>
+<style>
+  :root { --bg:#F3F5F8; --card:#FFFFFF; --line:#E2E6EC; --ink:#1C2533; --muted:#667085; --title:#0E2A47; --accent:#D9620F; --ok:#1B7A4D; --bad:#B3222B; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0F151D; --card:#17202B; --line:#2A3542; --ink:#E7ECF2; --muted:#94A0AF; --title:#BFD7F2; --accent:#F08A3C; --ok:#6FD3A0; --bad:#F29A9F; color-scheme:dark; } }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 "Segoe UI",Roboto,Arial,sans-serif }
+  .wrap { max-width:960px; margin:0 auto; padding:28px 16px 60px }
+  h1 { color:var(--title); font-size:24px; margin:0 0 4px }
+  .sub { color:var(--muted); margin:0 0 24px }
+  .who { font-size:13px; color:var(--muted); margin-bottom:20px }
+  .who b { color:var(--ink) }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px }
+  a.app { display:block; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; text-decoration:none; color:inherit }
+  a.app:hover, a.app:focus-visible { border-color:var(--accent); outline:none }
+  a.app h2 { margin:0 0 4px; font-size:16px; color:var(--title) }
+  a.app p { margin:0; font-size:13px; color:var(--muted) }
+  .tag { display:inline-block; margin-top:10px; font-size:12px; color:var(--accent); font-weight:600 }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ứng dụng AI của Trường Tiểu học Bà Nà</h1>
+  <p class="sub">Các công cụ do giáo viên tự xây dựng bằng AI. Dữ liệu dùng chung trong trường, chỉ người có email được cấp quyền mới truy cập được.</p>
+  <div class="who" id="who">Đang kiểm tra đăng nhập…</div>
+
+  <!-- DANH SÁCH ỨNG DỤNG: mỗi ứng dụng mới thêm một thẻ <a class="app"> vào đây -->
+  <div class="grid">
+    <a class="app" href="/dashboard/">
+      <h2>Bảng điều khiển bán hàng</h2>
+      <p>Dashboard mẫu (dữ liệu minh họa).</p>
+      <span class="tag">Mở ứng dụng →</span>
+    </a>
+  </div>
+</div>
+<script src="/lib/thbana.js"></script>
+<script>
+  TB.me().then(function (r) {
+    document.getElementById("who").innerHTML = "Đang đăng nhập: <b></b>";
+    document.querySelector("#who b").textContent = r.email;
+  }).catch(function (e) {
+    document.getElementById("who").textContent = e.message;
+  });
+</script>
+</body>
+</html>
