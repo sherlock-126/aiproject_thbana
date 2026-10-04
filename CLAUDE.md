@@ -63,8 +63,8 @@ Chưa có đăng nhập, nên mọi trang và mọi dữ liệu lưu qua `TB` **
 1. Làm trên **nhánh riêng**. **Không bao giờ đẩy thẳng lên `main`**, kể cả khi tài khoản có quyền.
 2. Commit, đẩy nhánh lên GitHub. Khoảng 1–2 phút sau Cloudflare tạo xong bản xem thử. **Gửi giáo viên link xem thử** (mục 1). Bản xem thử dùng database và kho file riêng, thử thoải mái.
 3. Kiểm tra link xem thử hoạt động, ví dụ `curl -s -o /dev/null -w "%{http_code}" <link>/<app>/` phải ra `200`. Nếu chưa ra, chờ thêm hoặc xem trạng thái check "Cloudflare Pages" trên commit, PR.
-4. Giáo viên duyệt xong: tạo **Pull Request vào `main`**, tiêu đề và mô tả bằng tiếng Việt, ghi rõ ứng dụng nào, thay đổi gì. Quản trị viên duyệt và gộp. Sau đó trang chính tự cập nhật.
-5. Nhánh hiện tại thiếu `CLAUDE.md`, `lib/`, `functions/` (tạo trước khi có hạ tầng): **merge `main` vào nhánh** trước khi làm tiếp.
+4. Giáo viên duyệt bản xem thử và yêu cầu đưa lên trang chính → trước khi merge: merge `main` mới nhất vào nhánh, đẩy lên, kiểm tra link xem thử vẫn chạy. Sau đó tạo Pull Request vào `main` (tiêu đề, mô tả tiếng Việt) và tự merge bằng squash. Chờ 1–2 phút, kiểm tra https://aiproject-thbana.pages.dev/<app>/ đã có bản mới, rồi báo giáo viên.
+5. Nhánh nào còn thiếu `CLAUDE.md`, `lib/`, `functions/` (tạo trước khi có hạ tầng): **merge `main` vào nhánh** trước khi làm tiếp.
 
 ## 6. TUYỆT ĐỐI KHÔNG (phần do quản trị viên quản lý)
 

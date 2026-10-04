@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bảng điều khiển</title>
+<title>Theo dõi nhiệm vụ giáo viên</title>
 <style>
   :root {
     color-scheme: light;
@@ -14,117 +14,109 @@
     --grid: #ebeae6;
     --text-primary: #0b0b0b;
     --text-secondary: #52514e;
-    --text-muted: #7a7974;
+    --text-muted: #6f6e69;
+    --accent: #2a78d6;
+    --accent-text: #1c5cab;
+    --accent-soft: #e6f0fc;
     --series-1: #2a78d6;
-    --series-ref: #a3a29c;
-    --bar-1: #2a78d6;
+    --ref: #a3a29c;
+    --r-xs: #104281;
+    --r-tot: #256abf;
+    --r-ht: #5598e7;
+    --r-kht: #86b6ef;
+    --on-xs: #fff; --on-tot: #fff; --on-ht: #0b0b0b; --on-kht: #0b0b0b;
     --good: #0ca30c;
     --good-text: #006300;
     --warning: #fab219;
+    --warning-text: #7a5300;
     --serious: #ec835a;
     --critical: #d03b3b;
     --critical-text: #b42f2f;
-    --focus: #2a78d6;
     --shadow: 0 1px 2px rgba(0,0,0,.04);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --bg: #111110;
-      --surface-1: #1a1a19;
-      --surface-2: #232321;
-      --border: #2e2e2c;
-      --grid: #2a2a28;
-      --text-primary: #ffffff;
-      --text-secondary: #c3c2b7;
-      --text-muted: #8f8e86;
-      --series-1: #3987e5;
-      --series-ref: #6b6a64;
-      --bar-1: #3987e5;
-      --good-text: #4cc94c;
-      --critical-text: #e66767;
-      --focus: #3987e5;
-      --shadow: none;
+      --bg: #111110; --surface-1: #1a1a19; --surface-2: #232321; --border: #2e2e2c; --grid: #2a2a28;
+      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #9a9990;
+      --accent: #3987e5; --accent-text: #86b6ef; --accent-soft: #1d2a3a;
+      --series-1: #3987e5; --ref: #6b6a64;
+      --r-xs: #9ec5f4; --r-tot: #5598e7; --r-ht: #2a78d6; --r-kht: #184f95;
+      --on-xs: #0b0b0b; --on-tot: #0b0b0b; --on-ht: #fff; --on-kht: #fff;
+      --good-text: #4cc94c; --warning-text: #fab219; --critical-text: #e66767; --shadow: none;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #111110;
-    --surface-1: #1a1a19;
-    --surface-2: #232321;
-    --border: #2e2e2c;
-    --grid: #2a2a28;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #8f8e86;
-    --series-1: #3987e5;
-    --series-ref: #6b6a64;
-    --bar-1: #3987e5;
-    --good-text: #4cc94c;
-    --critical-text: #e66767;
-    --focus: #3987e5;
-    --shadow: none;
+    --bg: #111110; --surface-1: #1a1a19; --surface-2: #232321; --border: #2e2e2c; --grid: #2a2a28;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #9a9990;
+    --accent: #3987e5; --accent-text: #86b6ef; --accent-soft: #1d2a3a;
+    --series-1: #3987e5; --ref: #6b6a64;
+    --r-xs: #9ec5f4; --r-tot: #5598e7; --r-ht: #2a78d6; --r-kht: #184f95;
+      --on-xs: #0b0b0b; --on-tot: #0b0b0b; --on-ht: #fff; --on-kht: #fff;
+    --good-text: #4cc94c; --warning-text: #fab219; --critical-text: #e66767; --shadow: none;
   }
 
   * { box-sizing: border-box; }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text-primary);
+    margin: 0; background: var(--bg); color: var(--text-primary);
     font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
-  header.top {
-    display: flex; flex-wrap: wrap; gap: 12px 16px;
-    align-items: center; justify-content: space-between; margin-bottom: 20px;
-  }
-  h1 { font-size: 22px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 16px 16px 64px; }
+  header.top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin: 4px 0 12px; }
+  h1 { font-size: 20px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
   .sub { color: var(--text-secondary); margin: 2px 0 0; font-size: 13px; }
+  h2 { font-size: 15px; margin: 0; font-weight: 620; }
+  h3 { font-size: 14px; margin: 0; font-weight: 620; }
 
-  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .seg {
-    display: inline-flex; background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 2px;
+  nav.tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border); margin-bottom: 16px; scrollbar-width: none; }
+  nav.tabs button {
+    border: 0; background: none; font: inherit; color: var(--text-secondary); padding: 10px 12px; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;
   }
-  .seg button {
-    border: 0; background: transparent; color: var(--text-secondary);
-    font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; cursor: pointer;
-  }
-  .seg button[aria-pressed="true"] {
-    background: var(--surface-1); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,.12);
-  }
-  select, .btn {
-    font: inherit; font-size: 13px; color: var(--text-primary);
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
-    padding: 6px 10px; cursor: pointer;
-  }
-  button:focus-visible, select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  nav.tabs button[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--accent); font-weight: 600; }
 
-  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
-  .card {
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px; box-shadow: var(--shadow); min-width: 0;
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .spacer { flex: 1; }
+  select, input[type=text], input[type=number], input[type=month], input[type=search], textarea {
+    font: inherit; font-size: 13px; color: var(--text-primary); background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; min-width: 0;
   }
-  .kpi .label { color: var(--text-secondary); font-size: 13px; }
-  .kpi .value { font-size: 26px; font-weight: 650; letter-spacing: -.02em; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
-  .delta { font-size: 12px; font-weight: 600; display: inline-flex; gap: 4px; align-items: center; }
-  .delta.up { color: var(--good-text); }
-  .delta.down { color: var(--critical-text); }
-  .delta .vs { color: var(--text-muted); font-weight: 400; }
+  textarea { width: 100%; resize: vertical; line-height: 1.4; }
+  input[type=number] { width: 72px; text-align: right; font-variant-numeric: tabular-nums; }
+  .btn {
+    font: inherit; font-size: 13px; color: var(--text-primary); background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn.ghost { border-color: transparent; background: none; color: var(--text-secondary); }
+  .btn.ghost:hover { background: var(--surface-2); }
+  .btn.danger { color: var(--critical-text); }
+  .btn.sm { padding: 3px 8px; font-size: 12px; }
+  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-  .grid2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
-  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-  .card-head h2 { font-size: 15px; margin: 0; font-weight: 620; }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+  .card + .card { margin-top: 12px; }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
   .card-head p { margin: 2px 0 0; color: var(--text-muted); font-size: 12px; }
-  .linkbtn {
-    border: 0; background: none; color: var(--text-secondary); font: inherit; font-size: 12px;
-    cursor: pointer; padding: 4px 6px; border-radius: 6px; white-space: nowrap;
-  }
-  .linkbtn:hover { background: var(--surface-2); }
+  .grid { display: grid; gap: 12px; margin-bottom: 12px; }
+  .g5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .g2 { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  .g2e { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .kpi .label { color: var(--text-secondary); font-size: 13px; }
+  .kpi .value { font-size: 26px; font-weight: 650; letter-spacing: -.02em; margin: 2px 0; font-variant-numeric: tabular-nums; }
+  .kpi .note { font-size: 12px; color: var(--text-muted); }
+
+  .banner { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary); }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .chip { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
   .sw { width: 14px; height: 0; border-top: 2px solid; display: inline-block; }
   .sw.dash { border-top-style: dashed; }
 
@@ -132,40 +124,111 @@
   .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
   .chart text { fill: var(--text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
   .chart .lbl { fill: var(--text-secondary); font-size: 12px; }
-  .chart .val { fill: var(--text-primary); font-size: 12px; font-weight: 600; }
-
   .tip {
-    position: absolute; pointer-events: none; z-index: 5;
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
-    padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.14);
-    min-width: 150px; opacity: 0; transition: opacity .08s; white-space: nowrap;
+    position: absolute; pointer-events: none; z-index: 5; background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.14); min-width: 160px;
+    opacity: 0; transition: opacity .08s; white-space: nowrap;
   }
   .tip.on { opacity: 1; }
   .tip .t { color: var(--text-secondary); margin-bottom: 4px; }
-  .tip .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
-  .tip .row b { font-variant-numeric: tabular-nums; }
-  .tip .k { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+  .tip .r { display: flex; justify-content: space-between; gap: 12px; }
+  .tip .r b { font-variant-numeric: tabular-nums; }
 
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--border); }
-  th { color: var(--text-muted); font-weight: 500; font-size: 12px; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--text-muted); font-weight: 500; font-size: 12px; white-space: nowrap; }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { color: var(--text-primary); }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.c, th.c { text-align: center; }
   tbody tr:last-child td { border-bottom: 0; }
-  .table-scroll { overflow-x: auto; }
-  #ordersTable { min-width: 600px; }
-  #ordersTable td { white-space: nowrap; }
-  .status { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); }
-  .status svg { flex: none; }
-  .hidden { display: none !important; }
+  tr.click { cursor: pointer; }
+  tr.click:hover td { background: var(--surface-2); }
+  tr.grp td { background: var(--surface-2); font-weight: 600; font-size: 12.5px; }
+  tr.tot td { font-weight: 650; border-top: 2px solid var(--border); }
+  .scroll { overflow-x: auto; }
+  .muted { color: var(--text-muted); }
+  .small { font-size: 12px; }
+  .nowrap { white-space: nowrap; }
 
-  @media (max-width: 900px) {
-    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .bar { display: inline-flex; align-items: center; gap: 6px; min-width: 96px; }
+  .bar i { display: block; height: 6px; border-radius: 3px; background: var(--grid); width: 48px; position: relative; overflow: hidden; flex: none; }
+  .bar i b { position: absolute; inset: 0 auto 0 0; background: var(--series-1); border-radius: 3px; }
+
+  .rank { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .status { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); white-space: nowrap; }
+  .status svg { flex: none; }
+
+  .alerts { list-style: none; margin: 0; padding: 0; }
+  .alerts li { display: flex; gap: 8px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .alerts li:last-child { border-bottom: 0; }
+  .alerts li svg { flex: none; margin-top: 2px; }
+  .alerts a { color: var(--accent-text); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+  /* Evaluation form */
+  .sec-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 18px 0 8px; flex-wrap: wrap; }
+  .sec-title:first-child { margin-top: 0; }
+  .task {
+    display: grid; grid-template-columns: 28px minmax(0, 1.4fr) minmax(0, 1.3fr) minmax(0, 1.5fr) 28px; gap: 8px;
+    padding: 10px 0; border-bottom: 1px dashed var(--border); align-items: start;
   }
-  @media (max-width: 420px) {
+  .task .idx { color: var(--text-muted); padding-top: 6px; font-variant-numeric: tabular-nums; }
+  .task .opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .task .opts label { display: grid; gap: 2px; font-size: 11px; color: var(--text-muted); }
+  .task .opts label.chk { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); grid-column: 1 / -1; }
+  .task select, .task input[type=text] { width: 100%; }
+  .task .tre { display: flex; gap: 4px; align-items: center; }
+  .task .tre input { width: 56px; }
+  .grp-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 12px; padding: 6px 10px;
+    background: var(--surface-2); border-radius: 8px; font-weight: 600; font-size: 13px; }
+  .empty { color: var(--text-muted); font-size: 12.5px; padding: 8px 0 4px 36px; }
+  .sumtbl td, .sumtbl th { text-align: center; padding: 6px 4px; }
+  .crit { min-width: 600px; }
+  .crit td:first-child { width: 36px; color: var(--text-muted); }
+  .crit input[type=number] { width: 64px; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; background: var(--surface-2); color: var(--text-secondary); white-space: nowrap; }
+  .pill.ok { color: var(--good-text); }
+  .saved { font-size: 12px; color: var(--text-muted); }
+  .bigscore { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .stickybar { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 8px 0; margin: -8px 0 8px; }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--text-primary); color: var(--surface-1);
+    padding: 8px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 50; max-width: calc(100% - 32px); }
+  .toast.on { opacity: 1; }
+  .hidden { display: none !important; }
+  .help p, .help li { color: var(--text-secondary); }
+  .help ol, .help ul { padding-left: 20px; }
+  .public-note { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }
+  .ev { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
+  .ev-item { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px 4px 4px; background: var(--surface-1); max-width: 100%; min-width: 0; }
+  .ev-item img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; display: block; background: var(--surface-2); }
+  .ev-item .ficon { width: 44px; height: 44px; border-radius: 6px; background: var(--surface-2); display: grid; place-items: center; font-size: 10.5px; font-weight: 700; color: var(--text-secondary); flex: none; }
+  .ev-item .meta { display: grid; min-width: 0; }
+  .ev-item .meta a { font-size: 12.5px; color: var(--accent-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+  .ev-item .meta small { font-size: 11px; color: var(--text-muted); }
+  .ev-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .ev-gallery figure { margin: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface-2); }
+  .ev-gallery img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; max-width: 100%; }
+  .ev-gallery figcaption { font-size: 11.5px; padding: 4px 6px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .loading { padding: 40px 16px; text-align: center; color: var(--text-muted); }
+
+  @media (max-width: 1000px) {
+    .g5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .g2, .g2e { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .task { grid-template-columns: 22px minmax(0, 1fr) 28px; }
+    .task > :nth-child(3), .task > :nth-child(4) { grid-column: 2 / 3; }
+    .task > :nth-child(5) { grid-column: 3; grid-row: 1; }
+  }
+  @media (max-width: 760px) { .stickybar { position: static; } }
+  @media (max-width: 520px) {
+    .g5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .kpi .value { font-size: 22px; }
-    .kpis { gap: 8px; }
     .card { padding: 12px; }
+  }
+  @media print {
+    body { background: #fff; }
   }
 </style>
 </head>
@@ -173,387 +236,1465 @@
 <div class="wrap">
   <header class="top">
     <div>
-      <h1>Bảng điều khiển bán hàng</h1>
-      <p class="sub" id="rangeText">Dữ liệu mẫu</p>
+      <h1>Theo dõi, đánh giá nhiệm vụ CB-GV-NV</h1>
+      <p class="sub" id="schoolLine"></p>
+      <p class="public-note">Dữ liệu trên trang này đang công khai với người có link.</p>
     </div>
-    <div class="controls">
-      <div class="seg" role="group" aria-label="Khoảng thời gian" id="rangeSeg">
-        <button data-range="7" aria-pressed="false">7 ngày</button>
-        <button data-range="30" aria-pressed="true">30 ngày</button>
-        <button data-range="90" aria-pressed="false">90 ngày</button>
-      </div>
-      <select id="channelSel" aria-label="Kênh bán">
-        <option value="all">Tất cả kênh</option>
-      </select>
-      <button class="btn" id="themeBtn" aria-label="Đổi giao diện sáng/tối">◐ Giao diện</button>
+    <div class="row">
+      <span class="saved" id="savedMark"></span>
+      <button class="btn ghost" data-act="reload" title="Tải lại dữ liệu mới nhất mà người khác vừa cập nhật">↻ Tải lại</button>
+      <button class="btn ghost" id="themeBtn" aria-label="Đổi giao diện sáng/tối">◐ Giao diện</button>
     </div>
   </header>
 
-  <section class="kpis" id="kpis" aria-label="Chỉ số chính"></section>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="overview">Tổng quan</button>
+    <button role="tab" data-tab="eval">Đánh giá tháng</button>
+    <button role="tab" data-tab="person">Theo dõi cá nhân</button>
+    <button role="tab" data-tab="staff">Danh sách CB-GV-NV</button>
+    <button role="tab" data-tab="data">Dữ liệu &amp; hướng dẫn</button>
+  </nav>
 
-  <section class="grid2">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <h2>Doanh thu theo ngày</h2>
-          <p>So với kỳ trước cùng độ dài</p>
-        </div>
-        <button class="linkbtn" data-toggle="trend">Xem bảng</button>
-      </div>
-      <div class="legend">
-        <span><i class="sw" style="border-color:var(--series-1)"></i>Kỳ này</span>
-        <span><i class="sw dash" style="border-color:var(--series-ref)"></i>Kỳ trước</span>
-      </div>
-      <div class="chart" id="trendChart"></div>
-      <div class="table-scroll hidden" id="trendTable"></div>
-    </div>
+  <div id="demoBanner" class="banner hidden"></div>
 
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <h2>Doanh thu theo kênh</h2>
-          <p>Tổng trong kỳ</p>
-        </div>
-        <button class="linkbtn" data-toggle="channel">Xem bảng</button>
-      </div>
-      <div class="chart" id="channelChart"></div>
-      <div class="table-scroll hidden" id="channelTable"></div>
-    </div>
-  </section>
-
-  <section class="grid2">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <h2>Đơn hàng gần đây</h2>
-          <p>10 đơn mới nhất</p>
-        </div>
-      </div>
-      <div class="table-scroll"><table id="ordersTable"></table></div>
-    </div>
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <h2>Sản phẩm bán chạy</h2>
-          <p>Theo số lượng bán</p>
-        </div>
-      </div>
-      <div class="table-scroll"><table id="productsTable"></table></div>
-    </div>
-  </section>
+  <main id="view"><div class="loading">Đang tải dữ liệu chung của trường…</div></main>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="/lib/thbana.js"></script>
 <script>
 (() => {
-  // ---------- Dữ liệu mẫu (thay bằng API thật khi tích hợp) ----------
-  const CHANNELS = ["Website", "Shopee", "Facebook", "Zalo", "Cửa hàng"];
-  const CHANNEL_WEIGHT = [1.0, 1.35, 0.7, 0.55, 0.85];
-  const PRODUCTS = ["Áo thun basic", "Quần jean slim", "Giày sneaker", "Túi tote vải", "Mũ lưỡi trai", "Áo khoác gió"];
-  const CUSTOMERS = ["Nguyễn Văn An", "Trần Thị Bình", "Lê Minh Châu", "Phạm Quốc Dũng", "Hoàng Thu Hà", "Vũ Đức Khang", "Đặng Mai Linh", "Bùi Gia Huy", "Đỗ Ngọc Lan", "Ngô Thanh Tùng"];
-  const STATUSES = [
-    { key: "good", label: "Hoàn thành" },
-    { key: "warning", label: "Đang giao" },
-    { key: "serious", label: "Chờ xử lý" },
-    { key: "critical", label: "Đã huỷ" },
-  ];
+"use strict";
 
-  function rng(seed) {
-    let s = seed >>> 0;
-    return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+// =====================================================================
+// 1. DANH MỤC TIÊU CHÍ (theo Mẫu 03, Mẫu 01TKNV, Phụ lục 1 & 3)
+// =====================================================================
+const CATALOG = {"PL1":[{"s":"I","g":"","t":"Nói chuyện riêng, đọc báo, khi họp, trong giờ dạy","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Đi trễ: Dưới 5 phút (kể cả hội họp, sinh hoạt, giảng dạy)","n":"0.5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"I","g":"","t":"Trễ 5 phút đến 10 phút","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Trễ 10 phút trở lên","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"I","g":"","t":"Sau 30 phút coi như vắng không phép","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"I","g":"","t":"Làm việc riêng trong giờ họp, dự giờ","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Nghỉ có phép (không tính nghỉ theo quy định)","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"I","g":"","t":"Nghỉ không phép","n":"5 điểm/buổi","p":-5.0,"k":"tru","m":false},{"s":"I","g":"","t":"Đau vắng có phép (nhiều ngày)","n":"1 điểm: 2-4 ngày - 3 điểm: 5-6 ngày - 5 điểm: 7-10 ngày - 7 điểm: 11-14 ngày - 14 điểm: Nghỉ 4 tuần, và cứ nghỉ tăng thêm 1 tuần trừ thêm 3,5 điểm","p":-1.0,"k":"tru","m":true},{"s":"I","g":"","t":"Đồng phục không đúng quy định (Trừ thời tiết mưa)","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"I","g":"","t":"Không đeo thẻ viên chức","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"II","g":"","t":"Lên lớp không có Kế hoạch bài dạy","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"II","g":"","t":"Soạn bài thiếu","n":"1 điểm/tiết","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Kế hoạch bài dạy xác định yêu cầu cần đạt chưa cụ thể","n":"0,5 điểm/tiết","p":-0.5,"k":"tru","m":false},{"s":"II","g":"","t":"Kế hoạch bài dạy thiếu tích hợp lồng ghép các nội dung giáo dục","n":"0,5 điểm/tiết","p":-0.5,"k":"tru","m":false},{"s":"II","g":"","t":"Kế hoạch dạy học sơ sài, không soạn theo định hưởng phát triển năng lực, phẩm chất của học sịnh.,không phân hóa đối tượng học sinh","n":"1 đến 5 điểm/lần kiểm tra","p":-1.0,"k":"tru","m":true},{"s":"II","g":"","t":"Kế hoạch bài dạy không đưa lên google driver kịp thời theo quy định","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Cắt xén giờ dạy tiết chính khoá (dạy không đảm bảo thời gian, chỉ ghi đề, ra bài tập HS làm, GV làm việc khác)","n":"3 điểm/tiết","p":-3.0,"k":"tru","m":false},{"s":"II","g":"","t":"Kế hoạch môn học không khớp sổ soạn bài","n":"1 điểm/1 tiết","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Bài dạy không đúng kế hoạch môn học","n":"1 điểm/lần k.tra","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Chữ viết trình bày không đẹp (dự giờ, bảng lớp, hội họp)","n":"1 điểm/loại HS","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Không mượn đồ dùng cần thiết có ở thư viện","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"","t":"Không sử dụng đồ dùng dạy học tự làm trong 1 tháng","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Bảo quản đồ dùng thiếu trách nhiệm (rách, hỏng)","n":"1 điểm/cái","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Không tham gia mượn đọc sách tại Thư viện (ít nhất 4 tháng 2 lần mượn hoặc đọc sách tại thư viên)","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"II","g":"","t":"Không nộp HSSS đúng thời gian quy định","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Thiếu 1 loại hồ sơ","n":"5 điểm/1HS","p":-5.0,"k":"tru","m":false},{"s":"II","g":"","t":"Không thao giảng, minh hoạ chuyên đề khi được phân công","n":"5 điểm/ lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"","t":"Giảng dạy không ứng dụng CNTT theo qui định","n":"2 điểm/HK","p":-2.0,"k":"tru","m":false},{"s":"II","g":"","t":"Không đủ số tiết dự giờ quy định.","n":"1 điểm/tiết","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Cập nhật các phần mềm chưa kịp thời, không đúng","n":"0,5 điểm/trường hợp","p":-0.5,"k":"tru","m":false},{"s":"II","g":"","t":"Không dự giờ đủ 3 khối lớp","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"","t":"Dự giờ khống (chép kế hoạch bài dạy)","n":"5 điểm/tiết","p":-5.0,"k":"tru","m":false},{"s":"II","g":"","t":"Ra đề kiểm tra sai","n":"2 điểm/ trường hợp.","p":-2.0,"k":"tru","m":false},{"s":"II","g":"","t":"Chấm bài kiểm tra sai sót","n":"1 điểm/t.hợp","p":-1.0,"k":"tru","m":false},{"s":"II","g":"","t":"Chấm bài không kịp thời - 1điểm, trường hợp 1 tuần -2 tuần trừ 2 điểm, 2 tuần trở lên trừ 3 điểm)","n":"Tối đa 3 điểm/lần","p":-3.0,"k":"tru","m":true},{"s":"II","g":"","t":"Không dạy theo chủ đề","n":"5 điểm/ lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"","t":"Nhận xét vở học sinh chưa đúng theo TT27","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp không có nền nếp, ồn ào, mất trật tự trong giờ học","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp không tham gia các phong trào do Đội phát động, phân công","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"III","g":"","t":"Vệ sinh lớp không sạch, bàn ghế không ngay thẳng","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp xếp hàng vào lớp, ra về chậm, mất trật tự","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp không sinh hoạt đầu giờ hoặc có sinh hoạt nhưng ồn, không chất lượng.","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp sinh hoạt giữa giờ chậm, nền nếp không tốt","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp không có góc xây xanh","n":"5 điểm","p":-5.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp có học sinh vi phạm đạo đức, gây ra tai nạn thương tích… để BGH phải can thiệp xử lý.","n":"2 đến 5 điểm/lần","p":-2.0,"k":"tru","m":true},{"s":"III","g":"","t":"GV không dự chào cờ, sinh hoạt tập thể","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"III","g":"","t":"Kế hoạch chủ nhiệm sơ sài","n":"1-2 điểm/lần k.tra","p":-1.0,"k":"tru","m":true},{"s":"III","g":"","t":"Lớp để người điều khiến, TPT đội hoặc BGH nhắc nhở mất trật tự khi tham gia chào cờ, sinh hoạt tập thể…","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"III","g":"","t":"Lớp trưc vệ sinh khu vực phân công không sạch sẽ","n":"2 điểm","p":-2.0,"k":"tru","m":false},{"s":"IV","g":"","t":"Đối với đoàn viên thanh niên không tham gia đầy đủ công tác đoàn thanh niên","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"IV","g":"","t":"Không tham gia hỗ trợ công tác Đội thiếu niên.","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"V","g":"","t":"Nộp kế hoạch, báo cáo, thống kê, biên bản… không đúng quy định","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"V","g":"","t":"Không hoàn thành điều tra PCGD đúng thời hạn, điều tra sai","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"V","g":"","t":"GV xử lý các tình huống trên lớp, cũng như quan hệ ứng xử với đồng nghiệp, phụ huynh… không tốt để BGH can thiệp xử lý tùy mức độ mà trừ điểm.","n":"Từ 2 đến 5 điểm/lần","p":-2.0,"k":"tru","m":true},{"s":"V","g":"","t":"Hút thuốc lá tại nơi làm việc","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"V","g":"","t":"Giáo viên không tham gia khắc phục hậu quả bão lụt (trừ lý do khách quan)","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"VI","g":"","t":"Cá nhân GV tham gia đạt giải hội thi các cấp Quốc gia: Nhất: 15đ, nhì: 12đ, ba: 10đ, KK: 8đ./giải TP: Nhất: 10đ, nhì: 8đ, ba: 6đ, KK: 4đ./giải Xã: Nhất: 8đ, nhì: 6đ, ba: 4đ, KK: 2đ/giải Trường: Nhất: 6đ, nhì: 4đ, ba: 2đ, KK: 1đ/giải","n":"Tối đa 10 điểm/giải/ 1 nội dung riêng","p":10.0,"k":"cong","m":true},{"s":"VI","g":"","t":"GV tham gia đạt giải hội thi các cấp (đối với nội dung thi tập thể) Quốc gia: Nhất: 15đ, nhì: 12đ, ba: 10đ, KK: 8đ./giải TP: Nhất: 8đ, nhì: 6đ, ba: 4đ, KK: 3đ./giải Xã: Nhất: 6đ, nhì: 4đ, ba: 3đ, KK: 2đ/giải Trường: Nhất: 4đ, nhì: 3đ, ba: 2đ, KK: 1đ/giải","n":"Tối đa 8đ/giải/ 1 nội dung riêng","p":8.0,"k":"cong","m":true},{"s":"VI","g":"","t":"Giáo viên dạy giỏi, giáo viên chủ nhiệm giỏi cấp trường","n":"3 điểm","p":3.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Giáo viên được công nhận giáo viên dạy giỏi, giáo viên chủ nhiệm giỏi cấp Xã (tham gia nhưng không đạt + 1đ)","n":"7 điểm","p":7.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Giáo viên được công nhận giáo viên dạy giỏi, giáo viên chủ nhiệm giỏi cấp Thành phố (tham gia nhưng không đạt + 2đ, GV được công nhận và có giấy khen cộng thêm 1 điểm)","n":"15 điểm","p":15.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Giáo viên được công nhận giáo viên dạy giỏi, giáo viên chủ nhiệm giỏi cấp Quốc gia","n":"20 điểm","p":20.0,"k":"cong","m":false},{"s":"VI","g":"","t":"GV thực hiện chuyên đề trường cộng 2 đ, chuyên đề xã 4 đ, chuyên đề thành phố 6 đ.","n":"Tối đa 6đ","p":6.0,"k":"cong","m":true},{"s":"VI","g":"","t":"GV xây dựng tư vấn chuyên đề trường cộng 0,5 đ, chuyên đề xã 1 đ, chuyên đề thành phố: 2đ","n":"Tối đa 2 điểm","p":2.0,"k":"cong","m":true},{"s":"VI","g":"","t":"GV chủ trì thảo luận chuyên đề trường cộng 0,5 đ, chuyên đề xã 1 đ, chuyên đề thành phố: 2đ","n":"Tối đa 2 điểm","p":2.0,"k":"cong","m":true},{"s":"VI","g":"","t":"GV tham gia đạo diễn, sáng tác, tập luyện cho đội văn nghệ phục vụ các ngày lễ, hội, hội thi …tại trường và các cấp khi được triệu tập.","n":"3 điểm/lần/nội dung dàn dựng)","p":3.0,"k":"cong","m":false},{"s":"VI","g":"","t":"GV tham gia biểu diễn Văn nghệ chào mừng Đại hội, các ngày lễ, hội…tại trường và các cấp khi được triệu tập.","n":"1,5 điểm/lần/nội dung dàn dựng","p":1.5,"k":"cong","m":false},{"s":"VI","g":"","t":"Cá nhân GV tham gia hỗ trợ phong trào như là tư vấn dàn dựng tiết mục, thay trang phục, làm và mang dụng cụ biểu diễn…các hội thi, các phong trào do cấp trên tổ chức (có giải)","n":"0,5 điểm","p":0.5,"k":"cong","m":false},{"s":"VI","g":"","t":"Đưa tin website, Facebook (Ngoài nhiệm vụ của Ban biên tập)","n":"0,25 điểm/tin","p":0.25,"k":"cong","m":false},{"s":"VI","g":"","t":"Người phụ trách webside, Facebook viết tin, đăng bài kịp thời, chất lượng.(Đối với người phụ trách Facebook Chi đoàn, Đội thì được cộng 0,5 điểm/tháng) + Giáo viên phụ trách CSDL của trường, thường xuyên hỗ trợ giáo viên và xử lý các lỗi tại thời điểm tháng 1, tháng 5, tháng 8 + Ban CNTT khi được phân công nhiệm vụ.","n":"1điểm/tháng + 0,5/đ (tháng1,tháng 5, tháng 8) 0,5 đ/ 1 lần","p":1.0,"k":"cong","m":false},{"s":"VI","g":"","t":"GV tham gia phòng chống, khắc phục lụt, bão","n":"1 điểm/lần","p":1.0,"k":"cong","m":false},{"s":"VI","g":"","t":"GV bồi dưỡng VH, năng khiểu cho HS đạt giải cấp Quốc gia (Nhất: 10đ, Nhì: 7đ, Ba: 5đ, KK: 3đ)","n":"tối đa 10 điểm/ giải","p":10.0,"k":"cong","m":true},{"s":"VI","g":"","t":"GV bồi dưỡng VH, năng khiểu cho HS đạt giải cấp TP (Nhất: 5đ, Nhì: 4đ, Ba: 3đ, KK: 2đ)","n":"tối đa 5 điểm/ giải","p":5.0,"k":"cong","m":true},{"s":"VI","g":"","t":"GV bồi dưỡng VH, năng khiểu cho HS đạt giải cấp xã (Nhất: 4đ, Nhì: 3đ, Ba: 2đ, KK: 1đ).","n":"tối đa 4 điểm/ giải","p":4.0,"k":"cong","m":true},{"s":"VI","g":"","t":"Lớp đạt giải các hội thi cấp trường như: vẽ tranh, thi ảnh, góc thư viện …(Nhất: 2đ, Nhì: 1,5đ, Ba: 1đ, KK 0,5đ).","n":"tối đa 2 điểm/ giải","p":2.0,"k":"cong","m":true},{"s":"VI","g":"","t":"Tham gia hiến máu nhân đạo","n":"2 điểm","p":2.0,"k":"cong","m":false},{"s":"VI","g":"","t":"GV tham gia tham quan dã ngoại ngày Quốc tế phụ nữ 8/3","n":"1 điểm","p":1.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Đạt SK kinh nghiệm cấp xã + Có tham gia viết sáng kiến đạt trường hoặc không đạt cấp xã","n":"3 điểm + 2 điểm","p":3.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Phong trào trồng và chăm sóc bồn cây trong Hoạt động Tết trồng cây (Đánh giá tại thời điểm tháng 4)","n":"tối đa 2 đ","p":2.0,"k":"cong","m":true},{"s":"VI","g":"","t":"GV phụ trách chào cờ ở Phú Hòa","n":"0,5-1đ/ tháng","p":0.5,"k":"cong","m":true},{"s":"VII","g":"","t":"Lên lớp không có Kế hoạch dạy học(3 lần)","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false},{"s":"VII","g":"","t":"Không thực hiện theo Kế hoạch môn học","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false},{"s":"VII","g":"","t":"Chấm bài sai 5 trường hợp trở lên","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false},{"s":"VII","g":"","t":"Không sẵn sàng nhận nhiệm vụ, đùn đẩy né tránh nhiệm vụ khi Hiệu trưởng, các phó hiệu trưởng, tổ trưởng chuyên môn, tổ trưởng văn phòng, trưởng các đoàn thể phân công.","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false},{"s":"VII","g":"","t":"Vi phạm các điều quy định đối với nhà giáo, việc chấp hành chủ trương đường lới của Đảng, pháp luật của Nhà nước, kỷ cương hành chính…nhưng chưa đến mức xử lý kỷ luật.","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false}],"PL3":[{"s":"I","g":"","t":"Nói chuyện riêng, đọc báo khi họp, trong giờ dạy","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Đi trễ: Dưới 5 phút (kể cả hội họp, sinh hoạt, giảng dạy)","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"I","g":"","t":"Trễ 5 phút đến 10 phút","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Trễ 10 phút trở lên","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"I","g":"","t":"Sau 30 phút coi như vắng không phép","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"I","g":"","t":"Về sớm 10 phút trở lên","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"I","g":"","t":"Làm việc riêng trong giờ họp","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Nghỉ có phép (ma chay, hiếu hỷ không trừ)","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"I","g":"","t":"Nghỉ không phép","n":"5 điểm/buổi","p":-5.0,"k":"tru","m":false},{"s":"I","g":"","t":"Đau vắng có phép (nhiều ngày)","n":"1 điểm: 2-4 ngày - 3 điểm: 5-6 ngày - 5 điểm: 7-10 ngày - 7 điểm: 11-14 ngày - 14 điểm: Nghỉ 4 tuần, và cứ nghỉ tăng thêm 1 tuần trừ thêm 3,5 điểm","p":-1.0,"k":"tru","m":true},{"s":"I","g":"","t":"Không đeo thẻ viên chức","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"I","g":"","t":"Không dự chào cờ đầu tuần.","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Vệ sinh phòng làm việc không sạch, bàn ghế không ngay thẳng","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"I","g":"","t":"Trang phục không đúng quy định (Công sở)","n":"0,5 điểm/lần","p":-0.5,"k":"tru","m":false},{"s":"II","g":"","t":"Thiếu một loại hồ sơ sổ sách","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"","t":"Bị cấp trên phê bình về phần phụ trách","n":"5 đ/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"","t":"Không tham gia hỗ trợ, phục vụ lễ hội, chuyên đề,…","n":"5 đ/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tài vụ","t":"Sắp xếp hồ sơ không khoa học, lộn xộn","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tài vụ","t":"Mất chứng từ gốc","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tài vụ","t":"Không thực hiện đầy đủ kịp thời chế độ cho CBGVCNV","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tài vụ","t":"Thực hiện nhiệm vụ được phân công bị nhắc nhở","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"II","g":"Tài vụ","t":"Hồ sơ sổ sách, chứng từ không đầy đủ hợp lệ","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tài vụ","t":"Hiệu quả công việc còn hạn chế để BGH nhắc nhở","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Không xây dựng kế hoạch","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Sắp xếp hồ sơ không khoa học, lộn xộn","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Không lên bảng báo đồ dùng trong tuần","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Phục vụ bạn đọc khu vực lẻ không đảm bảo thời gian quy định","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Không kiểm tra việc sử dụng đồ dùng","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Mất hoặc thất lạc sách, thiết bị, đồ dùng dạy học","n":"3 điểm /cái (q)","p":-3.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Bảo quản, sắp xếp đồ dùng không gọn gàng, ngăn nắp, không đảm bảo vệ sinh.","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Không giới thiệu sách ít nhất 1 lần/tháng","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Tủ sách mở chưa thường xuyên, hiệu quả chưa cao","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"II","g":"Thư viện","t":"Hiệu quả công việc còn chậm trễ, hạn chế để cấp trên nhắc nhở (- 3điểm) BGH nhắc nhở (- 2 điểm)","n":"tối đa 3 điểm/lần","p":-3.0,"k":"tru","m":true},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Không xây dựng kế hoạch","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Sắp xếp hồ sơ lộn xộn, làm thất lạc.","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Giao nhận công văn đi, đến chậm","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Nộp báo cáo thông tin 2 chiều chậm","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Lưu trữ công văn thiếu khoa học","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Không hoàn thành công tác PCGD","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Không hoàn thành phần mền PMIS bị nhắc nhở","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Không hoàn thành dữ liệu CBCCVC trên hệ thống thông tin điện tử bị nhắc nhở.","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Tham mưu ban hành văn bản không kịp thời","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Giáo vụ- văn thư- PCGD","t":"Hiệu quả công việc còn hạn chế để BGH nhắc nhở","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Không xây dựng kế hoạch","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Không hoàn thành kế hoạch cấp trên giao.","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Thiếu hồ sơ sổ sách.","n":"5 điểm/loại","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Làm việc không theo kế hoạch.","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Sắp xếp hồ sơ lộn xộn, làm thất lạc.","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Sinh hoạt tập thể, không đúng thời gian quy định","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Không tham gia sinh hoạt chuyên môn","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Không theo dõi, đánh giá thi đua các lớp kịp thời, chính xác","n":"2 điểm/đợt","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Vệ sinh môi trường không sạch sẽ","n":"2 điểm/đợt","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Tổng phụ trách đội","t":"Hiệu quả công việc còn hạn chế để BGH nhắc nhở","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Y tế học đường","t":"Không xây dựng kế hoạch cá nhân","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Y tế học đường","t":"Làm việc không đúng lịch, đúng thời gian","n":"8 điểm/lần","p":-8.0,"k":"tru","m":false},{"s":"II","g":"Y tế học đường","t":"Không thường xuyên kiểm tra công tác vệ sinh, y té trường học, bán trú…","n":"5 điểm","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Y tế học đường","t":"Thiếu hồ sơ sổ sách","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Y tế học đường","t":"Bảo quản dụng cụ thiếu trách nhiệm","n":"10 điểm/lần","p":-10.0,"k":"tru","m":false},{"s":"II","g":"Y tế học đường","t":"Hiệu quả công việc còn hạn chế để BGH nhắc nhở","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Để xảy ra mất mát (Ngoài ra phải đền bù theo trách nhiệm).","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Không tham gia chăm sóc cây cảnh, sắp xếp cơ sở vật chất,…","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Nhân viên bảo vệ phục vụ uống rượu bia trong giờ làm việc.","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Bàn giao ca trực không đúng thời gian quy định.","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Không cập nhật sổ trực đúng thời gian quy định.","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Không đảm bảo vệ sinh vị trí, thời gian mình phụ trách.","n":"4 điểm/lần","p":-4.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Tình hình an ninh trật tự trường học không đảm bảo","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Bảo vệ phục vụ","t":"Hiệu quả công việc còn hạn chế để BGH nhắc nhở","n":"2 điểm/lần","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Lãnh đạo","t":"Làm việc không có kế hoạch, không theo kế hoạch","n":"10 điểm/lần","p":-10.0,"k":"tru","m":false},{"s":"II","g":"Lãnh đạo","t":"Không xác lập hồ sơ công việc","n":"5 điểm/1 loại","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Lãnh đạo","t":"Sắp xếp hồ sơ không khoa học, thiếu ngăn nắp","n":"5 điểm/lần","p":-5.0,"k":"tru","m":false},{"s":"II","g":"Lãnh đạo","t":"Công tác kiểm tra nội bộ chưa đúng tiến độ, ít đi kiểm tra nắm bắt tình hình trường chính, phân hiệu, điểm trường. đôn đốc nhắc nhở chưa kịp thời…dẫn đến còn những tồn tại hạn chế thuộc phạm vi mình phụ trách","n":"2 điểm/đợt","p":-2.0,"k":"tru","m":false},{"s":"II","g":"Lãnh đạo","t":"Duyệt đề kiểm tra nhưng để xảy ra sai sót","n":"1 điểm/ t.hợp","p":-1.0,"k":"tru","m":false},{"s":"II","g":"Lãnh đạo","t":"Hiệu quả công việc hạn chế, bị cấp trên phê bình về lĩnh vực mình phụ trách","n":"10 điểm/lần","p":-10.0,"k":"tru","m":false},{"s":"III","g":"","t":"Không phối hợp tốt với GV, các đoàn thể trong và ngoài nhà trường.","n":"5 điểm lần","p":-5.0,"k":"tru","m":false},{"s":"III","g":"","t":"Không tham gia hoạt động ngoài giờ khi được phân công","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"IV","g":"","t":"Đối với đoàn viên thanh niên không tham gia đầy đủ công tác đoàn thanh niên","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"IV","g":"","t":"Không tham gia hỗ trợ công tác Đội thiếu niên.","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"V","g":"","t":"Nộp kế hoạch, báo cáo, thống kê, biên bản… không đúng quy định","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"V","g":"","t":"Cán bộ, nhân viên xử lý công việc chưa hiệu quả, để đồng nghiệp và nhân dân phản ảnh hoặc xử lý các tình huống trong nhà trường, cũng như quan hệ ứng xử với đồng nghiệp, phụ huynh… không tốt để Lãnh đạo can thiệp xử lý tùy mức độ mà trừ điểm.","n":"Từ 2 đến 5 điểm/lần","p":-2.0,"k":"tru","m":true},{"s":"V","g":"","t":"Báo cáo thống kê sai","n":"1 điểm/t.hợp","p":-1.0,"k":"tru","m":false},{"s":"V","g":"","t":"Hút thuốc lá tại nơi làm việc","n":"1 điểm/lần","p":-1.0,"k":"tru","m":false},{"s":"V","g":"","t":"Không tham gia khắc phục hậu quả bão lụt (trừ lý do khách quan)","n":"3 điểm/lần","p":-3.0,"k":"tru","m":false},{"s":"VI","g":"","t":"Hoàn thành vượt bậc các nhiệm vụ tháng","n":"Tối đa 10 điểm","p":10.0,"k":"cong","m":true},{"s":"VI","g":"","t":"Cá nhân GV tham gia đạt giải hội thi các cấp Quốc gia: Nhất: 15đ, nhì: 12đ, ba: 10đ, KK: 8đ./giải TP: Nhất: 10đ, nhì: 8đ, ba: 6đ, KK: 4đ./giải Xã: Nhất: 8đ, nhì: 6đ, ba: 4đ, KK: 2đ/giải Trường: Nhất: 1,5đ, nhì: 1đ, ba: 0,5đ + Cá nhân GV tham gia đạt giải hội thi các cấp theo hình thức trực tuyến: Quốc gia: Nhất: 12đ, nhì: 8đ, ba: 6đ, KK: 4đ./giải TP: Nhất: 8đ, nhì: 6đ, ba: 4đ, KK: 2đ./giải Xã: Nhất: 6đ, nhì: 4đ, ba: 2đ, KK: 1đ/giải","n":"Theo cấp và giải","p":null,"k":"cong","m":true},{"s":"VI","g":"","t":"GV tham gia đạt giải hội thi các cấp (đối với nội dung thi tập thể) Quốc gia: Nhất: 15đ, nhì: 12đ, ba: 10đ, KK: 8đ/giải; TP: Nhất: 8đ, nhì: 6đ, ba: 4đ, KK: 3đ/giải; Xã: Nhất: 6đ, nhì: 4đ, ba: 3đ, KK: 2đ/giải; Trường: Nhất: 1đ, nhì: 0,5đ, ba: 0,25đ","n":"Tối đa 15đ/giải/1 nội dung riêng","p":15.0,"k":"cong","m":true},{"s":"VI","g":"","t":"CBNV tham gia đạo diễn, sáng tác, tập luyện cho đội văn nghệ phục vụ các ngày lễ, hội, hội thi …tại trường và các cấp khi được triệu tập.","n":"5 điểm/lần/nội dung dàn dựng)","p":5.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Cá nhân GV tham gia hỗ trợ phong trào như là tư vấn dàn dựng tiết mục, thay trang phục, làm và mang dụng cụ biểu diễn…các hội thi, các phong trào do cấp trên tổ chức (có giải)","n":"0,5 điểm","p":0.5,"k":"cong","m":false},{"s":"VI","g":"","t":"Công nhận GV tổng phụ trách đội giỏi, có giấy khen cộng thêm 1 điểm.","n":"7 điểm cấp xã, 15 đ TP, 20đ QG","p":7.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Tham gia hiến máu nhân đạo","n":"2 điểm","p":2.0,"k":"cong","m":false},{"s":"VI","g":"","t":"GV đầy đủ, nhiệt tình các hoạt động ngoại khoá, tham quan dã ngoại, các hoạt động phát sinh khác","n":"1 điểm","p":1.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Đạt SK kinh nghiệm cấp xã + Có tham gia viết sáng kiến đạt trường hoặc không đạt cấp xã","n":"5 điểm + 2 điểm","p":5.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Tham gia biểu diễn Văn nghệ chào mừng Đại hội, các ngày lễ, hội…tại trường và các cấp khi được triệu tập.","n":"2 điểm/lần/nội dung dàn dựng)","p":2.0,"k":"cong","m":false},{"s":"VI","g":"","t":"Đưa tin website (Ngoài nhiệm vụ của Ban biên tập)","n":"0,25 điểm/tin","p":0.25,"k":"cong","m":false},{"s":"VI","g":"","t":"Người phụ trách webside, Facebook viết tin, đăng bài kịp thời, chất lượng.(Đối với người phụ trách Facebook Chi đoàn, Đội thì được cộng 0,5 điểm/tháng)","n":"1 điểm/tháng","p":1.0,"k":"cong","m":false},{"s":"VII","g":"","t":"Bị cấp trên phê bình (3 lần)","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false},{"s":"VII","g":"","t":"Không sẵn sàng nhận nhiệm vụ, đùn đẩy né tránh nhiệm vụ khi Hiệu trưởng, các phó hiệu trưởng, tổ trưởng chuyên môn, tổ trưởng văn phòng, trưởng các đoàn thể phân công.","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false},{"s":"VII","g":"","t":"Vi phạm các điều quy định đối với nhà giáo, việc chấp hành chủ trương đường lới của Đảng, pháp luật của Nhà nước, kỷ cương hành chính…nhưng chưa đến mức xử lý kỷ luật.","n":"Hạ 1 bậc","p":null,"k":"khongche","m":false}]};
+
+// Mẫu 03 – Phần A: Tiêu chí chung (30 điểm)
+const CRIT_A = [
+  { h: "I", t: "Phẩm chất chính trị, đạo đức, văn hóa thực thi công vụ; ý thức kỷ luật, kỷ cương", max: 10 },
+  { h: "1", t: "Phẩm chất chính trị, phẩm chất đạo đức, văn hóa thực thi công vụ", max: 5, sub: true },
+  { c: "A1a", t: "Chấp hành nghiêm túc đường lối, chủ trương của Đảng, chính sách pháp luật của Nhà nước và nguyên tắc tổ chức, kỷ luật của Đảng", max: 0.75 },
+  { c: "A1b", t: "Có quan điểm, bản lĩnh chính trị vững vàng; kiên định lập trường", max: 0.5 },
+  { c: "A1c", t: "Có ý thức nghiên cứu, học tập, vận dụng chủ nghĩa Mác - Lênin, tư tưởng Hồ Chí Minh, nghị quyết, chỉ thị", max: 0.5 },
+  { c: "A1d", t: "Giữ gìn phẩm chất đạo đức, lối sống trong sáng, trung thực, khiêm tốn, giản dị; cần, kiệm, liêm, chính, chí công vô tư", max: 0.75 },
+  { c: "A1đ", t: "Không tham ô, tham nhũng, lãng phí, tiêu cực, quan liêu, hách dịch, cửa quyền, vụ lợi", max: 0.75 },
+  { c: "A1e", t: "Có tinh thần đoàn kết, xây dựng đơn vị trong sạch, vững mạnh; tích cực tham gia hoạt động tập thể", max: 0.75 },
+  { c: "A1ê", t: "Thực hiện văn hóa công vụ: thái độ đúng mực, phong cách làm việc chuẩn mực, chuyên nghiệp", max: 0.5 },
+  { c: "A1g", t: "Tinh thần tự phê bình; tự soi, tự sửa; khắc phục hạn chế sau khi được chỉ ra", max: 0.5 },
+  { h: "2", t: "Ý thức kỷ luật, kỷ cương trong thực thi công vụ", max: 5, sub: true },
+  { c: "A2a", t: "Chấp hành sự phân công của tổ chức", max: 1 },
+  { c: "A2b", t: "Thực hiện các quy định, quy chế, nội quy của cơ quan, đơn vị", max: 1 },
+  { c: "A2c", t: "Thực hiện việc kê khai và công khai tài sản, thu nhập theo quy định", max: 1 },
+  { c: "A2d", t: "Báo cáo đầy đủ, trung thực, cung cấp thông tin chính xác, khách quan với cấp trên khi được yêu cầu", max: 2 },
+  { h: "II", t: "Năng lực chuyên môn, nghiệp vụ; khả năng đáp ứng nhiệm vụ; tinh thần trách nhiệm; thái độ phục vụ và phối hợp", max: 10 },
+  { h: "1", t: "Năng lực chuyên môn, nghiệp vụ theo yêu cầu của vị trí việc làm", max: 2.5, sub: true },
+  { c: "B1a", t: "Có kiến thức chuyên sâu, toàn diện về lĩnh vực được phân công; hiểu biết quy định, quy trình nghiệp vụ", max: 1 },
+  { c: "B1b", t: "Thường xuyên cập nhật kiến thức mới; nghiên cứu, phân tích, vận dụng sáng tạo vào công việc", max: 0.75 },
+  { c: "B1c", t: "Xử lý công việc độc lập, làm việc nhóm hiệu quả; sử dụng thành thạo CNTT, ứng dụng công nghệ mới", max: 0.75 },
+  { h: "2", t: "Khả năng đáp ứng yêu cầu thực thi nhiệm vụ thường xuyên, đột xuất", max: 2.5, sub: true },
+  { c: "B2a", t: "Nhiệm vụ thường xuyên: vận dụng thành thạo chuyên môn, duy trì ổn định chất lượng", max: 1.5 },
+  { c: "B2b", t: "Nhiệm vụ đột xuất: chủ động đề xuất giải pháp, phản ứng nhanh, chính xác với yêu cầu mới", max: 1 },
+  { h: "3", t: "Tinh thần trách nhiệm trong thực thi công vụ", max: 2.5, sub: true },
+  { c: "B3a", t: "Có trách nhiệm trong nghiên cứu, đề xuất, tham mưu; chủ động điều chỉnh cách làm phù hợp yêu cầu mới", max: 1.5 },
+  { c: "B3b", t: "Tích cực cập nhật, ứng dụng kiến thức, công nghệ mới; cầu thị, phối hợp tốt", max: 1 },
+  { h: "4", t: "Thái độ phục vụ người dân và khả năng phối hợp với đồng nghiệp", max: 2.5, sub: true },
+  { c: "B4a", t: "Được người dân (phụ huynh) đánh giá tích cực về tính chuyên nghiệp, rõ ràng, minh bạch", max: 1.5 },
+  { c: "B4b", t: "Có tinh thần trách nhiệm, hợp tác trong chuyên môn; phối hợp hiệu quả trong xử lý công việc", max: 1 },
+  { h: "III", t: "Năng lực đổi mới, sáng tạo, dám nghĩ, dám làm, dám chịu trách nhiệm", max: 10 },
+  { c: "C1", t: "Có sản phẩm, giải pháp đột phá, sáng tạo, mang lại hiệu quả thiết thực cho đơn vị", max: 2.5 },
+  { c: "C2", t: "Dám nghĩ, dám làm, dám chịu trách nhiệm; sẵn sàng nhận nhiệm vụ đột xuất, phức tạp, khó khăn", max: 2.5 },
+  { c: "C3", t: "Chịu trách nhiệm trước kết quả công việc; chủ động nhận trách nhiệm và khắc phục sai sót", max: 2.5 },
+  { c: "C4", t: "Chủ động quyết định trong phạm vi thẩm quyền; không né tránh, đùn đẩy; tiên phong với nhiệm vụ mới", max: 2.5 },
+];
+const CRIT_ITEMS = CRIT_A.filter(x => x.c);
+const A_MAX = 30;
+
+const GROUPS = [
+  { g: 1, t: "I. Nhiệm vụ theo chương trình, kế hoạch đã đề ra" },
+  { g: 2, t: "II. Nhiệm vụ chuyên môn, thường xuyên theo vị trí việc làm" },
+  { g: 3, t: "III. Nhiệm vụ đột xuất, phát sinh do lãnh đạo phân công" },
+  { g: 4, t: "IV. Nhiệm vụ khác (hội họp, tập huấn, bồi dưỡng, hoạt động khác)" },
+];
+const TINH_CHAT = { bt: "Bình thường", pt: "Phức tạp", rpt: "Rất phức tạp" };
+const MUC_DO = { chu: "Chủ trì", phoi: "Phối hợp" };
+const KET_QUA = { done: "Đã hoàn thành", notdone: "Chưa hoàn thành" };
+const TIEN_DO = { som: "Sớm hạn", dung: "Đúng hạn", tre: "Trễ hạn" };
+const CHAT_LUONG = { chua: "Chưa đảm bảo", dam: "Đảm bảo", vuot: "Vượt mức" };
+
+const STAFF_TYPES = {
+  gvcn: { name: "Giáo viên chủ nhiệm", pl: "PL1", plName: "Phụ lục 1 (GVCN)" },
+  gvbm: { name: "Giáo viên bộ môn", pl: "PL1", plName: "Phụ lục 1 (bỏ mục Chủ nhiệm)" },
+  cbnv: { name: "BGH, TPT, thư viện, văn phòng", pl: "PL3", plName: "Phụ lục 3 (BGH, TPT, TV, VP)" },
+};
+const RECORD_STATUS = {
+  nhap: { label: "Đang nhập", key: "serious" },
+  nop: { label: "Đã tự đánh giá", key: "warning" },
+  duyet: { label: "Đã duyệt", key: "good" },
+};
+const RANKS = [
+  { k: "xs", name: "Hoàn thành xuất sắc nhiệm vụ", short: "Xuất sắc", min: 90, color: "var(--r-xs)" },
+  { k: "tot", name: "Hoàn thành tốt nhiệm vụ", short: "Tốt", min: 70, color: "var(--r-tot)" },
+  { k: "ht", name: "Hoàn thành nhiệm vụ", short: "Hoàn thành", min: 50, color: "var(--r-ht)" },
+  { k: "kht", name: "Không hoàn thành nhiệm vụ", short: "Không HT", min: -Infinity, color: "var(--r-kht)" },
+];
+
+// =====================================================================
+// 2. LƯU TRỮ
+// =====================================================================
+// Dữ liệu dùng chung lưu trên máy chủ của trường qua TB (/lib/thbana.js):
+//   dashboard/truong   – 1 bản ghi: tên trường, cơ quan chủ quản
+//   dashboard/nhan-su  – mỗi CB-GV-NV một bản ghi
+//   dashboard/phieu    – mỗi người mỗi tháng một phiếu (kèm danh sách minh chứng đã upload)
+const APP = "dashboard";
+const COL = { school: "truong", staff: "nhan-su", rec: "phieu" };
+let db = { school: { name: "Trường Tiểu học Bà Nà", donVi: "UBND xã Bà Nà" }, staff: [], records: {}, demo: false };
+const remote = { school: null, staff: new Map(), recs: new Map() };
+let loaded = false, syncing = false, syncAgain = false, lastLoad = null, lastErr = null;
+
+function setMark(t) { const el = document.getElementById("savedMark"); if (el) el.textContent = t; }
+const hhmm = () => new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+function infraHint(msg) { return /\b(DB|FILES)\b|prepare/.test(msg || "") ? " – cần quản trị viên gắn D1/R2." : ""; }
+
+async function loadAll() {
+  const [sc, st, ph] = await Promise.all([TB.list(APP, COL.school), TB.list(APP, COL.staff), TB.list(APP, COL.rec)]);
+  remote.school = null; remote.staff.clear(); remote.recs.clear();
+  const next = { school: { name: "Trường Tiểu học Bà Nà", donVi: "UBND xã Bà Nà" }, staff: [], records: {}, demo: false };
+  if (sc.length) { next.school = { ...next.school, ...sc[0].data }; remote.school = { rid: sc[0].id, json: JSON.stringify(sc[0].data) }; }
+  const staffRows = st.slice().sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0) || a.created_at.localeCompare(b.created_at));
+  for (const r of staffRows) {
+    if (!r.data.id || remote.staff.has(r.data.id)) continue;
+    next.staff.push(r.data); remote.staff.set(r.data.id, { rid: r.id, json: JSON.stringify(r.data) });
   }
+  for (const r of ph) {
+    const k = rkey(r.data.staffId, r.data.month);
+    if (!r.data.staffId || !r.data.month || remote.recs.has(k)) continue;
+    const rec = { ...r.data }; delete rec.staffId; delete rec.month;
+    rec.updatedBy = r.updated_by; rec.updatedAt = r.updated_at;
+    next.records[k] = rec;
+    remote.recs.set(k, { rid: r.id, json: recJson(r.data.staffId, r.data.month, rec) });
+  }
+  next.demo = next.staff.some(x => x.demo);
+  db = next; loaded = true; lastLoad = new Date();
+}
+function recData(sid, month, rec) { const d = { ...rec, staffId: sid, month }; delete d.updatedBy; delete d.updatedAt; return d; }
+function recJson(sid, month, rec) { return JSON.stringify(recData(sid, month, rec)); }
+function hasLocalChanges() {
+  if (JSON.stringify(db.school) !== remote.school?.json) return true;
+  if (db.staff.length !== remote.staff.size || Object.keys(db.records).length !== remote.recs.size) return true;
+  for (const x of db.staff) if (remote.staff.get(x.id)?.json !== JSON.stringify(x)) return true;
+  for (const [k, rec] of Object.entries(db.records)) { const [sid, m] = k.split("|"); if (remote.recs.get(k)?.json !== recJson(sid, m, rec)) return true; }
+  return false;
+}
+async function pool(tasks, n = 5) {
+  let i = 0, firstErr = null;
+  const run = async () => { while (i < tasks.length) { const t = tasks[i++]; try { await t(); } catch (e) { firstErr ||= e; } } };
+  await Promise.all(Array.from({ length: Math.min(n, tasks.length) }, run));
+  if (firstErr) throw firstErr;
+}
+async function sync() {
+  if (!loaded) return;
+  if (syncing) { syncAgain = true; return; }
+  syncing = true; setMark("Đang lưu…");
+  try {
+    const ops = [];
+    const sj = JSON.stringify(db.school);
+    if (!remote.school) ops.push(async () => { const r = await TB.create(APP, COL.school, JSON.parse(sj)); remote.school = { rid: r.id, json: sj }; });
+    else if (remote.school.json !== sj) ops.push(async () => { await TB.update(APP, COL.school, remote.school.rid, JSON.parse(sj)); remote.school.json = sj; });
+    db.staff.forEach((x, i) => { x.order = i; });
+    for (const x of db.staff) {
+      const j = JSON.stringify(x), r = remote.staff.get(x.id);
+      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.staff, JSON.parse(j)); remote.staff.set(x.id, { rid: c.id, json: j }); });
+      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.staff, r.rid, JSON.parse(j)); r.json = j; });
+    }
+    for (const [id, r] of remote.staff) if (!db.staff.some(x => x.id === id)) ops.push(async () => { await TB.remove(APP, COL.staff, r.rid); remote.staff.delete(id); });
+    for (const [k, rec] of Object.entries(db.records)) {
+      const [sid, m] = k.split("|"); const j = recJson(sid, m, rec), r = remote.recs.get(k);
+      if (!r) ops.push(async () => { const c = await TB.create(APP, COL.rec, JSON.parse(j)); remote.recs.set(k, { rid: c.id, json: j }); });
+      else if (r.json !== j) ops.push(async () => { await TB.update(APP, COL.rec, r.rid, JSON.parse(j)); r.json = j; });
+    }
+    for (const [k, r] of remote.recs) if (!db.records[k]) ops.push(async () => { await TB.remove(APP, COL.rec, r.rid); remote.recs.delete(k); });
+    await pool(ops);
+    lastErr = null;
+    setMark(ops.length ? "Đã lưu lên máy chủ " + hhmm() : "Đã đồng bộ " + hhmm());
+  } catch (e) {
+    lastErr = e;
+    setMark("⚠ Chưa lưu được");
+    toast("Chưa lưu được: " + e.message + infraHint(e.message));
+  } finally {
+    syncing = false;
+    if (syncAgain) { syncAgain = false; sync(); }
+  }
+}
+let saveTimer;
+function save(now) {
+  clearTimeout(saveTimer);
+  setMark("Chưa lưu…");
+  saveTimer = setTimeout(sync, now ? 0 : 800);
+}
+async function reload(quiet) {
+  if (syncing || hasLocalChanges()) { if (!quiet) toast("Đang có thay đổi chưa lưu xong, thử lại sau vài giây."); return; }
+  try { await loadAll(); initUi(true); render(); setMark("Đã tải lúc " + hhmm()); if (!quiet) toast("Đã tải dữ liệu mới nhất."); }
+  catch (e) { if (!quiet) toast("Không tải được: " + e.message + infraHint(e.message)); }
+}
 
-  const DAYS = 180;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const daily = []; // daily[i] = { date, byChannel: [{rev, orders, newCust}] }
-  {
-    const r = rng(42);
-    for (let i = DAYS - 1; i >= 0; i--) {
-      const d = new Date(today); d.setDate(d.getDate() - i);
-      const t = (DAYS - i) / DAYS;
-      const weekend = d.getDay() === 0 || d.getDay() === 6 ? 1.25 : 1;
-      daily.push({
-        date: d,
-        byChannel: CHANNEL_WEIGHT.map(w => {
-          const orders = Math.round((18 + 10 * t) * w * weekend * (0.75 + r() * 0.5));
-          const aov = 320000 + r() * 160000;
-          return { rev: orders * aov, orders, newCust: Math.round(orders * (0.25 + r() * 0.15)) };
-        }),
+// ---- Minh chứng (file, ảnh) upload qua TB.upload
+const EV_ACCEPT = "image/jpeg,image/png,image/webp,image/gif,image/heic,.heic,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt";
+const EXT_MIME = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif", heic: "image/heic", pdf: "application/pdf", csv: "text/csv", txt: "text/plain",
+  doc: "application/msword", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ppt: "application/vnd.ms-powerpoint", pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation" };
+async function prepareUpload(f) {
+  const ext = (f.name.split(".").pop() || "").toLowerCase();
+  let file = f;
+  if (!f.type && EXT_MIME[ext]) file = new File([f], f.name, { type: EXT_MIME[ext] });
+  if (/^image\/(jpeg|png|webp)$/.test(file.type) && file.size > 1.5 * 1048576) {
+    try {
+      const bmp = await createImageBitmap(file);
+      const k = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+      const cv = document.createElement("canvas"); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+      cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+      const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.82));
+      if (blob && blob.size < file.size) file = new File([blob], f.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
+    } catch (e) { /* giữ ảnh gốc */ }
+  }
+  if (file.size > 10 * 1048576) throw new Error(`“${f.name}” lớn hơn 10 MB. Hãy nén hoặc chia nhỏ.`);
+  return file;
+}
+function pickFiles(accept, multiple = true) {
+  return new Promise(res => { const i = document.createElement("input"); i.type = "file"; i.accept = accept; i.multiple = multiple; i.onchange = () => res([...i.files]); i.click(); });
+}
+async function uploadEvidence(list, files) {
+  for (const f of files) {
+    let file;
+    try { file = await prepareUpload(f); } catch (e) { toast(e.message); continue; }
+    setMark(`Đang tải lên “${file.name}”…`);
+    try {
+      const r = await TB.upload(APP, file);
+      list.push({ key: r.key, url: r.url, name: r.name, type: r.type, size: r.size, at: r.uploaded_at || new Date().toISOString(), by: r.uploaded_by || "" });
+      toast(`Đã tải lên “${r.name}”.`);
+    } catch (e) { toast(`Không tải được “${f.name}”: ${e.message}${infraHint(e.message)}`); }
+  }
+  save(true);
+}
+const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round((b || 0) / 1024)) + " KB";
+const isImg = e => /^image\/(jpeg|png|webp|gif)$/.test(e.type || "");
+function evHtml(list, scope, editable = true) {
+  return `<div class="ev">${(list || []).map((e, i) => `<div class="ev-item" data-ei="${i}" data-scope="${scope}">
+      ${isImg(e) ? `<a href="${esc(e.url)}" target="_blank" rel="noopener" title="Xem ảnh"><img src="${esc(e.url)}" alt="${esc(e.name)}" loading="lazy"></a>` : `<span class="ficon">${esc((e.name.split(".").pop() || "TỆP").slice(0, 4).toUpperCase())}</span>`}
+      <span class="meta"><a href="${esc(e.url)}" download="${esc(e.name)}" title="Tải về ${esc(e.name)}">${esc(e.name)}</a><small>${fmtSize(e.size)} · ${new Date(e.at).toLocaleDateString("vi-VN")}${e.by ? " · " + esc(e.by) : ""}</small></span>
+      ${editable ? `<button class="btn ghost sm danger" data-act="delEv" aria-label="Xoá minh chứng" title="Xoá">✕</button>` : ""}
+    </div>`).join("")}
+    ${editable ? `<button class="btn sm" data-act="upEv" data-scope="${scope}" title="Ảnh, PDF, Word, Excel… tối đa 10 MB">⤒ Tải minh chứng</button>` : ""}</div>`;
+}
+function evList(rec, scope) {
+  if (scope === "gen") return (rec.evGen ||= []);
+  const t = rec.tasks.find(x => x.id === scope); return t ? (t.ev ||= []) : [];
+}
+
+// =====================================================================
+// 3. TIỆN ÍCH
+// =====================================================================
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+const round2 = n => Math.round(n * 100) / 100;
+const fmt = (n, d = 2) => n == null || isNaN(n) ? "–" : round2(n).toLocaleString("vi-VN", { maximumFractionDigits: d });
+const pct = n => n == null || isNaN(n) ? "–" : (Math.round(n * 10) / 10).toLocaleString("vi-VN") + "%";
+const num = v => { const x = parseFloat(String(v).replace(",", ".")); return isNaN(x) ? null : x; };
+const ym = (y, m) => `${y}-${String(m).padStart(2, "0")}`;
+function addMonth(k, d) { let [y, m] = k.split("-").map(Number); m += d; while (m > 12) { m -= 12; y++; } while (m < 1) { m += 12; y--; } return ym(y, m); }
+const monthLabel = k => { const [y, m] = k.split("-").map(Number); return `Tháng ${m}/${y}`; };
+const monthShort = k => { const [y, m] = k.split("-").map(Number); return `T${m}/${String(y).slice(2)}`; };
+const now = new Date();
+const CUR_MONTH = ym(now.getFullYear(), now.getMonth() + 1);
+const schoolYearOf = k => { const [y, m] = k.split("-").map(Number); return m >= 9 ? y : y - 1; };
+const rkey = (sid, m) => sid + "|" + m;
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("on"), 2600);
+}
+function download(name, content, type) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+const ICON = {
+  good: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--good)"/><path d="M4 7.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warning: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--warning)"/><path d="M7 3.6V7l2.2 1.4" stroke="#3a2a00" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+  serious: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--serious)"/><circle cx="4.2" cy="7" r="1" fill="#fff"/><circle cx="7" cy="7" r="1" fill="#fff"/><circle cx="9.8" cy="7" r="1" fill="#fff"/></svg>',
+  critical: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--critical)"/><path d="M7 3.5v4.2" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/><circle cx="7" cy="10.2" r="1" fill="#fff"/></svg>',
+};
+const statusHtml = (key, label) => `<span class="status">${ICON[key]}${esc(label)}</span>`;
+const recStatusHtml = st => st ? statusHtml(RECORD_STATUS[st].key, RECORD_STATUS[st].label) : statusHtml("critical", "Chưa có phiếu");
+const rankHtml = r => r ? `<span class="rank"><i class="chip" style="background:${r.color}"></i>${esc(r.short)}</span>` : '<span class="muted">–</span>';
+
+// =====================================================================
+// 4. TÍNH ĐIỂM
+// =====================================================================
+const bandHT = r => r >= 100 ? 20 : r >= 90 ? 15 : r >= 80 ? 10 : r >= 70 ? 5 : r >= 60 ? 1 : 0;
+const bandCL = r => r >= 95 ? 30 : r >= 90 ? 25 : r >= 80 ? 20 : r >= 70 ? 15 : r >= 60 ? 10 : r >= 50 ? 5 : 0;
+
+function newRecord() {
+  return { tasks: [], a: { tu: {}, off: {} }, c03: { vp: 0, moi: 0 }, pl: [], kc: [], uu: "", han: "", status: "nhap", updated: null };
+}
+
+function taskStats(tasks) {
+  const s = { n: tasks.length, done: 0, notdone: 0, som: 0, dung: 0, tre: 0, dam: 0, vuot: 0, chua: 0, dotxuat: 0, ahTre: 0, ahChua: 0, ahCL: 0 };
+  for (const t of tasks) {
+    if (t.kq === "done") {
+      s.done++;
+      s[t.td || "dung"]++;
+      s[t.cl || "dam"]++;
+      if (t.g === 3 && t.cl !== "chua") s.dotxuat++;
+      if (t.ah && t.td === "tre") s.ahTre++;
+      if (t.ah && t.cl === "chua") s.ahCL++;
+    } else {
+      s.notdone++;
+      if (t.ah) s.ahChua++;
+    }
+  }
+  s.rHT = s.n ? s.done / s.n * 100 : null;
+  s.rTD = s.n ? (s.som + s.dung) / s.n * 100 : null;
+  s.rCL = s.n ? (s.dam + s.vuot) / s.n * 100 : null;
+  s.rSom = s.n ? s.som / s.n * 100 : 0;
+  return s;
+}
+
+function calc(rec) {
+  const s = taskStats(rec.tasks);
+  const B = s.n ? { ht: bandHT(s.rHT), td: bandHT(s.rTD), cl: bandCL(s.rCL) } : null;
+  const Btot = B ? B.ht + B.td + B.cl : 0;
+  let Atu = 0, Aoff = 0, aFilled = 0;
+  for (const c of CRIT_ITEMS) {
+    const tu = rec.a.tu[c.c], off = rec.a.off[c.c];
+    if (tu != null) { Atu += tu; aFilled++; }
+    Aoff += off != null ? off : (tu ?? 0);
+  }
+  const c = {
+    dotxuat: Math.min(1, 0.5 * s.dotxuat),
+    som: s.rSom >= 80 ? 1 : s.rSom >= 50 ? 0.5 : 0,
+    vuot: Math.min(2, s.vuot),
+    moi: Math.min(2, Math.max(0, rec.c03.moi || 0)),
+    vp: -Math.max(0, rec.c03.vp || 0),
+    tre: -s.ahTre, chua: -2 * s.ahChua, cl: -2 * s.ahCL,
+  };
+  const C03 = Object.values(c).reduce((a, b) => a + b, 0);
+  let PLtu = 0, PLoff = 0;
+  for (const e of rec.pl) { const v = (e.qty || 0) * (e.p || 0); PLtu += v; if (e.ok !== false) PLoff += v; }
+  const totTu = Atu + Btot + C03 + PLtu;
+  const totOff = Aoff + Btot + C03 + PLoff;
+  const final = rec.status === "duyet" ? totOff : totTu;
+  const down = rec.kc.length ? 1 : 0;
+  return { s, B, Btot, Atu, Aoff, aFilled, c, C03, PLtu, PLoff, totTu, totOff, final, down, rank: rankOf(final, down), rankTu: rankOf(totTu, down), rankOff: rankOf(totOff, down) };
+}
+function rankOf(score, down = 0) {
+  let i = RANKS.findIndex(r => score >= r.min);
+  return RANKS[Math.min(3, i + down)];
+}
+
+// Gộp nhiều tháng (quý / năm): cộng dồn công việc, điểm = trung bình cộng điểm các tháng
+function aggregate(sid, months) {
+  const recs = months.map(m => ({ m, r: db.records[rkey(sid, m)] })).filter(x => x.r && x.r.status !== "nhap");
+  if (!recs.length) return null;
+  const cs = recs.map(x => ({ m: x.m, rec: x.r, c: calc(x.r) }));
+  const all = taskStats(cs.flatMap(x => x.rec.tasks));
+  const score = cs.reduce((a, x) => a + x.c.final, 0) / cs.length;
+  const down = cs.some(x => x.c.down) ? 1 : 0;
+  return { months: cs, s: all, score, down, rank: rankOf(score, down), approved: cs.every(x => x.rec.status === "duyet") };
+}
+
+// =====================================================================
+// 5. DỮ LIỆU MẪU
+// =====================================================================
+function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function demo() {
+  const r = rng(2026);
+  const staff = [
+    ["Giáo viên A", "gvcn", "Giáo viên", "Tổ 1", "1/1"],
+    ["Giáo viên B", "gvcn", "Tổ trưởng", "Tổ 1", "1/2"],
+    ["Giáo viên C", "gvcn", "Giáo viên", "Tổ 2", "2/1"],
+    ["Giáo viên D", "gvcn", "Giáo viên", "Tổ 3", "3/1"],
+    ["Giáo viên E", "gvcn", "Tổ trưởng", "Tổ 4-5", "5/3"],
+    ["Giáo viên F", "gvbm", "GV Tiếng Anh", "Tổ Bộ môn", ""],
+    ["Nhân viên G", "cbnv", "Nhân viên thư viện", "Tổ Văn phòng", ""],
+    ["Cán bộ H", "cbnv", "Phó Hiệu trưởng", "Ban Giám hiệu", ""],
+  ].map(([name, type, chucVu, to, lop]) => ({ id: uid(), name, type, chucVu, to, lop, demo: true }));
+
+  const T = {
+    gvcn: [
+      [1, "Thực hiện kế hoạch bài dạy, hoàn thành chương trình giảng dạy {m} lớp {lop}", "bt", "chu"],
+      [1, "Thực hiện công tác chủ nhiệm lớp {lop} (ổn định nền nếp, rèn luyện ý thức, tổ chức hoạt động lớp)", "pt", "chu"],
+      [1, "Phụ đạo học sinh chưa hoàn thành, bồi dưỡng học sinh năng khiếu", "bt", "chu"],
+      [2, "Tham gia sinh hoạt chuyên môn, xây dựng kế hoạch tổ chuyên môn {m}", "bt", "phoi"],
+      [2, "Cập nhật hồ sơ sổ sách, phần mềm quản lý học sinh đúng quy định", "bt", "chu"],
+      [2, "Dự giờ, thao giảng theo kế hoạch tổ chuyên môn", "bt", "chu"],
+      [3, "Hướng dẫn học sinh tham gia cuộc thi vẽ tranh cấp trường", "pt", "chu"],
+      [3, "Viết tham luận phục vụ Hội nghị viên chức", "bt", "phoi"],
+      [4, "Tham gia đầy đủ hội họp, tập huấn chuyên môn và phong trào của nhà trường", "bt", "phoi"],
+    ],
+    gvbm: [
+      [1, "Giảng dạy môn {mon} các lớp theo phân công, hoàn thành chương trình {m}", "bt", "chu"],
+      [1, "Bồi dưỡng đội tuyển học sinh năng khiếu môn {mon}", "pt", "chu"],
+      [2, "Tham gia sinh hoạt chuyên môn tổ bộ môn", "bt", "phoi"],
+      [2, "Cập nhật điểm, nhận xét học sinh trên phần mềm", "bt", "chu"],
+      [3, "Hỗ trợ tổ chức hoạt động ngoại khoá của trường", "pt", "phoi"],
+      [4, "Tham gia đầy đủ hội họp, tập huấn chuyên môn", "bt", "phoi"],
+    ],
+    cbnv: [
+      [1, "Xây dựng và triển khai kế hoạch công tác {m} theo vị trí việc làm", "pt", "chu"],
+      [1, "Thực hiện nhiệm vụ chuyên trách theo phân công ({cv})", "bt", "chu"],
+      [2, "Cập nhật hồ sơ sổ sách, báo cáo định kỳ đúng hạn", "bt", "chu"],
+      [2, "Phối hợp với tổ chuyên môn, đoàn thể trong các hoạt động chung", "bt", "phoi"],
+      [3, "Thực hiện nhiệm vụ đột xuất do Hiệu trưởng phân công", "pt", "chu"],
+      [4, "Tham gia hội họp, tập huấn, bồi dưỡng theo kế hoạch", "bt", "phoi"],
+    ],
+  };
+  const months = [];
+  for (let k = addMonth(CUR_MONTH, -9); k <= CUR_MONTH; k = addMonth(k, 1)) {
+    const m = +k.split("-")[1];
+    if (m >= 6 && m <= 8) continue;
+    if (k === CUR_MONTH && now.getDate() < 25) continue;
+    months.push(k);
+  }
+  const records = {};
+  staff.forEach((st, si) => {
+    const skill = 0.82 + r() * 0.17;
+    months.forEach((mk, mi) => {
+      const isLast = mi === months.length - 1;
+      if (isLast && (si === 3 || si === 6)) return; // chưa nộp
+      const rec = newRecord();
+      const tpl = T[st.type];
+      const mName = monthLabel(mk).toLowerCase();
+      tpl.forEach(([g, t, tc, md]) => {
+        if (g === 3 && r() < 0.5) return;
+        const done = r() < 0.94 + skill * 0.05;
+        const x = r();
+        const td = x < 0.12 * skill ? "som" : x < 1 - (1 - skill) * 0.9 ? "dung" : "tre";
+        const y = r();
+        const cl = y < 0.07 * skill ? "vuot" : y < 1 - (1 - skill) * 0.6 ? "dam" : "chua";
+        rec.tasks.push({
+          id: uid(), g, nd: t.replace("{m}", mName).replace("{lop}", st.lop).replace("{mon}", st.chucVu.replace("GV ", "")).replace("{cv}", st.chucVu),
+          tc, md, kq: done ? "done" : "notdone", han: monthLabel(mk), td: done ? td : "", tre: td === "tre" ? 1 + Math.floor(r() * 3) : 0,
+          cl: done ? cl : "", ah: !done && r() < 0.3, kqnd: done ? "Đã thực hiện đầy đủ theo yêu cầu." : "Chưa hoàn thành do trùng lịch công tác.",
+        });
       });
-    }
-  }
-
-  // ---------- Trạng thái ----------
-  const state = { range: 30, channel: "all", view: { trend: "chart", channel: "chart" } };
-
-  const fmtVND = n => new Intl.NumberFormat("vi-VN").format(Math.round(n)) + " ₫";
-  const fmtShort = n => {
-    const a = Math.abs(n);
-    if (a >= 1e9) return (n / 1e9).toFixed(a >= 1e10 ? 0 : 1).replace(".", ",") + " tỷ";
-    if (a >= 1e6) return (n / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(".", ",") + " tr";
-    if (a >= 1e3) return Math.round(n / 1e3) + "k";
-    return String(Math.round(n));
-  };
-  const fmtInt = n => new Intl.NumberFormat("vi-VN").format(Math.round(n));
-  const fmtDate = d => d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
-  const fmtDateLong = d => d.toLocaleDateString("vi-VN", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
-  function pick(day) {
-    if (state.channel === "all") {
-      return day.byChannel.reduce((a, c) => ({ rev: a.rev + c.rev, orders: a.orders + c.orders, newCust: a.newCust + c.newCust }), { rev: 0, orders: 0, newCust: 0 });
-    }
-    return day.byChannel[+state.channel];
-  }
-
-  function periods() {
-    const n = state.range;
-    const cur = daily.slice(-n);
-    const prev = daily.slice(-2 * n, -n);
-    return { cur, prev };
-  }
-
-  function sum(days) {
-    return days.map(pick).reduce((a, c) => ({ rev: a.rev + c.rev, orders: a.orders + c.orders, newCust: a.newCust + c.newCust }), { rev: 0, orders: 0, newCust: 0 });
-  }
-
-  // ---------- KPI ----------
-  function renderKpis() {
-    const { cur, prev } = periods();
-    const a = sum(cur), b = sum(prev);
-    const items = [
-      { label: "Doanh thu", v: a.rev, p: b.rev, f: fmtShort, full: fmtVND },
-      { label: "Đơn hàng", v: a.orders, p: b.orders, f: fmtInt },
-      { label: "Khách hàng mới", v: a.newCust, p: b.newCust, f: fmtInt },
-      { label: "Giá trị TB / đơn", v: a.rev / a.orders, p: b.rev / b.orders, f: fmtShort, full: fmtVND },
-    ];
-    document.getElementById("kpis").innerHTML = items.map(it => {
-      const pct = it.p ? (it.v - it.p) / it.p * 100 : 0;
-      const up = pct >= 0;
-      return `<div class="card kpi">
-        <div class="label">${it.label}</div>
-        <div class="value" title="${it.full ? it.full(it.v) : fmtInt(it.v)}">${it.f(it.v)}</div>
-        <div class="delta ${up ? "up" : "down"}">${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(1).replace(".", ",")}%
-          <span class="vs">so với kỳ trước</span></div>
-      </div>`;
-    }).join("");
-    const first = cur[0].date, last = cur[cur.length - 1].date;
-    document.getElementById("rangeText").textContent =
-      `${fmtDateLong(first)} – ${fmtDateLong(last)} · Dữ liệu mẫu`;
-  }
-
-  // ---------- Tooltip ----------
-  function tipFor(container) {
-    let tip = container.querySelector(".tip");
-    if (!tip) { tip = document.createElement("div"); tip.className = "tip"; container.appendChild(tip); }
-    return {
-      show(html, x, y) {
-        tip.innerHTML = html; tip.classList.add("on");
-        const cw = container.clientWidth, tw = tip.offsetWidth, th = tip.offsetHeight;
-        let left = x + 14; if (left + tw > cw) left = x - tw - 14; if (left < 0) left = Math.max(0, cw - tw);
-        let top = y - th - 10; if (top < 0) top = y + 14;
-        tip.style.left = left + "px"; tip.style.top = top + "px";
-      },
-      hide() { tip.classList.remove("on"); },
-    };
-  }
-
-  function niceMax(v) {
-    const p = Math.pow(10, Math.floor(Math.log10(v)));
-    for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
-    return v;
-  }
-
-  const NS = "http://www.w3.org/2000/svg";
-
-  // ---------- Biểu đồ đường ----------
-  function renderTrend() {
-    const el = document.getElementById("trendChart");
-    const { cur, prev } = periods();
-    const a = cur.map(d => pick(d).rev);
-    const b = prev.map(d => pick(d).rev);
-    const W = Math.max(280, el.clientWidth), H = W < 500 ? 220 : 280;
-    const m = { t: 12, r: 12, b: 26, l: 48 };
-    const iw = W - m.l - m.r, ih = H - m.t - m.b;
-    const max = niceMax(Math.max(...a, ...b) * 1.05);
-    const x = i => m.l + (a.length === 1 ? iw / 2 : i * iw / (a.length - 1));
-    const y = v => m.t + ih - v / max * ih;
-    const path = arr => arr.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
-
-    const ticks = 4;
-    let grid = "";
-    for (let i = 0; i <= ticks; i++) {
-      const v = max * i / ticks, yy = y(v);
-      grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="var(--${i ? "grid" : "border"})" stroke-width="1"/>`;
-      grid += `<text x="${m.l - 8}" y="${yy + 4}" text-anchor="end">${fmtShort(v)}</text>`;
-    }
-    const step = Math.ceil(a.length / Math.max(2, Math.floor(iw / 70)));
-    let xl = "";
-    for (let i = 0; i < a.length; i += step) xl += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${fmtDate(cur[i].date)}</text>`;
-
-    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Biểu đồ doanh thu theo ngày, kỳ này so với kỳ trước">
-      ${grid}${xl}
-      <path d="${path(b)}" fill="none" stroke="var(--series-ref)" stroke-width="2" stroke-dasharray="4 4" stroke-linejoin="round"/>
-      <path d="${path(a)}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-      <g id="trendHover" visibility="hidden">
-        <line y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-muted)" stroke-width="1"/>
-        <circle r="4" fill="var(--series-ref)" stroke="var(--surface-1)" stroke-width="2" data-s="b"/>
-        <circle r="5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2" data-s="a"/>
-      </g>
-      <rect x="${m.l}" y="0" width="${iw}" height="${H}" fill="transparent" id="trendHit"/>
-    </svg>`;
-
-    const svg = el.querySelector("svg"), hit = el.querySelector("#trendHit"), g = el.querySelector("#trendHover");
-    const tip = tipFor(el);
-    const move = ev => {
-      const rect = svg.getBoundingClientRect();
-      const px = (ev.clientX - rect.left) * W / rect.width;
-      const i = Math.max(0, Math.min(a.length - 1, Math.round((px - m.l) / iw * (a.length - 1))));
-      const xx = x(i);
-      g.setAttribute("visibility", "visible");
-      g.querySelector("line").setAttribute("x1", xx); g.querySelector("line").setAttribute("x2", xx);
-      const ca = g.querySelector('[data-s="a"]'), cb = g.querySelector('[data-s="b"]');
-      ca.setAttribute("cx", xx); ca.setAttribute("cy", y(a[i]));
-      cb.setAttribute("cx", xx); cb.setAttribute("cy", y(b[i] ?? 0));
-      const pct = b[i] ? ((a[i] - b[i]) / b[i] * 100) : 0;
-      tip.show(`<div class="t">${fmtDateLong(cur[i].date)}</div>
-        <div class="row"><span class="k"><i class="sw" style="border-color:var(--series-1)"></i>Kỳ này</span><b>${fmtVND(a[i])}</b></div>
-        <div class="row"><span class="k"><i class="sw dash" style="border-color:var(--series-ref)"></i>Kỳ trước (${fmtDate(prev[i].date)})</span><b>${fmtVND(b[i])}</b></div>
-        <div class="row"><span class="k">Chênh lệch</span><b>${pct >= 0 ? "+" : ""}${pct.toFixed(1).replace(".", ",")}%</b></div>`,
-        xx * rect.width / W, y(a[i]) * rect.height / H);
-    };
-    hit.addEventListener("pointermove", move);
-    hit.addEventListener("pointerdown", move);
-    hit.addEventListener("pointerleave", () => { g.setAttribute("visibility", "hidden"); tip.hide(); });
-
-    document.getElementById("trendTable").innerHTML = `<table>
-      <thead><tr><th>Ngày</th><th class="num">Kỳ này</th><th class="num">Kỳ trước</th></tr></thead>
-      <tbody>${cur.map((d, i) => `<tr><td>${fmtDate(d.date)}</td><td class="num">${fmtVND(a[i])}</td><td class="num">${fmtVND(b[i])}</td></tr>`).join("")}</tbody></table>`;
-  }
-
-  // ---------- Biểu đồ cột ngang theo kênh ----------
-  function renderChannels() {
-    const el = document.getElementById("channelChart");
-    const { cur } = periods();
-    const rows = CHANNELS.map((name, ci) => ({
-      name, ci, rev: cur.reduce((s, d) => s + d.byChannel[ci].rev, 0),
-    })).sort((p, q) => q.rev - p.rev);
-    const total = rows.reduce((s, r) => s + r.rev, 0);
-    const W = Math.max(260, el.clientWidth);
-    const rowH = 40, barH = 14, labelW = 76, valW = 64;
-    const H = rows.length * rowH + 4;
-    const iw = W - labelW - valW;
-    const max = rows[0].rev;
-    const sel = state.channel;
-
-    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Doanh thu theo kênh bán">
-      ${rows.map((r, i) => {
-        const yy = i * rowH + (rowH - barH) / 2;
-        const w = Math.max(4, r.rev / max * iw);
-        const dim = sel !== "all" && +sel !== r.ci;
-        return `<g data-i="${i}" opacity="${dim ? 0.35 : 1}">
-          <rect x="0" y="${i * rowH}" width="${W}" height="${rowH}" fill="transparent"/>
-          <text class="lbl" x="0" y="${yy + barH / 2 + 4}">${esc(r.name)}</text>
-          <path d="M${labelW},${yy} h${w - 4} a4,4 0 0 1 4,4 v${barH - 8} a4,4 0 0 1 -4,4 h${-(w - 4)} z" fill="var(--bar-1)"/>
-          <text class="val" x="${W}" y="${yy + barH / 2 + 4}" text-anchor="end">${fmtShort(r.rev)}</text>
-        </g>`;
-      }).join("")}
-    </svg>`;
-
-    const tip = tipFor(el), svg = el.querySelector("svg");
-    el.querySelectorAll("g[data-i]").forEach(g => {
-      const r = rows[+g.dataset.i];
-      const show = ev => {
-        const rect = el.getBoundingClientRect();
-        tip.show(`<div class="t">${esc(r.name)}</div>
-          <div class="row"><span class="k">Doanh thu</span><b>${fmtVND(r.rev)}</b></div>
-          <div class="row"><span class="k">Tỷ trọng</span><b>${(r.rev / total * 100).toFixed(1).replace(".", ",")}%</b></div>`,
-          ev.clientX - rect.left, ev.clientY - rect.top);
-      };
-      g.addEventListener("pointermove", show);
-      g.addEventListener("pointerdown", show);
-      g.addEventListener("pointerleave", () => tip.hide());
+      for (const c of CRIT_ITEMS) {
+        const v = r() < 0.08 * (1.2 - skill) * 6 ? c.max * 0.8 : c.max;
+        rec.a.tu[c.c] = round2(v);
+        if (r() < 0.05) rec.a.off[c.c] = round2(c.max * 0.8);
+      }
+      const cat = CATALOG[STAFF_TYPES[st.type].pl].filter(x => x.k !== "khongche" && !x.m && (st.type !== "gvbm" || x.s !== "III"));
+      const nPl = Math.floor(r() * 3);
+      for (let i = 0; i < nPl; i++) {
+        const minus = cat.filter(x => x.k === "tru"), plus = cat.filter(x => x.k === "cong" && x.p <= 3);
+        const pick = r() < 0.55 ? minus[Math.floor(r() * minus.length)] : plus[Math.floor(r() * plus.length)];
+        const idx = CATALOG[STAFF_TYPES[st.type].pl].indexOf(pick);
+        rec.pl.push({ id: uid(), ref: idx, t: pick.t, p: pick.p, qty: 1, note: "", ok: true });
+      }
+      rec.status = isLast ? (r() < 0.6 ? "nop" : "duyet") : "duyet";
+      rec.updated = new Date().toISOString();
+      records[rkey(st.id, mk)] = rec;
     });
-
-    document.getElementById("channelTable").innerHTML = `<table>
-      <thead><tr><th>Kênh</th><th class="num">Doanh thu</th><th class="num">Tỷ trọng</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${fmtVND(r.rev)}</td><td class="num">${(r.rev / total * 100).toFixed(1).replace(".", ",")}%</td></tr>`).join("")}</tbody></table>`;
-  }
-
-  // ---------- Bảng ----------
-  const STATUS_ICON = {
-    good: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--good)"/><path d="M4 7.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    warning: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--warning)"/><path d="M7 3.6V7l2.2 1.4" stroke="#3a2a00" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
-    serious: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--serious)"/><circle cx="4.2" cy="7" r="1" fill="#fff"/><circle cx="7" cy="7" r="1" fill="#fff"/><circle cx="9.8" cy="7" r="1" fill="#fff"/></svg>',
-    critical: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--critical)"/><path d="M4.8 4.8l4.4 4.4M9.2 4.8l-4.4 4.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>',
-  };
-
-  function renderOrders() {
-    const r = rng(7 + state.range + (state.channel === "all" ? 0 : +state.channel + 1) * 13);
-    const rows = Array.from({ length: 10 }, (_, i) => {
-      const ci = state.channel === "all" ? Math.floor(r() * CHANNELS.length) : +state.channel;
-      const roll = r();
-      const st = roll < 0.55 ? STATUSES[0] : roll < 0.8 ? STATUSES[1] : roll < 0.93 ? STATUSES[2] : STATUSES[3];
-      const t = new Date(Date.now() - (i * 47 + Math.floor(r() * 40)) * 60000);
-      return {
-        id: "DH" + String(10480 - i * 3 - Math.floor(r() * 3)).padStart(6, "0"),
-        cust: CUSTOMERS[Math.floor(r() * CUSTOMERS.length)],
-        ch: CHANNELS[ci], amount: Math.round((200 + r() * 1800) * 1000), st, t,
-      };
-    });
-    document.getElementById("ordersTable").innerHTML = `
-      <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Kênh</th><th>Trạng thái</th><th class="num">Giá trị</th></tr></thead>
-      <tbody>${rows.map(o => `<tr>
-        <td><span title="${o.t.toLocaleString("vi-VN")}">${o.id}</span></td>
-        <td>${esc(o.cust)}</td><td>${esc(o.ch)}</td>
-        <td><span class="status">${STATUS_ICON[o.st.key]}${o.st.label}</span></td>
-        <td class="num">${fmtVND(o.amount)}</td></tr>`).join("")}</tbody>`;
-  }
-
-  function renderProducts() {
-    const r = rng(99 + state.range * 3 + (state.channel === "all" ? 0 : +state.channel + 1) * 31);
-    const scale = state.range / 30 * (state.channel === "all" ? 1 : 0.22);
-    const rows = PRODUCTS.map(p => ({ p, q: Math.round((120 + r() * 520) * scale), price: Math.round((150 + r() * 650) * 1000) }))
-      .sort((a, b) => b.q - a.q);
-    document.getElementById("productsTable").innerHTML = `
-      <thead><tr><th>Sản phẩm</th><th class="num">SL</th><th class="num">Doanh thu</th></tr></thead>
-      <tbody>${rows.map(x => `<tr><td>${esc(x.p)}</td><td class="num">${fmtInt(x.q)}</td><td class="num">${fmtShort(x.q * x.price)}</td></tr>`).join("")}</tbody>`;
-  }
-
-  function renderAll() {
-    renderKpis(); renderTrend(); renderChannels(); renderOrders(); renderProducts();
-  }
-
-  // ---------- Điều khiển ----------
-  const sel = document.getElementById("channelSel");
-  CHANNELS.forEach((c, i) => sel.insertAdjacentHTML("beforeend", `<option value="${i}">${esc(c)}</option>`));
-  sel.addEventListener("change", () => { state.channel = sel.value; renderAll(); });
-
-  document.querySelectorAll("#rangeSeg button").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll("#rangeSeg button").forEach(x => x.setAttribute("aria-pressed", x === b));
-    state.range = +b.dataset.range; renderAll();
-  }));
-
-  document.querySelectorAll("[data-toggle]").forEach(b => b.addEventListener("click", () => {
-    const k = b.dataset.toggle;
-    const toTable = state.view[k] === "chart";
-    state.view[k] = toTable ? "table" : "chart";
-    document.getElementById(k + "Chart").classList.toggle("hidden", toTable);
-    document.getElementById(k + "Table").classList.toggle("hidden", !toTable);
-    b.textContent = toTable ? "Xem biểu đồ" : "Xem bảng";
-  }));
-
-  const root = document.documentElement;
-  try { const t = localStorage.getItem("dash-theme"); if (t) root.dataset.theme = t; } catch (e) {}
-  document.getElementById("themeBtn").addEventListener("click", () => {
-    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    root.dataset.theme = dark ? "light" : "dark";
-    try { localStorage.setItem("dash-theme", root.dataset.theme); } catch (e) {}
   });
+  return { staff, records };
+}
 
-  let rt;
-  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { renderTrend(); renderChannels(); }, 120); });
+// =====================================================================
+// 6. TRẠNG THÁI GIAO DIỆN
+// =====================================================================
+const latestMonth = () => {
+  const ms = Object.keys(db.records).map(k => k.split("|")[1]).sort();
+  return ms.length ? ms[ms.length - 1] : CUR_MONTH;
+};
+const ui = { tab: "overview", sort: { key: "score", dir: -1 }, filter: { q: "", to: "", rank: "" } };
+function initUi(keep) {
+  if (!keep || !ui.period) ui.period = { type: "month", value: latestMonth() };
+  if (!keep || !staffById(ui.evalStaff)) ui.evalStaff = db.staff[0]?.id || null;
+  if (!keep || !ui.evalMonth) ui.evalMonth = latestMonth();
+  if (!keep || !staffById(ui.person)) ui.person = db.staff[0]?.id || null;
+  if (!keep || !ui.personYear) ui.personYear = schoolYearOf(latestMonth());
+}
+try { const t = sessionStorage.getItem("tdgv-tab"); if (t) ui.tab = t; } catch (e) {}
 
-  renderAll();
+function periodMonths(p) {
+  if (p.type === "month") return [p.value];
+  if (p.type === "quarter") { const [y, q] = p.value.split("-Q").map(Number); return [1, 2, 3].map(i => ym(y, (q - 1) * 3 + i)); }
+  if (p.type === "year") return Array.from({ length: 12 }, (_, i) => ym(+p.value, i + 1));
+  const y = +p.value; return [9, 10, 11, 12].map(m => ym(y, m)).concat([1, 2, 3, 4, 5, 6, 7, 8].map(m => ym(y + 1, m)));
+}
+function periodLabel(p) {
+  if (p.type === "month") return monthLabel(p.value);
+  if (p.type === "quarter") { const [y, q] = p.value.split("-Q"); return `Quý ${["I", "II", "III", "IV"][q - 1]}/${y}`; }
+  if (p.type === "year") return `Năm ${p.value}`;
+  return `Năm học ${p.value}-${+p.value + 1}`;
+}
+function periodOptions(type) {
+  const ms = new Set(Object.keys(db.records).map(k => k.split("|")[1])); ms.add(CUR_MONTH);
+  const arr = [...ms].sort();
+  const opts = new Map();
+  for (const m of arr) {
+    const [y, mo] = m.split("-").map(Number);
+    if (type === "month") opts.set(m, monthLabel(m));
+    if (type === "quarter") { const v = `${y}-Q${Math.ceil(mo / 3)}`; opts.set(v, periodLabel({ type, value: v })); }
+    if (type === "year") opts.set(String(y), `Năm ${y}`);
+    if (type === "schoolyear") { const sy = schoolYearOf(m); opts.set(String(sy), periodLabel({ type, value: String(sy) })); }
+  }
+  return [...opts.entries()].reverse();
+}
+function defaultValue(type) {
+  const m = latestMonth(); const [y, mo] = m.split("-").map(Number);
+  return type === "month" ? m : type === "quarter" ? `${y}-Q${Math.ceil(mo / 3)}` : type === "year" ? String(y) : String(schoolYearOf(m));
+}
+
+// =====================================================================
+// 7. BIỂU ĐỒ
+// =====================================================================
+const NS = "http://www.w3.org/2000/svg";
+function tipFor(container) {
+  let tip = container.querySelector(".tip");
+  if (!tip) { tip = document.createElement("div"); tip.className = "tip"; container.appendChild(tip); }
+  return {
+    show(html, x, y) {
+      tip.innerHTML = html; tip.classList.add("on");
+      const cw = container.clientWidth, tw = tip.offsetWidth, th = tip.offsetHeight;
+      let left = x + 14; if (left + tw > cw) left = x - tw - 14; if (left < 0) left = Math.max(0, cw - tw);
+      let top = y - th - 10; if (top < 0) top = y + 14;
+      tip.style.left = left + "px"; tip.style.top = top + "px";
+    },
+    hide() { tip.classList.remove("on"); },
+  };
+}
+
+// Biểu đồ đường: điểm theo tháng với các ngưỡng xếp loại
+function lineChart(el, pts, opts = {}) {
+  const W = Math.max(280, el.clientWidth), H = W < 520 ? 220 : 260;
+  const m = { t: 14, r: 92, b: 26, l: 36 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const vals = pts.map(p => p.v).filter(v => v != null);
+  const lo = Math.max(0, Math.floor(Math.min(40, ...vals) / 10) * 10);
+  const hi = Math.max(100, Math.ceil(Math.max(...vals, 0) / 10) * 10);
+  const n = pts.length;
+  const x = i => m.l + (n === 1 ? iw / 2 : i * iw / (n - 1));
+  const y = v => m.t + ih - (v - lo) / (hi - lo) * ih;
+  let g = "";
+  for (let v = lo; v <= hi; v += 10) {
+    g += `<line x1="${m.l}" x2="${m.l + iw}" y1="${y(v)}" y2="${y(v)}" stroke="var(--${v === lo ? "border" : "grid"})"/>`;
+    if ((v - lo) % 20 === 0) g += `<text x="${m.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  }
+  for (const [v, lab] of [[90, "Xuất sắc"], [70, "Tốt"], [50, "Hoàn thành"]]) {
+    if (v < lo || v > hi) continue;
+    g += `<line x1="${m.l}" x2="${m.l + iw}" y1="${y(v)}" y2="${y(v)}" stroke="var(--ref)" stroke-dasharray="3 4"/>`;
+    g += `<text x="${m.l + iw + 6}" y="${y(v) + 4}">≥${v} ${lab}</text>`;
+  }
+  const step = Math.ceil(n / Math.max(2, Math.floor(iw / 52)));
+  pts.forEach((p, i) => { if (i % step === 0 || i === n - 1) g += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${esc(p.label)}</text>`; });
+  let d = "", started = false;
+  pts.forEach((p, i) => { if (p.v == null) { started = false; return; } d += `${started ? "L" : "M"}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`; started = true; });
+  const dots = pts.map((p, i) => p.v == null ? "" : `<circle cx="${x(i)}" cy="${y(p.v)}" r="${n > 14 ? 0 : 3.5}" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2"/>`).join("");
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || "Biểu đồ điểm theo tháng")}">${g}
+    <path d="${d}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}
+    <g class="hov" visibility="hidden"><line y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-muted)"/><circle r="5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2"/></g>
+    <rect x="${m.l - 10}" y="0" width="${iw + 20}" height="${H}" fill="transparent" class="hit"/></svg>`;
+  const svg = el.querySelector("svg"), hov = el.querySelector(".hov"), tip = tipFor(el);
+  const move = ev => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * W / rect.width;
+    const i = Math.max(0, Math.min(n - 1, Math.round((px - m.l) / (iw || 1) * (n - 1))));
+    const p = pts[i];
+    if (p.v == null) { hov.setAttribute("visibility", "hidden"); tip.show(`<div class="t">${esc(p.full || p.label)}</div><div class="muted">Chưa có dữ liệu</div>`, x(i) * rect.width / W, 30); return; }
+    hov.setAttribute("visibility", "visible");
+    hov.querySelector("line").setAttribute("x1", x(i)); hov.querySelector("line").setAttribute("x2", x(i));
+    hov.querySelector("circle").setAttribute("cx", x(i)); hov.querySelector("circle").setAttribute("cy", y(p.v));
+    tip.show(`<div class="t">${esc(p.full || p.label)}</div>${(p.rows || [["Điểm", fmt(p.v)]]).map(([k, v]) => `<div class="r"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("")}`,
+      x(i) * rect.width / W, y(p.v) * rect.height / H);
+  };
+  const hit = el.querySelector(".hit");
+  hit.addEventListener("pointermove", move); hit.addEventListener("pointerdown", move);
+  hit.addEventListener("pointerleave", () => { hov.setAttribute("visibility", "hidden"); tip.hide(); });
+}
+
+// Thanh xếp chồng 100%: phân bố xếp loại theo tổ
+function stackedRanks(el, rows) {
+  const W = Math.max(280, el.clientWidth);
+  const labelW = Math.min(110, W * 0.3), cntW = 34, rowH = 34, barH = 16;
+  const H = rows.length * rowH;
+  const iw = W - labelW - cntW;
+  let g = "";
+  rows.forEach((row, i) => {
+    const yy = i * rowH + (rowH - barH) / 2;
+    const total = row.counts.reduce((a, b) => a + b, 0);
+    g += `<text class="lbl" x="0" y="${yy + barH / 2 + 4}" ${row.bold ? 'font-weight="650"' : ""}>${esc(row.label)}</text>`;
+    g += `<text x="${W}" y="${yy + barH / 2 + 4}" text-anchor="end">${total}</text>`;
+    if (!total) { g += `<rect x="${labelW}" y="${yy}" width="${iw}" height="${barH}" rx="4" fill="var(--grid)"/>`; return; }
+    let xx = labelW;
+    const segs = row.counts.map((c, k) => ({ c, k })).filter(s => s.c);
+    segs.forEach((s, j) => {
+      const w = s.c / total * iw;
+      const gap = j < segs.length - 1 ? 2 : 0;
+      const first = j === 0, last = j === segs.length - 1;
+      const ww = Math.max(1, w - gap);
+      const rl = first ? 4 : 0, rr = last ? 4 : 0;
+      g += `<path data-r="${i}" data-k="${s.k}" d="M${xx + rl},${yy} h${ww - rl - rr} ${rr ? `a${rr},${rr} 0 0 1 ${rr},${rr}` : ""} v${barH - 2 * rr} ${rr ? `a${rr},${rr} 0 0 1 -${rr},${rr}` : ""} h-${ww - rl - rr} ${rl ? `a${rl},${rl} 0 0 1 -${rl},-${rl}` : ""} v-${barH - 2 * rl} ${rl ? `a${rl},${rl} 0 0 1 ${rl},-${rl}` : ""} z" fill="${RANKS[s.k].color}"/>`;
+      if (w > 22) g += `<text x="${xx + ww / 2}" y="${yy + barH / 2 + 4}" text-anchor="middle" style="fill:var(--on-${RANKS[s.k].k});font-weight:600;pointer-events:none">${s.c}</text>`;
+      xx += w;
+    });
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Phân bố xếp loại theo tổ">${g}</svg>`;
+  const tip = tipFor(el);
+  el.querySelectorAll("path[data-r]").forEach(p => {
+    const row = rows[+p.dataset.r], k = +p.dataset.k, total = row.counts.reduce((a, b) => a + b, 0);
+    const show = ev => { const rc = el.getBoundingClientRect(); tip.show(`<div class="t">${esc(row.label)}</div><div class="r"><span>${esc(RANKS[k].name)}</span><b>${row.counts[k]} người</b></div><div class="r"><span>Tỷ lệ</span><b>${pct(row.counts[k] / total * 100)}</b></div>`, ev.clientX - rc.left, ev.clientY - rc.top); };
+    p.addEventListener("pointermove", show); p.addEventListener("pointerdown", show); p.addEventListener("pointerleave", () => tip.hide());
+  });
+}
+
+// =====================================================================
+// 8. TAB: TỔNG QUAN
+// =====================================================================
+function overviewData() {
+  const months = periodMonths(ui.period);
+  const rows = db.staff.map(st => {
+    let a, recStatus = null;
+    if (ui.period.type === "month") {
+      const rec = db.records[rkey(st.id, months[0])];
+      recStatus = rec?.status || null;
+      if (rec && rec.status !== "nhap") { const c = calc(rec); a = { s: c.s, score: c.final, rank: c.rank, approved: rec.status === "duyet", down: c.down }; }
+    } else {
+      a = aggregate(st.id, months);
+      const n = months.filter(m => db.records[rkey(st.id, m)]?.status && db.records[rkey(st.id, m)].status !== "nhap").length;
+      recStatus = a ? (a.approved ? "duyet" : "nop") : null;
+      if (a) a.nMonths = n;
+    }
+    return { st, a, recStatus };
+  });
+  return { months, rows };
+}
+
+function renderOverview() {
+  const { months, rows } = overviewData();
+  const withData = rows.filter(r => r.a);
+  const tasks = withData.reduce((s, r) => { for (const k of ["n", "done", "som", "dung", "dam", "vuot", "tre", "notdone"]) s[k] += r.a.s[k]; return s; }, { n: 0, done: 0, som: 0, dung: 0, dam: 0, vuot: 0, tre: 0, notdone: 0 });
+  const avg = withData.length ? withData.reduce((a, r) => a + r.a.score, 0) / withData.length : null;
+  const tos = [...new Set(db.staff.map(s => s.to || "(Chưa có tổ)"))];
+  const isMonth = ui.period.type === "month";
+
+  const typeSel = `<div class="row" role="group" aria-label="Kỳ đánh giá">
+      <select id="pType" aria-label="Loại kỳ">${[["month", "Tháng"], ["quarter", "Quý"], ["year", "Năm"], ["schoolyear", "Năm học"]].map(([v, l]) => `<option value="${v}" ${ui.period.type === v ? "selected" : ""}>${l}</option>`).join("")}</select>
+      <select id="pValue" aria-label="Kỳ">${periodOptions(ui.period.type).map(([v, l]) => `<option value="${v}" ${ui.period.value === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>
+    </div>`;
+
+  const nSubmitted = isMonth ? rows.filter(r => r.recStatus === "nop" || r.recStatus === "duyet").length : withData.length;
+  const nApproved = rows.filter(r => r.recStatus === "duyet").length;
+
+  // Cảnh báo
+  const alerts = [];
+  if (isMonth) {
+    const miss = rows.filter(r => !r.recStatus || r.recStatus === "nhap");
+    if (miss.length) alerts.push(["critical", `${miss.length} người chưa nộp tự đánh giá: ${miss.map(r => `<a data-open="${r.st.id}">${esc(r.st.name)}</a>`).join(", ")}`]);
+    const pend = rows.filter(r => r.recStatus === "nop");
+    if (pend.length) alerts.push(["warning", `${pend.length} phiếu chờ tổ/Hội đồng thi đua duyệt: ${pend.map(r => `<a data-open="${r.st.id}">${esc(r.st.name)}</a>`).join(", ")}`]);
+  }
+  for (const r of withData) {
+    const lateTasks = [], notDone = [];
+    for (const m of months) {
+      const rec = db.records[rkey(r.st.id, m)]; if (!rec || rec.status === "nhap") continue;
+      for (const t of rec.tasks) { if (t.kq === "done" && t.td === "tre") lateTasks.push(t); if (t.kq !== "done") notDone.push(t); }
+    }
+    if (notDone.length) alerts.push(["critical", `<a data-open="${r.st.id}">${esc(r.st.name)}</a>: ${notDone.length} công việc chưa hoàn thành${notDone.length === 1 ? ` – “${esc(notDone[0].nd.slice(0, 70))}${notDone[0].nd.length > 70 ? "…" : ""}”` : ""}`]);
+    if (lateTasks.length) alerts.push(["serious", `<a data-open="${r.st.id}">${esc(r.st.name)}</a>: ${lateTasks.length} công việc trễ hạn`]);
+    if (r.a.down) alerts.push(["critical", `<a data-open="${r.st.id}">${esc(r.st.name)}</a>: có tiêu chí khống chế (hạ 1 bậc xếp loại)`]);
+  }
+
+  // Phân bố xếp loại theo tổ
+  const rankRows = [{ label: "Toàn trường", bold: true, counts: [0, 0, 0, 0] }].concat(tos.map(t => ({ label: t, counts: [0, 0, 0, 0] })));
+  for (const r of withData) { const k = RANKS.indexOf(r.a.rank); rankRows[0].counts[k]++; rankRows[1 + tos.indexOf(r.st.to || "(Chưa có tổ)")].counts[k]++; }
+
+  // Bảng
+  let list = rows.filter(r => {
+    const f = ui.filter;
+    if (f.q && !(r.st.name + " " + r.st.chucVu).toLowerCase().includes(f.q.toLowerCase())) return false;
+    if (f.to && (r.st.to || "(Chưa có tổ)") !== f.to) return false;
+    if (f.rank && (!r.a || r.a.rank.k !== f.rank)) return false;
+    return true;
+  });
+  const sk = ui.sort.key, dir = ui.sort.dir;
+  const val = r => sk === "name" ? r.st.name.split(" ").pop() + r.st.name : sk === "to" ? r.st.to : !r.a ? -Infinity : sk === "score" ? r.a.score : sk === "n" ? r.a.s.n : sk === "rHT" ? r.a.s.rHT : sk === "rTD" ? r.a.s.rTD : sk === "rCL" ? r.a.s.rCL : 0;
+  list.sort((a, b) => { const x = val(a), y = val(b); return (typeof x === "string" ? x.localeCompare(y, "vi") : x - y) * dir; });
+  const th = (k, l, cls = "") => `<th class="sortable ${cls}" data-sort="${k}" aria-sort="${sk === k ? (dir > 0 ? "ascending" : "descending") : "none"}">${l}${sk === k ? (dir > 0 ? " ▲" : " ▼") : ""}</th>`;
+  const bar = v => v == null ? "–" : `<span class="bar"><i><b style="width:${Math.max(0, Math.min(100, v))}%"></b></i>${pct(v)}</span>`;
+
+  $("#view").innerHTML = `
+  <div class="row" style="margin-bottom:12px">
+    ${typeSel}
+    <span class="spacer"></span>
+    <button class="btn" data-act="copyAI" title="Sao chép số liệu kèm câu lệnh để dán vào Trợ lý AI (Gemini, ChatGPT, NotebookLM…)">✨ Sao chép cho Trợ lý AI</button>
+    <button class="btn" data-act="exportSummary">⬇ Xuất Excel tổng hợp</button>
+  </div>
+  <section class="grid g5" aria-label="Chỉ số chính">
+    <div class="card kpi"><div class="label">${isMonth ? "Đã nộp tự đánh giá" : "Có kết quả đánh giá"}</div><div class="value">${nSubmitted}/${db.staff.length}</div><div class="note">${isMonth ? `${nApproved} phiếu đã duyệt` : esc(periodLabel(ui.period))}</div></div>
+    <div class="card kpi"><div class="label">Điểm trung bình</div><div class="value">${fmt(avg, 1)}</div><div class="note">${avg != null ? esc(rankOf(avg).name) : "Chưa có dữ liệu"}</div></div>
+    <div class="card kpi"><div class="label">Tỷ lệ hoàn thành công việc</div><div class="value">${pct(tasks.n ? tasks.done / tasks.n * 100 : null)}</div><div class="note">${tasks.done}/${tasks.n} việc · ${tasks.notdone} chưa HT</div></div>
+    <div class="card kpi"><div class="label">Đúng và sớm hạn</div><div class="value">${pct(tasks.n ? (tasks.som + tasks.dung) / tasks.n * 100 : null)}</div><div class="note">${tasks.tre} việc trễ hạn</div></div>
+    <div class="card kpi"><div class="label">Đảm bảo chất lượng trở lên</div><div class="value">${pct(tasks.n ? (tasks.dam + tasks.vuot) / tasks.n * 100 : null)}</div><div class="note">${tasks.vuot} việc vượt mức</div></div>
+  </section>
+  <section class="grid g2">
+    <div class="card">
+      <div class="card-head"><div><h2>Điểm trung bình toàn trường theo tháng</h2><p>12 tháng gần nhất · đường đứt là ngưỡng xếp loại</p></div></div>
+      <div class="chart" id="trendChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Phân bố xếp loại theo tổ</h2><p>${esc(periodLabel(ui.period))} · số người</p></div></div>
+      <div class="legend">${RANKS.map(r => `<span><i class="chip" style="background:${r.color}"></i>${esc(r.short)}</span>`).join("")}</div>
+      <div class="chart" id="rankChart"></div>
+    </div>
+  </section>
+  <section style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-head"><div><h2>Cần chú ý</h2><p>${esc(periodLabel(ui.period))}</p></div></div>
+      ${alerts.length ? `<ul class="alerts">${alerts.slice(0, 40).map(([k, h]) => `<li>${ICON[k]}<span>${h}</span></li>`).join("")}</ul>` : `<p class="muted">${statusHtml("good", "Không có vấn đề cần chú ý.")}</p>`}
+    </div>
+  </section>
+  <section>
+    <div class="card">
+      <div class="card-head">
+        <div><h2>Kết quả từng người</h2><p>${esc(periodLabel(ui.period))}${isMonth ? "" : " · điểm = trung bình cộng điểm các tháng"} · bấm vào một dòng để xem chi tiết</p></div>
+        <div class="row">
+          <input type="search" id="fQ" placeholder="Tìm tên…" value="${esc(ui.filter.q)}" aria-label="Tìm theo tên">
+          <select id="fTo" aria-label="Lọc theo tổ"><option value="">Tất cả tổ</option>${tos.map(t => `<option ${ui.filter.to === t ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>
+          <select id="fRank" aria-label="Lọc theo xếp loại"><option value="">Mọi xếp loại</option>${RANKS.map(r => `<option value="${r.k}" ${ui.filter.rank === r.k ? "selected" : ""}>${esc(r.short)}</option>`).join("")}</select>
+        </div>
+      </div>
+      <div class="scroll"><table>
+        <thead><tr>${th("name", "Họ và tên")}${th("to", "Tổ")}${th("n", "Số việc", "num")}${th("rHT", "Hoàn thành")}${th("rTD", "Đúng hạn")}${th("rCL", "Chất lượng")}${th("score", "Điểm", "num")}<th>Xếp loại</th><th>Trạng thái</th></tr></thead>
+        <tbody>${list.map(r => `<tr class="click" data-open="${r.st.id}">
+          <td style="min-width:170px"><b>${esc(r.st.name)}</b><div class="small muted">${esc(r.st.chucVu)}${r.st.lop ? " · Lớp " + esc(r.st.lop) : ""}</div></td>
+          <td class="nowrap">${esc(r.st.to)}</td>
+          <td class="num">${r.a ? `${r.a.s.done}/${r.a.s.n}` : "–"}</td>
+          <td>${bar(r.a?.s.rHT)}</td><td>${bar(r.a?.s.rTD)}</td><td>${bar(r.a?.s.rCL)}</td>
+          <td class="num"><b>${r.a ? fmt(r.a.score) : "–"}</b></td>
+          <td>${rankHtml(r.a?.rank)}</td>
+          <td>${isMonth ? recStatusHtml(r.recStatus) : r.a ? `<span class="small muted">${r.a.nMonths} tháng</span>` : recStatusHtml(null)}</td>
+        </tr>`).join("") || `<tr><td colspan="9" class="muted">Không có ai khớp bộ lọc.</td></tr>`}</tbody>
+      </table></div>
+    </div>
+  </section>`;
+
+  // Biểu đồ xu hướng
+  const endM = months[months.length - 1] > CUR_MONTH ? CUR_MONTH : months[months.length - 1];
+  let trendMonths = Array.from({ length: 12 }, (_, i) => addMonth(endM, i - 11));
+  const hasData = m => db.staff.some(s => { const r = db.records[rkey(s.id, m)]; return r && r.status !== "nhap"; });
+  while (trendMonths.length > 1 && !hasData(trendMonths[0])) trendMonths.shift();
+  const pts = trendMonths.map(m => {
+    const sc = db.staff.map(s => db.records[rkey(s.id, m)]).filter(r => r && r.status !== "nhap").map(r => calc(r).final);
+    const v = sc.length ? sc.reduce((a, b) => a + b, 0) / sc.length : null;
+    return { label: monthShort(m), full: monthLabel(m), v, rows: v == null ? null : [["Điểm trung bình", fmt(v, 1)], ["Số phiếu", String(sc.length)], ["Xếp loại TB", rankOf(v).short]] };
+  });
+  if (pts.some(p => p.v != null)) lineChart($("#trendChart"), pts, { aria: "Điểm trung bình toàn trường theo tháng" });
+  else $("#trendChart").innerHTML = `<p class="muted">Chưa có dữ liệu.</p>`;
+  stackedRanks($("#rankChart"), rankRows);
+}
+
+function onOverviewClick(ev) {
+  const s = ev.target.closest("[data-sort]");
+  if (s) { const k = s.dataset.sort; ui.sort = { key: k, dir: ui.sort.key === k ? -ui.sort.dir : (k === "name" || k === "to" ? 1 : -1) }; renderOverview(); return true; }
+  const o = ev.target.closest("[data-open]");
+  if (o) {
+    const sid = o.dataset.open;
+    if (ui.period.type === "month") { ui.evalStaff = sid; ui.evalMonth = ui.period.value; setTab("eval"); }
+    else { ui.person = sid; ui.personYear = schoolYearOf(periodMonths(ui.period).slice(-1)[0]); setTab("person"); }
+    return true;
+  }
+  return false;
+}
+
+// =====================================================================
+// 9. TAB: ĐÁNH GIÁ THÁNG
+// =====================================================================
+function getRec(create) {
+  const k = rkey(ui.evalStaff, ui.evalMonth);
+  if (!db.records[k] && create) db.records[k] = newRecord();
+  return db.records[k];
+}
+const staffById = id => db.staff.find(s => s.id === id);
+function catFor(st) {
+  const t = STAFF_TYPES[st.type] || STAFF_TYPES.gvcn;
+  return CATALOG[t.pl].map((x, i) => ({ ...x, i })).filter(x => !(st.type === "gvbm" && x.s === "III"));
+}
+function staffSelect(id, value) {
+  const groups = {};
+  db.staff.forEach(s => (groups[s.to || "(Chưa có tổ)"] ||= []).push(s));
+  return `<select id="${id}" aria-label="Chọn người">${Object.entries(groups).map(([g, arr]) => `<optgroup label="${esc(g)}">${arr.map(s => `<option value="${s.id}" ${s.id === value ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</optgroup>`).join("")}</select>`;
+}
+
+function renderEval() {
+  if (!db.staff.length) { $("#view").innerHTML = `<div class="card"><p>Chưa có CB-GV-NV nào. Vào tab <b>Danh sách CB-GV-NV</b> để thêm.</p></div>`; return; }
+  if (!staffById(ui.evalStaff)) ui.evalStaff = db.staff[0].id;
+  const st = staffById(ui.evalStaff);
+  const rec = getRec(false);
+  const head = `<div class="stickybar"><div class="row">
+      ${staffSelect("eStaff", ui.evalStaff)}
+      <input type="month" id="eMonth" value="${ui.evalMonth}" aria-label="Tháng đánh giá">
+      <span class="small muted">${esc(st.chucVu)}${st.lop ? " · Lớp " + esc(st.lop) : ""} · ${esc(st.to)}</span>
+      <span class="spacer"></span>
+      ${rec ? `<span id="eStatus">${recStatusHtml(rec.status)}</span>
+      ${rec.updatedBy ? `<span class="small muted" title="${esc(rec.updatedAt || "")}">Sửa lần cuối: ${esc(rec.updatedBy)}</span>` : ""}
+      <button class="btn" data-act="print">🖨 In phiếu</button>
+      <button class="btn" data-act="exportMau01">⬇ Excel Mẫu 01</button>` : ""}
+    </div></div>`;
+  if (!rec) {
+    const prev = db.records[rkey(ui.evalStaff, addMonth(ui.evalMonth, -1))];
+    $("#view").innerHTML = head + `<div class="card"><h2>${esc(st.name)} – ${monthLabel(ui.evalMonth)}</h2>
+      <p class="muted">Chưa có phiếu đánh giá cho tháng này.</p>
+      <div class="row"><button class="btn primary" data-act="newRec">+ Tạo phiếu trống</button>
+      ${prev ? `<button class="btn" data-act="newRecCopy">Tạo phiếu, sao chép danh sách công việc từ ${monthLabel(addMonth(ui.evalMonth, -1))}</button>` : ""}</div></div>`;
+    return;
+  }
+  const cat = catFor(st);
+  const secNames = {}; cat.forEach(x => secNames[x.s] = x.s + ". " + (x.s === "I" ? "Nền nếp" : x.s === "II" ? "Chuyên môn" : x.s === "III" ? (STAFF_TYPES[st.type].pl === "PL1" ? "Chủ nhiệm" : "Phối hợp") : x.s === "IV" ? "Đoàn thể" : x.s === "V" ? "Công tác khác" : x.s === "VI" ? "Điểm cộng" : "Khống chế"));
+  const opt = (map, v) => Object.entries(map).map(([k, l]) => `<option value="${k}" ${v === k ? "selected" : ""}>${l}</option>`).join("");
+
+  const taskRow = (t, i) => `<div class="task" data-tid="${t.id}">
+      <div class="idx">${i + 1}</div>
+      <div><textarea rows="3" data-f="nd" placeholder="Nội dung công việc/sản phẩm được giao" aria-label="Nội dung công việc">${esc(t.nd)}</textarea></div>
+      <div><textarea rows="3" data-f="kqnd" placeholder="Sản phẩm đã thực hiện (ghi rõ văn bản, kết quả) hoặc lý do chưa hoàn thành" aria-label="Kết quả thực hiện">${esc(t.kqnd)}</textarea>
+        <input type="text" data-f="han" value="${esc(t.han)}" placeholder="Thời hạn yêu cầu (vd: 30/9/2026)" aria-label="Thời hạn" style="width:100%;margin-top:6px">
+        ${evHtml(t.ev, t.id)}</div>
+      <div class="opts">
+        <label>Tính chất<select data-f="tc">${opt(TINH_CHAT, t.tc)}</select></label>
+        <label>Vai trò<select data-f="md">${opt(MUC_DO, t.md)}</select></label>
+        <label>Kết quả<select data-f="kq">${opt(KET_QUA, t.kq)}</select></label>
+        <label>Tiến độ<span class="tre"><select data-f="td" ${t.kq !== "done" ? "disabled" : ""}>${opt(TIEN_DO, t.td || "dung")}</select>${t.kq === "done" && t.td === "tre" ? `<input type="number" min="0" data-f="tre" value="${t.tre || 0}" aria-label="Số ngày trễ" title="Số ngày trễ">` : ""}</span></label>
+        <label>Chất lượng<select data-f="cl" ${t.kq !== "done" ? "disabled" : ""}>${opt(CHAT_LUONG, t.cl || "dam")}</select></label>
+        <label class="chk"><input type="checkbox" data-f="ah" ${t.ah ? "checked" : ""}> Ảnh hưởng kết quả chung của đơn vị</label>
+      </div>
+      <div><button class="btn ghost sm danger" data-act="delTask" aria-label="Xoá công việc" title="Xoá">✕</button></div>
+    </div>`;
+
+  let html = head + `<div class="card">
+    <div class="sec-title"><div><h2>1. Bảng thống kê, tự đánh giá kết quả thực hiện nhiệm vụ</h2><p class="small muted" style="margin:2px 0 0">Mẫu 01TKNV · ${esc(st.name)} · ${monthLabel(ui.evalMonth)}</p></div>
+      <button class="btn sm" data-act="copyPrev">Sao chép công việc từ tháng trước</button></div>
+    ${GROUPS.map(G => {
+      const ts = rec.tasks.filter(t => t.g === G.g);
+      return `<div class="grp-h"><span>${esc(G.t)}</span><button class="btn sm" data-act="addTask" data-g="${G.g}">+ Thêm</button></div>
+        ${ts.length ? ts.map(taskRow).join("") : `<div class="empty">Chưa có công việc.</div>`}`;
+    }).join("")}
+    <h3 style="margin:16px 0 6px">Tổng số sản phẩm/công việc</h3>
+    <div class="scroll" id="sum01"></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title"><div><h2>2. Tiêu chí chung (A – tối đa 30 điểm)</h2><p class="small muted" style="margin:2px 0 0">Mẫu 03 · bỏ trống cột “Chính thức” nghĩa là giữ nguyên điểm tự chấm</p></div>
+      <div class="row"><button class="btn sm" data-act="fillMax">Tự chấm tối đa các ô trống</button><button class="btn sm" data-act="copyOff">Chính thức = tự chấm</button></div></div>
+    <div class="scroll"><table class="crit">
+      <thead><tr><th></th><th>Tiêu chí</th><th class="num">Tối đa</th><th class="num">Tự chấm</th><th class="num">Chính thức</th></tr></thead>
+      <tbody>${CRIT_A.map(c => c.c
+        ? `<tr><td>${esc(c.c.slice(2))}</td><td>${esc(c.t)}</td><td class="num">${fmt(c.max)}</td>
+            <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="tu" data-c="${c.c}" value="${rec.a.tu[c.c] ?? ""}" aria-label="Tự chấm ${esc(c.c)}"></td>
+            <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="off" data-c="${c.c}" value="${rec.a.off[c.c] ?? ""}" placeholder="${rec.a.tu[c.c] ?? ""}" aria-label="Chính thức ${esc(c.c)}"></td></tr>`
+        : `<tr class="grp"><td>${esc(c.h)}</td><td ${c.sub ? 'style="font-weight:600"' : ""}>${esc(c.t)}</td><td class="num">${fmt(c.max)}</td><td></td><td></td></tr>`).join("")}
+        <tr class="tot"><td></td><td>Cộng phần A</td><td class="num">30</td><td class="num" id="aTu"></td><td class="num" id="aOff"></td></tr>
+      </tbody></table></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title"><h2>3. Kết quả thực hiện nhiệm vụ (B – tối đa 70 điểm, tự tính)</h2></div>
+    <div class="scroll" id="partB"></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title"><div><h2>4. Điểm cộng, điểm trừ theo Mẫu 03 (C.I, C.II)</h2><p class="small muted" style="margin:2px 0 0">Phần lớn tự tính từ bảng công việc; chỉ nhập số lần ở 2 dòng có ô nhập</p></div></div>
+    <div class="scroll" id="partC03"></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title"><div><h2>5. Điểm cộng, điểm trừ theo ${esc(STAFF_TYPES[st.type].plName)}</h2><p class="small muted" style="margin:2px 0 0">Chọn mục rồi bấm Thêm. Bỏ dấu “Duyệt” nếu tổ/Hội đồng thi đua không chấp nhận mục đó.</p></div></div>
+    <div class="row" style="margin-bottom:8px">
+      <select id="plPick" style="flex:1;min-width:220px;max-width:100%" aria-label="Chọn mục điểm cộng/trừ">
+        ${Object.keys(secNames).filter(s => s !== "VII").map(s => `<optgroup label="${esc(secNames[s])}">${cat.filter(x => x.s === s).map(x => `<option value="${x.i}">${x.p != null ? (x.p > 0 ? "+" : "") + fmt(x.p) : "±"} │ ${esc((x.g ? x.g + ": " : "") + x.t.slice(0, 110))}</option>`).join("")}</optgroup>`).join("")}
+      </select>
+      <button class="btn" data-act="addPl">+ Thêm</button>
+      <button class="btn ghost" data-act="addPlCustom">+ Mục khác</button>
+    </div>
+    <div class="scroll"><table>
+      <thead><tr><th>Nội dung</th><th class="num">Số lần</th><th class="num">Điểm/lần</th><th class="num">Thành điểm</th><th>Ghi chú/minh chứng</th><th class="c">Duyệt</th><th></th></tr></thead>
+      <tbody id="plBody">${rec.pl.map(e => { const ref = e.ref != null ? CATALOG[STAFF_TYPES[st.type].pl][e.ref] : null; return `<tr data-pid="${e.id}">
+        <td>${ref ? `<div>${esc(e.t)}</div><div class="small muted">Quy định: ${esc(ref.n)}</div>` : `<input type="text" data-p="t" value="${esc(e.t)}" placeholder="Nội dung" style="width:100%">`}</td>
+        <td class="num"><input type="number" min="0" step="1" data-p="qty" value="${e.qty}" aria-label="Số lần"></td>
+        <td class="num"><input type="number" step="0.25" data-p="p" value="${e.p ?? ""}" aria-label="Điểm mỗi lần"></td>
+        <td class="num" data-sum>${fmt((e.qty || 0) * (e.p || 0))}</td>
+        <td><input type="text" data-p="note" value="${esc(e.note)}" placeholder="Ngày, minh chứng…" style="width:100%;min-width:140px"></td>
+        <td class="c"><input type="checkbox" data-p="ok" ${e.ok !== false ? "checked" : ""} aria-label="Được duyệt"></td>
+        <td><button class="btn ghost sm danger" data-act="delPl" aria-label="Xoá mục">✕</button></td></tr>`; }).join("") || `<tr><td colspan="7" class="muted">Chưa có mục điểm cộng/trừ nào.</td></tr>`}</tbody>
+    </table></div>
+    <h3 style="margin:16px 0 6px">Minh chứng chung của phiếu</h3>
+    <p class="small muted" style="margin:0">Giấy khen, quyết định, ảnh hoạt động… dùng làm căn cứ cho điểm cộng/trừ. Minh chứng của từng công việc tải ở mục 1.</p>
+    ${evHtml(rec.evGen, "gen")}
+    ${(() => { const imgs = [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || [])].filter(isImg); return imgs.length ? `<h3 style="margin:16px 0 6px">Ảnh minh chứng trong phiếu (${imgs.length})</h3><div class="ev-gallery">${imgs.map(e => `<figure><a href="${esc(e.url)}" target="_blank" rel="noopener"><img src="${esc(e.url)}" alt="${esc(e.name)}" loading="lazy"></a><figcaption>${esc(e.name)}</figcaption></figure>`).join("")}</div>` : ""; })()}
+    <h3 style="margin:16px 0 6px">Khống chế (mỗi mục vi phạm → hạ 1 bậc xếp loại)</h3>
+    ${cat.filter(x => x.s === "VII").map(x => `<label class="row small" style="margin:4px 0;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" data-kc="${x.i}" ${rec.kc.includes(x.i) ? "checked" : ""}> <span>${esc(x.t)}</span></label>`).join("")}
+  </div>
+
+  <div class="card">
+    <div class="sec-title"><h2>6. Tổng hợp kết quả và xếp loại</h2></div>
+    <div class="grid g2e" style="margin:0">
+      <div class="scroll" id="partTotal"></div>
+      <div>
+        <div class="row" style="justify-content:space-between;margin-bottom:6px"><b>Ưu điểm</b><button class="btn sm" data-act="suggest" title="Tạo gợi ý nhận xét từ số liệu đã nhập">✨ Gợi ý nhận xét</button></div>
+        <textarea rows="4" data-r="uu" placeholder="Ưu điểm…">${esc(rec.uu)}</textarea>
+        <div style="margin:10px 0 6px"><b>Hạn chế, khuyết điểm</b></div>
+        <textarea rows="4" data-r="han" placeholder="Hạn chế, khuyết điểm…">${esc(rec.han)}</textarea>
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <span class="small muted">Trạng thái phiếu:</span>
+      ${Object.entries(RECORD_STATUS).map(([k, v]) => `<button class="btn ${rec.status === k ? "primary" : ""}" data-act="setStatus" data-s="${k}">${esc(v.label)}</button>`).join("")}
+      <span class="spacer"></span>
+      <button class="btn ghost danger" data-act="delRec">Xoá phiếu tháng này</button>
+    </div>
+  </div>`;
+  $("#view").innerHTML = html;
+  updateEvalTotals();
+}
+
+function updateEvalTotals() {
+  const rec = getRec(false); if (!rec) return;
+  const c = calc(rec), s = c.s;
+  $("#sum01").innerHTML = `<table class="sumtbl">
+    <thead><tr><th>Được giao</th><th>Hoàn thành</th><th>Chưa HT</th><th>Tỷ lệ HT</th><th>Sớm hạn</th><th>Đúng hạn</th><th>Trễ hạn</th><th>Tỷ lệ đúng/sớm hạn</th><th>Đảm bảo</th><th>Vượt mức</th><th>Chưa đảm bảo</th><th>Tỷ lệ đảm bảo CL</th></tr>
+    <tr class="small muted"><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)=(2)/(1)</td><td>(5)</td><td>(6)</td><td>(7)</td><td>(8)=(5+6)/(1)</td><td>(9)</td><td>(10)</td><td>(11)</td><td>(12)=(9+10)/(1)</td></tr></thead>
+    <tbody><tr><td>${s.n}</td><td>${s.done}</td><td>${s.notdone}</td><td><b>${pct(s.rHT)}</b></td><td>${s.som}</td><td>${s.dung}</td><td>${s.tre}</td><td><b>${pct(s.rTD)}</b></td><td>${s.dam}</td><td>${s.vuot}</td><td>${s.chua}</td><td><b>${pct(s.rCL)}</b></td></tr></tbody></table>`;
+  $("#aTu").innerHTML = `<b>${fmt(c.Atu)}</b>${c.aFilled < CRIT_ITEMS.length ? `<div class="small muted">còn ${CRIT_ITEMS.length - c.aFilled} ô trống</div>` : ""}`;
+  $("#aOff").innerHTML = `<b>${fmt(c.Aoff)}</b>`;
+  $("#partB").innerHTML = c.B ? `<table>
+    <thead><tr><th>Tiêu chí</th><th class="num">Tỷ lệ</th><th class="num">Tối đa</th><th class="num">Điểm</th></tr></thead>
+    <tbody>
+      <tr><td>1. Tỷ lệ công việc, sản phẩm hoàn thành</td><td class="num">${pct(s.rHT)}</td><td class="num">20</td><td class="num"><b>${c.B.ht}</b></td></tr>
+      <tr><td>2. Tỷ lệ công việc, sản phẩm đảm bảo tiến độ</td><td class="num">${pct(s.rTD)}</td><td class="num">20</td><td class="num"><b>${c.B.td}</b></td></tr>
+      <tr><td>3. Tỷ lệ công việc, sản phẩm đảm bảo chất lượng</td><td class="num">${pct(s.rCL)}</td><td class="num">30</td><td class="num"><b>${c.B.cl}</b></td></tr>
+      <tr class="tot"><td>Cộng phần B</td><td></td><td class="num">70</td><td class="num">${c.Btot}</td></tr>
+    </tbody></table>` : `<p class="muted">Thêm công việc ở mục 1 để tính điểm phần B.</p>`;
+  const rec03 = rec.c03;
+  $("#partC03").innerHTML = `<table>
+    <thead><tr><th>Nội dung</th><th class="num">Căn cứ</th><th class="num">Điểm</th></tr></thead><tbody>
+    <tr class="grp"><td colspan="3">I. Điểm cộng</td></tr>
+    <tr><td>Công việc đột xuất, phát sinh được hoàn thành đảm bảo (+0,5/việc, tối đa 1)</td><td class="num">${s.dotxuat} việc nhóm III</td><td class="num">${fmt(c.c.dotxuat)}</td></tr>
+    <tr><td>Hoàn thành sớm tiến độ (50–80%: +0,5; ≥80%: +1)</td><td class="num">${pct(s.rSom)} sớm hạn</td><td class="num">${fmt(c.c.som)}</td></tr>
+    <tr><td>Công việc được biểu dương, khen thưởng – vượt mức (+1/việc, tối đa 2)</td><td class="num">${s.vuot} việc vượt mức</td><td class="num">${fmt(c.c.vuot)}</td></tr>
+    <tr><td>Hoàn thành công việc phức tạp, hoàn toàn mới, có ảnh hưởng tích cực rộng (+1/việc, tối đa 2)</td><td class="num"><input type="number" min="0" data-c03="moi" value="${rec03.moi || 0}" aria-label="Số công việc mới, phức tạp"> việc</td><td class="num">${fmt(c.c.moi)}</td></tr>
+    <tr class="grp"><td colspan="3">II. Điểm trừ</td></tr>
+    <tr><td>Vi phạm quy định bị nhắc nhở, phê bình (−1/lần)</td><td class="num"><input type="number" min="0" data-c03="vp" value="${rec03.vp || 0}" aria-label="Số lần vi phạm"> lần</td><td class="num">${fmt(c.c.vp)}</td></tr>
+    <tr><td>Chậm tiến độ gây ảnh hưởng kết quả chung (−1/việc)</td><td class="num">${s.ahTre} việc</td><td class="num">${fmt(c.c.tre)}</td></tr>
+    <tr><td>Chưa hoàn thành gây ảnh hưởng kết quả chung (−2/việc)</td><td class="num">${s.ahChua} việc</td><td class="num">${fmt(c.c.chua)}</td></tr>
+    <tr><td>Không đảm bảo chất lượng, gây hậu quả (−2/việc)</td><td class="num">${s.ahCL} việc</td><td class="num">${fmt(c.c.cl)}</td></tr>
+    <tr class="tot"><td>Cộng</td><td></td><td class="num">${fmt(c.C03)}</td></tr></tbody></table>`;
+  $$("#plBody tr[data-pid]").forEach(tr => { const e = rec.pl.find(x => x.id === tr.dataset.pid); if (e) tr.querySelector("[data-sum]").textContent = fmt((e.qty || 0) * (e.p || 0)); });
+  $("#partTotal").innerHTML = `<table>
+    <thead><tr><th>Phần</th><th class="num">Tự chấm</th><th class="num">Chính thức</th></tr></thead><tbody>
+    <tr><td>A. Tiêu chí chung</td><td class="num">${fmt(c.Atu)}</td><td class="num">${fmt(c.Aoff)}</td></tr>
+    <tr><td>B. Kết quả thực hiện nhiệm vụ</td><td class="num">${fmt(c.Btot)}</td><td class="num">${fmt(c.Btot)}</td></tr>
+    <tr><td>C.I–II. Cộng/trừ Mẫu 03</td><td class="num">${fmt(c.C03)}</td><td class="num">${fmt(c.C03)}</td></tr>
+    <tr><td>C.III. Cộng/trừ theo phụ lục</td><td class="num">${fmt(c.PLtu)}</td><td class="num">${fmt(c.PLoff)}</td></tr>
+    <tr class="tot"><td>Tổng điểm</td><td class="num"><span class="bigscore">${fmt(c.totTu)}</span></td><td class="num"><span class="bigscore">${fmt(c.totOff)}</span></td></tr>
+    <tr><td>Xếp loại${c.down ? ' <span class="pill">hạ 1 bậc do khống chế</span>' : ""}</td><td class="num">${rankHtml(c.rankTu)}</td><td class="num">${rankHtml(c.rankOff)}</td></tr>
+    </tbody></table>
+    <p class="small muted" style="margin:8px 0 0">${esc(c.rankOff.name)}. Ngưỡng: ≥90 xuất sắc · ≥70 tốt · 50–70 hoàn thành · &lt;50 không hoàn thành.</p>`;
+  $("#eStatus") && ($("#eStatus").innerHTML = recStatusHtml(rec.status));
+}
+
+function suggestComments(rec, st) {
+  const c = calc(rec), s = c.s, uu = [], han = [];
+  if (s.n) {
+    if (s.rHT >= 100) uu.push(`Hoàn thành 100% (${s.done}/${s.n}) công việc, sản phẩm được giao.`);
+    else uu.push(`Hoàn thành ${s.done}/${s.n} công việc được giao (${pct(s.rHT)}).`);
+    if (s.rTD >= 90) uu.push(`Đảm bảo tiến độ ${pct(s.rTD)} công việc${s.som ? `, trong đó ${s.som} việc hoàn thành sớm hạn` : ""}.`);
+    if (s.rCL >= 90) uu.push(`Chất lượng công việc đảm bảo yêu cầu (${pct(s.rCL)})${s.vuot ? `, có ${s.vuot} sản phẩm vượt mức được ghi nhận` : ""}.`);
+  }
+  const chuTri = rec.tasks.filter(t => t.md === "chu" && t.kq === "done" && t.tc !== "bt");
+  if (chuTri.length) uu.push(`Chủ trì hoàn thành ${chuTri.length} nhiệm vụ phức tạp: ${chuTri.slice(0, 2).map(t => t.nd.replace(/\.$/, "")).join("; ")}.`);
+  const plus = rec.pl.filter(e => (e.p || 0) > 0 && e.ok !== false);
+  if (plus.length) uu.push(`Tích cực tham gia phong trào: ${plus.map(e => e.t.split(/[.(]/)[0].trim()).slice(0, 3).join("; ")}.`);
+  if (c.Aoff >= 29) uu.push("Chấp hành tốt chủ trương, chính sách, nội quy; có tinh thần trách nhiệm, đoàn kết, phối hợp tốt với đồng nghiệp.");
+
+  const notDone = rec.tasks.filter(t => t.kq !== "done"), late = rec.tasks.filter(t => t.kq === "done" && t.td === "tre"), weak = rec.tasks.filter(t => t.kq === "done" && t.cl === "chua");
+  if (notDone.length) han.push(`Còn ${notDone.length} công việc chưa hoàn thành: ${notDone.map(t => t.nd.replace(/\.$/, "")).slice(0, 2).join("; ")}.`);
+  if (late.length) han.push(`${late.length} công việc hoàn thành trễ hạn${late.some(t => t.tre) ? ` (trễ ${late.map(t => t.tre || 0).reduce((a, b) => a + b, 0)} ngày)` : ""}.`);
+  if (weak.length) han.push(`${weak.length} sản phẩm chưa đảm bảo chất lượng, phải chỉnh sửa, bổ sung.`);
+  const minus = rec.pl.filter(e => (e.p || 0) < 0 && e.ok !== false);
+  if (minus.length) han.push(`Bị trừ điểm: ${minus.map(e => e.t.split(/[.(]/)[0].trim() + (e.qty > 1 ? ` (${e.qty} lần)` : "")).slice(0, 3).join("; ")}.`);
+  const lowA = CRIT_ITEMS.filter(x => { const v = rec.a.off[x.c] ?? rec.a.tu[x.c]; return v != null && v < x.max; });
+  if (lowA.length) han.push(`Cần cố gắng thêm ở tiêu chí: ${lowA.slice(0, 2).map(x => x.t.split(/[;,]/)[0].toLowerCase()).join("; ")}.`);
+  if (!han.length) han.push("Không có hạn chế đáng kể trong kỳ.");
+  return { uu: uu.join("\n"), han: han.join("\n") };
+}
+
+function onEvalInput(ev) {
+  const el = ev.target, rec = getRec(false); if (!rec) return false;
+  const tRow = el.closest("[data-tid]");
+  if (tRow && el.dataset.f) {
+    const t = rec.tasks.find(x => x.id === tRow.dataset.tid); const f = el.dataset.f;
+    t[f] = el.type === "checkbox" ? el.checked : el.type === "number" ? (num(el.value) ?? 0) : el.value;
+    if (f === "kq" && t.kq === "done") { t.td ||= "dung"; t.cl ||= "dam"; }
+    if (f === "kq" || f === "td") { if (ev.type === "change") { renderEval(); save(); } return true; }
+    updateEvalTotals(); save(); return true;
+  }
+  if (el.dataset.a) {
+    const v = num(el.value); const c = CRIT_ITEMS.find(x => x.c === el.dataset.c);
+    if (v == null) delete rec.a[el.dataset.a][c.c]; else rec.a[el.dataset.a][c.c] = Math.max(0, Math.min(c.max, v));
+    if (el.dataset.a === "tu") { const off = $(`[data-a="off"][data-c="${c.c}"]`); if (off) off.placeholder = el.value; }
+    updateEvalTotals(); save(); return true;
+  }
+  if (el.dataset.c03) { rec.c03[el.dataset.c03] = Math.max(0, Math.floor(num(el.value) || 0)); if (ev.type === "change") updateEvalTotals(); save(); return true; }
+  const pRow = el.closest("[data-pid]");
+  if (pRow && el.dataset.p) {
+    const e = rec.pl.find(x => x.id === pRow.dataset.pid); const f = el.dataset.p;
+    e[f] = f === "ok" ? el.checked : (f === "qty" || f === "p") ? num(el.value) : el.value;
+    updateEvalTotals(); save(); return true;
+  }
+  if (el.dataset.kc != null && el.type === "checkbox") {
+    const i = +el.dataset.kc; rec.kc = rec.kc.filter(x => x !== i); if (el.checked) rec.kc.push(i);
+    updateEvalTotals(); save(); return true;
+  }
+  if (el.dataset.r) { rec[el.dataset.r] = el.value; save(); return true; }
+  return false;
+}
+
+function copyTasksFrom(prevRec) {
+  return prevRec.tasks.map(t => ({ ...t, id: uid(), kq: "done", td: "dung", tre: 0, cl: "dam", ah: false, kqnd: "", han: monthLabel(ui.evalMonth), ev: [] }));
+}
+
+// =====================================================================
+// 10. TAB: THEO DÕI CÁ NHÂN
+// =====================================================================
+function renderPerson() {
+  if (!db.staff.length) { $("#view").innerHTML = `<div class="card"><p>Chưa có CB-GV-NV.</p></div>`; return; }
+  if (!staffById(ui.person)) ui.person = db.staff[0].id;
+  const st = staffById(ui.person);
+  const years = new Set(Object.keys(db.records).map(k => schoolYearOf(k.split("|")[1]))); years.add(schoolYearOf(CUR_MONTH));
+  const months = periodMonths({ type: "schoolyear", value: String(ui.personYear) });
+  const data = months.map(m => { const rec = db.records[rkey(st.id, m)]; return { m, rec, c: rec && rec.status !== "nhap" ? calc(rec) : null }; });
+  const calQ = [];
+  for (const m of months) { const [y, mo] = m.split("-").map(Number); const v = `${y}-Q${Math.ceil(mo / 3)}`; if (!calQ.includes(v)) calQ.push(v); }
+  const yearAgg = aggregate(st.id, months);
+  const row = (label, a, cls = "") => `<tr class="${cls}"><td>${label}</td><td class="num">${a ? `${a.s.done}/${a.s.n}` : "–"}</td><td class="num">${a ? pct(a.s.rHT) : "–"}</td><td class="num">${a ? pct(a.s.rTD) : "–"}</td><td class="num">${a ? pct(a.s.rCL) : "–"}</td><td class="num"><b>${a ? fmt(a.score) : "–"}</b></td><td>${rankHtml(a?.rank)}</td><td></td></tr>`;
+
+  $("#view").innerHTML = `
+  <div class="row" style="margin-bottom:12px">
+    ${staffSelect("pStaff", ui.person)}
+    <select id="pYear" aria-label="Năm học">${[...years].sort().reverse().map(y => `<option value="${y}" ${+ui.personYear === y ? "selected" : ""}>Năm học ${y}-${y + 1}</option>`).join("")}</select>
+    <span class="small muted">${esc(st.chucVu)}${st.lop ? " · Lớp " + esc(st.lop) : ""} · ${esc(st.to)} · ${esc(STAFF_TYPES[st.type]?.name || "")}</span>
+  </div>
+  <section class="grid g5">
+    <div class="card kpi"><div class="label">Điểm TB năm học</div><div class="value">${yearAgg ? fmt(yearAgg.score, 1) : "–"}</div><div class="note">${yearAgg ? esc(yearAgg.rank.name) : "Chưa có dữ liệu"}</div></div>
+    <div class="card kpi"><div class="label">Số tháng đã đánh giá</div><div class="value">${yearAgg ? yearAgg.months.length : 0}</div><div class="note">${yearAgg ? yearAgg.months.filter(x => x.rec.status === "duyet").length + " tháng đã duyệt" : ""}</div></div>
+    <div class="card kpi"><div class="label">Hoàn thành công việc</div><div class="value">${yearAgg ? pct(yearAgg.s.rHT) : "–"}</div><div class="note">${yearAgg ? `${yearAgg.s.done}/${yearAgg.s.n} việc` : ""}</div></div>
+    <div class="card kpi"><div class="label">Đúng và sớm hạn</div><div class="value">${yearAgg ? pct(yearAgg.s.rTD) : "–"}</div><div class="note">${yearAgg ? `${yearAgg.s.tre} việc trễ hạn` : ""}</div></div>
+    <div class="card kpi"><div class="label">Đảm bảo chất lượng</div><div class="value">${yearAgg ? pct(yearAgg.s.rCL) : "–"}</div><div class="note">${yearAgg ? `${yearAgg.s.vuot} việc vượt mức` : ""}</div></div>
+  </section>
+  <div class="card">
+    <div class="card-head"><div><h2>Điểm theo tháng – ${esc(st.name)}</h2><p>Điểm chính thức nếu phiếu đã duyệt, ngược lại là điểm tự chấm</p></div></div>
+    <div class="chart" id="pChart"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Chi tiết theo tháng, quý, năm</h2><p>Bấm vào một tháng để mở phiếu đánh giá</p></div></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Kỳ</th><th class="num">Việc HT/giao</th><th class="num">Hoàn thành</th><th class="num">Đúng hạn</th><th class="num">Chất lượng</th><th class="num">Điểm</th><th>Xếp loại</th><th>Trạng thái</th></tr></thead>
+      <tbody>
+        ${data.map(d => `<tr class="click" data-month="${d.m}"><td>${monthLabel(d.m)}</td>
+          <td class="num">${d.c ? `${d.c.s.done}/${d.c.s.n}` : "–"}</td><td class="num">${d.c ? pct(d.c.s.rHT) : "–"}</td><td class="num">${d.c ? pct(d.c.s.rTD) : "–"}</td><td class="num">${d.c ? pct(d.c.s.rCL) : "–"}</td>
+          <td class="num"><b>${d.c ? fmt(d.c.final) : "–"}</b></td><td>${rankHtml(d.c?.rank)}</td><td>${d.rec ? recStatusHtml(d.rec.status) : '<span class="muted small">–</span>'}</td></tr>`).join("")}
+        ${calQ.map(q => row(periodLabel({ type: "quarter", value: q }), aggregate(st.id, periodMonths({ type: "quarter", value: q }).filter(m => months.includes(m))), "grp")).join("")}
+        ${row(`Cả năm học ${ui.personYear}-${+ui.personYear + 1}`, yearAgg, "tot")}
+      </tbody></table></div>
+  </div>`;
+  const pts = data.filter(d => d.m <= CUR_MONTH || d.c).map(d => ({ label: monthShort(d.m), full: monthLabel(d.m), v: d.c ? d.c.final : null,
+    rows: d.c ? [["Điểm", fmt(d.c.final)], ["Xếp loại", d.c.rank.short], ["Công việc", `${d.c.s.done}/${d.c.s.n}`]] : null }));
+  if (pts.some(p => p.v != null)) lineChart($("#pChart"), pts, { aria: "Điểm theo tháng của " + st.name });
+  else $("#pChart").innerHTML = `<p class="muted">Chưa có phiếu đánh giá nào trong năm học này.</p>`;
+}
+
+// =====================================================================
+// 11. TAB: DANH SÁCH
+// =====================================================================
+function renderStaff() {
+  $("#view").innerHTML = `<div class="card">
+    <div class="card-head"><div><h2>Danh sách cán bộ, giáo viên, nhân viên</h2><p>Loại quyết định dùng phụ lục điểm cộng/trừ nào. Sửa trực tiếp trong bảng, tự động lưu.</p></div>
+      <div class="row"><button class="btn" data-act="importStaff">⬆ Nhập từ Excel</button><button class="btn primary" data-act="addStaff">+ Thêm người</button></div></div>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Họ và tên</th><th>Chức vụ</th><th>Tổ</th><th>Lớp CN</th><th>Loại</th><th class="num">Số phiếu</th><th></th></tr></thead>
+      <tbody>${db.staff.map((s, i) => `<tr data-sid="${s.id}">
+        <td class="muted">${i + 1}</td>
+        <td><input type="text" data-s="name" value="${esc(s.name)}" aria-label="Họ và tên" style="min-width:170px;width:100%"></td>
+        <td><input type="text" data-s="chucVu" value="${esc(s.chucVu)}" aria-label="Chức vụ" style="min-width:130px;width:100%"></td>
+        <td><input type="text" data-s="to" value="${esc(s.to)}" aria-label="Tổ" style="width:110px" list="toList"></td>
+        <td><input type="text" data-s="lop" value="${esc(s.lop)}" aria-label="Lớp" style="width:64px"></td>
+        <td><select data-s="type" aria-label="Loại">${Object.entries(STAFF_TYPES).map(([k, v]) => `<option value="${k}" ${s.type === k ? "selected" : ""}>${esc(v.name)}</option>`).join("")}</select></td>
+        <td class="num">${Object.keys(db.records).filter(k => k.startsWith(s.id + "|")).length}</td>
+        <td><button class="btn ghost sm danger" data-act="delStaff" aria-label="Xoá người này">✕</button></td></tr>`).join("") || `<tr><td colspan="8" class="muted">Chưa có ai. Bấm “Thêm người” hoặc “Nhập từ Excel”.</td></tr>`}</tbody>
+    </table></div>
+    <datalist id="toList">${[...new Set(db.staff.map(s => s.to).filter(Boolean))].map(t => `<option value="${esc(t)}">`).join("")}</datalist>
+    <p class="small muted" style="margin-top:10px">Nhập từ Excel: dòng đầu là tiêu đề, cần có cột <b>Họ và tên</b>; các cột tuỳ chọn: <b>Chức vụ</b>, <b>Tổ</b>, <b>Lớp</b>, <b>Loại</b> (GVCN / GVBM / CBNV).</p>
+  </div>`;
+}
+
+// =====================================================================
+// 12. TAB: DỮ LIỆU & HƯỚNG DẪN
+// =====================================================================
+function renderData() {
+  const nRec = Object.keys(db.records).length;
+  $("#view").innerHTML = `<div class="grid g2e">
+  <div class="card">
+    <h2>Thông tin đơn vị</h2>
+    <div style="display:grid;gap:8px;margin-top:10px">
+      <label class="small muted">Tên trường<input type="text" data-school="name" value="${esc(db.school.name)}" style="width:100%"></label>
+      <label class="small muted">Cơ quan chủ quản<input type="text" data-school="donVi" value="${esc(db.school.donVi)}" style="width:100%"></label>
+    </div>
+    <h2 style="margin-top:20px">Dữ liệu dùng chung</h2>
+    <p class="small muted">Dữ liệu (${db.staff.length} người, ${nRec} phiếu) lưu trên máy chủ của trường; mọi người mở trang đều xem và sửa được. ${lastLoad ? "Tải lần cuối lúc " + lastLoad.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + "." : ""} Bấm “↻ Tải lại” để xem thay đổi người khác vừa nhập.</p>
+    <div class="row">
+      <button class="btn" data-act="backup">⬇ Xuất bản sao lưu (.json)</button>
+    </div>
+    <h2 style="margin-top:20px">Dữ liệu mẫu</h2>
+    <p class="small muted">Dữ liệu mẫu dùng tên giả (Giáo viên A, B…) để xem thử; xoá đi trước khi nhập dữ liệu thật.</p>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" data-act="loadDemo">Nạp dữ liệu mẫu</button>
+      ${db.demo ? `<button class="btn danger" data-act="clearDemo">Xoá dữ liệu mẫu</button>` : ""}
+    </div>
+  </div>
+  <div class="card help">
+    <h2>Hướng dẫn nhanh</h2>
+    <ol>
+      <li><b>Danh sách CB-GV-NV:</b> nhập hoặc dán từ Excel danh sách người, chọn đúng <i>Loại</i> để dùng đúng phụ lục điểm cộng/trừ (Phụ lục 1 cho giáo viên, Phụ lục 3 cho BGH, TPT, thư viện, văn phòng).</li>
+      <li><b>Đánh giá tháng:</b> chọn người và tháng → tạo phiếu (có thể sao chép danh sách công việc từ tháng trước) → nhập từng công việc theo Mẫu 01TKNV: kết quả, tiến độ, chất lượng.</li>
+      <li>Phần <b>B (70 điểm)</b> và điểm cộng/trừ Mẫu 03 được <b>tự tính</b> từ bảng công việc. Chỉ cần chấm phần <b>A (30 điểm)</b> và thêm các mục cộng/trừ theo phụ lục.</li>
+      <li>Chuyển trạng thái phiếu: <i>Đang nhập</i> → <i>Đã tự đánh giá</i> → <i>Đã duyệt</i>. Khi đã duyệt, điểm <b>chính thức</b> được dùng để tổng hợp.</li>
+      <li><b>Tổng quan:</b> chọn Tháng / Quý / Năm / Năm học để xem tiến độ toàn trường, cảnh báo, xếp loại; xuất Excel tổng hợp.</li>
+      <li><b>✨ Sao chép cho Trợ lý AI:</b> sao chép số liệu kèm câu lệnh để dán vào Gemini, ChatGPT hoặc NotebookLM, nhờ viết báo cáo, nhận xét.</li>
+    </ol>
+    <h3>Cách tính</h3>
+    <ul>
+      <li>Tổng điểm = A + B + điểm cộng/trừ (Mẫu 03 và phụ lục). Xếp loại: ≥90 xuất sắc, ≥70 tốt, 50–70 hoàn thành, &lt;50 không hoàn thành; có tiêu chí khống chế thì hạ 1 bậc.</li>
+      <li>Quý, năm: cộng dồn công việc các tháng; điểm = trung bình cộng điểm các tháng đã nộp.</li>
+      <li>Tỷ lệ theo Mẫu 01TKNV: hoàn thành = (2)/(1); đúng hạn = (sớm + đúng)/(1); chất lượng = (đảm bảo + vượt mức)/(1).</li>
+    </ul>
+    <p class="small muted">Không đưa thông tin bí mật nhà nước vào công cụ hay vào Trợ lý AI. Người dùng chịu trách nhiệm kiểm tra nội dung AI tạo ra trước khi sử dụng.</p>
+  </div></div>`;
+}
+
+// =====================================================================
+// 13. XUẤT / NHẬP
+// =====================================================================
+let xlsxP;
+function loadXLSX() {
+  return xlsxP ||= new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    s.onload = () => res(window.XLSX);
+    s.onerror = () => { xlsxP = null; rej(new Error("Không tải được thư viện Excel (cần kết nối Internet).")); };
+    document.head.appendChild(s);
+  });
+}
+function csvDownload(name, rows) {
+  const csv = "﻿" + rows.map(r => r.map(v => { const s = String(v ?? ""); return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }).join(",")).join("\r\n");
+  download(name, csv, "text/csv;charset=utf-8");
+}
+async function writeSheet(name, aoa, merges, cols) {
+  try {
+    const X = await loadXLSX();
+    const ws = X.utils.aoa_to_sheet(aoa);
+    if (merges) ws["!merges"] = merges;
+    if (cols) ws["!cols"] = cols.map(w => ({ wch: w }));
+    const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, "Sheet1");
+    X.writeFile(wb, name + ".xlsx");
+  } catch (e) { toast(e.message + " Đã xuất dạng CSV thay thế."); csvDownload(name + ".csv", aoa); }
+}
+function exportSummary() {
+  const { rows } = overviewData();
+  const aoa = [[db.school.name.toUpperCase()], [`BẢNG TỔNG HỢP KẾT QUẢ THEO DÕI, ĐÁNH GIÁ – ${periodLabel(ui.period).toUpperCase()}`], [],
+    ["TT", "Họ và tên", "Chức vụ", "Tổ", "Được giao", "Hoàn thành", "Chưa HT", "Tỷ lệ HT (%)", "Sớm hạn", "Đúng hạn", "Trễ hạn", "Tỷ lệ đúng hạn (%)", "Đảm bảo", "Vượt mức", "Chưa đảm bảo", "Tỷ lệ CL (%)", "Điểm", "Xếp loại", "Trạng thái"]];
+  rows.forEach((r, i) => {
+    const a = r.a, s = a?.s;
+    aoa.push([i + 1, r.st.name, r.st.chucVu, r.st.to, s?.n ?? "", s?.done ?? "", s?.notdone ?? "", s ? round2(s.rHT) : "", s?.som ?? "", s?.dung ?? "", s?.tre ?? "", s ? round2(s.rTD) : "", s?.dam ?? "", s?.vuot ?? "", s?.chua ?? "", s ? round2(s.rCL) : "",
+      a ? round2(a.score) : "", a ? a.rank.name : "", r.recStatus ? RECORD_STATUS[r.recStatus].label : "Chưa có phiếu"]);
+  });
+  writeSheet(`Tong_hop_${periodLabel(ui.period).replace(/[\s/]/g, "_")}`, aoa, [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 18 } }], [5, 24, 18, 12, 9, 10, 8, 11, 8, 8, 8, 13, 8, 9, 11, 11, 7, 28, 14]);
+}
+function exportMau01() {
+  const rec = getRec(false), st = staffById(ui.evalStaff); if (!rec) return;
+  const s = calc(rec).s;
+  const X = (b) => b ? "X" : "";
+  const aoa = [
+    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Mẫu 01TKNV"],
+    [db.school.donVi.toUpperCase(), "", "", "", "", "", "", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
+    [db.school.name.toUpperCase(), "", "", "", "", "", "", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
+    [],
+    ["BẢNG THỐNG KÊ, TỰ ĐÁNH GIÁ KẾT QUẢ THỰC HIỆN NHIỆM VỤ CỦA CÁ NHÂN CÁN BỘ/CÔNG CHỨC/VIÊN CHỨC"],
+    [monthLabel(ui.evalMonth).toUpperCase().replace("/", "/NĂM ")],
+    [`Họ và tên: ${st.name}`, "", "", "", "", "", "", `Chức vụ: ${st.chucVu}`],
+    [],
+    ["TT", "Nội dung công việc/sản phẩm được giao", "Bình thường", "Phức tạp", "Rất phức tạp", "Chủ trì", "Phối hợp", "Đã hoàn thành", "Chưa hoàn thành (lý do)", "Thời gian yêu cầu", "Sớm hạn", "Đúng hạn", "Trễ hạn", "Chưa đảm bảo CL", "Đảm bảo CL", "Vượt mức", "Kiến nghị/Giải trình"],
+  ];
+  GROUPS.forEach(G => {
+    aoa.push([["I", "II", "III", "IV"][G.g - 1], G.t.replace(/^[IV]+\.\s*/, "")]);
+    rec.tasks.filter(t => t.g === G.g).forEach((t, i) => {
+      const done = t.kq === "done";
+      aoa.push([i + 1, t.nd, X(t.tc === "bt"), X(t.tc === "pt"), X(t.tc === "rpt"), X(t.md === "chu"), X(t.md === "phoi"), done ? t.kqnd : "", done ? "" : t.kqnd || "X", t.han,
+        X(done && t.td === "som"), X(done && t.td === "dung"), done && t.td === "tre" ? (t.tre ? `${t.tre} ngày` : "X") : "", X(done && t.cl === "chua"), X(done && t.cl === "dam"), X(done && t.cl === "vuot"), ""]);
+    });
+  });
+  aoa.push([], ["TỔNG SỐ SẢN PHẨM/CÔNG VIỆC"],
+    ["", "", "Được giao", "Hoàn thành", "Chưa hoàn thành", "Tỷ lệ HT (%)", "Sớm hạn", "Đúng hạn", "Trễ hạn", "Tỷ lệ đúng/sớm hạn (%)", "Đảm bảo", "Vượt mức", "Chưa đảm bảo", "Tỷ lệ đảm bảo CL (%)"],
+    ["", "", s.n, s.done, s.notdone, round2(s.rHT ?? 0), s.som, s.dung, s.tre, round2(s.rTD ?? 0), s.dam, s.vuot, s.chua, round2(s.rCL ?? 0)],
+    [], ["", "TRƯỞNG PHÒNG/BAN/ĐƠN VỊ", "", "", "", "", "", "CẤP PHÓ PHỤ TRÁCH", "", "", "", "", "", "", "CÁ NHÂN TỰ ĐÁNH GIÁ"]);
+  writeSheet(`Mau01TKNV_${st.name.replace(/\s+/g, "_")}_${ui.evalMonth}`, aoa, [{ s: { r: 4, c: 0 }, e: { r: 4, c: 16 } }, { s: { r: 5, c: 0 }, e: { r: 5, c: 16 } }], [5, 46, 8, 8, 8, 8, 8, 34, 22, 14, 7, 7, 9, 9, 9, 9, 18]);
+}
+function printRecord() {
+  const rec = getRec(false), st = staffById(ui.evalStaff); if (!rec) return;
+  const c = calc(rec), s = c.s;
+  const w = window.open("", "_blank");
+  if (!w) { toast("Trình duyệt chặn cửa sổ in. Hãy cho phép cửa sổ bật lên."); return; }
+  const td = (v, cls = "") => `<td class="${cls}">${v}</td>`;
+  w.document.write(`<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Phiếu đánh giá ${esc(st.name)} ${monthLabel(ui.evalMonth)}</title>
+  <style>body{font:13px/1.4 "Times New Roman",serif;color:#000;margin:24px}h1{font-size:15px;text-align:center;margin:12px 0 4px}p.c{text-align:center;margin:0}
+  table{width:100%;border-collapse:collapse;margin:8px 0}th,td{border:1px solid #000;padding:4px 6px;vertical-align:top}th{background:#eee}.n{text-align:right}.cc{text-align:center}
+  .hdr{display:flex;justify-content:space-between;text-align:center;font-weight:bold}.sig{display:flex;justify-content:space-between;text-align:center;margin-top:24px;font-weight:bold}
+  @media print{body{margin:10mm}}</style></head><body>
+  <div class="hdr"><div>${esc(db.school.donVi.toUpperCase())}<br>${esc(db.school.name.toUpperCase())}</div><div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>Độc lập - Tự do - Hạnh phúc</div></div>
+  <h1>PHIẾU THEO DÕI, ĐÁNH GIÁ, XẾP LOẠI CHẤT LƯỢNG CÁN BỘ/CÔNG CHỨC/VIÊN CHỨC</h1>
+  <p class="c">Kỳ đánh giá: ${monthLabel(ui.evalMonth)}</p>
+  <p>Họ và tên: <b>${esc(st.name)}</b> &nbsp;·&nbsp; Chức vụ, chức danh: ${esc(st.chucVu)} &nbsp;·&nbsp; Đơn vị: ${esc(db.school.name)}</p>
+  <h3>I. Thống kê công việc (Mẫu 01TKNV)</h3>
+  <table><tr><th>TT</th><th>Nội dung công việc</th><th>Kết quả</th><th>Tiến độ</th><th>Chất lượng</th></tr>
+  ${GROUPS.map(G => `<tr><td colspan="5"><b>${esc(G.t)}</b></td></tr>` + rec.tasks.filter(t => t.g === G.g).map((t, i) => `<tr>${td(i + 1, "cc")}${td(esc(t.nd) + (t.kqnd ? `<br><i>${esc(t.kqnd)}</i>` : "") + ((t.ev || []).length ? `<br><small>Minh chứng: ${t.ev.map(e => esc(e.name)).join("; ")}</small>` : ""))}${td(KET_QUA[t.kq])}${td(t.kq === "done" ? TIEN_DO[t.td] + (t.td === "tre" && t.tre ? ` (${t.tre} ngày)` : "") : "–")}${td(t.kq === "done" ? CHAT_LUONG[t.cl] : "–")}</tr>`).join("")).join("")}
+  </table>
+  <p>Được giao: ${s.n} · Hoàn thành: ${s.done} (${pct(s.rHT)}) · Đúng/sớm hạn: ${s.som + s.dung} (${pct(s.rTD)}) · Đảm bảo chất lượng trở lên: ${s.dam + s.vuot} (${pct(s.rCL)})</p>
+  <h3>II. Tổng hợp điểm</h3>
+  <table><tr><th>Nội dung</th><th>Tối đa</th><th>Tự chấm</th><th>Chính thức</th></tr>
+  <tr><td>A. Tiêu chí chung</td><td class="n">30</td><td class="n">${fmt(c.Atu)}</td><td class="n">${fmt(c.Aoff)}</td></tr>
+  <tr><td>B. Kết quả thực hiện nhiệm vụ (hoàn thành ${c.B?.ht ?? 0} + tiến độ ${c.B?.td ?? 0} + chất lượng ${c.B?.cl ?? 0})</td><td class="n">70</td><td class="n">${fmt(c.Btot)}</td><td class="n">${fmt(c.Btot)}</td></tr>
+  <tr><td>C. Điểm cộng, điểm trừ theo Mẫu 03</td><td></td><td class="n">${fmt(c.C03)}</td><td class="n">${fmt(c.C03)}</td></tr>
+  <tr><td>C.III. Điểm cộng, điểm trừ theo phụ lục${rec.pl.length ? "<br><small>" + rec.pl.map(e => `${esc(e.t.slice(0, 80))}: ${fmt((e.qty || 0) * (e.p || 0))}${e.ok === false ? " (không duyệt)" : ""}`).join("<br>") + "</small>" : ""}</td><td></td><td class="n">${fmt(c.PLtu)}</td><td class="n">${fmt(c.PLoff)}</td></tr>
+  <tr><th style="text-align:left">Tổng điểm</th><th></th><th class="n">${fmt(c.totTu)}</th><th class="n">${fmt(c.totOff)}</th></tr>
+  <tr><td>Xếp loại${c.down ? " (hạ 1 bậc do khống chế)" : ""}</td><td></td><td>${esc(c.rankTu.name)}</td><td>${esc(c.rankOff.name)}</td></tr></table>
+  <p><b>Ưu điểm:</b><br>${esc(rec.uu || "…").replace(/\n/g, "<br>")}</p>
+  <p><b>Hạn chế, khuyết điểm:</b><br>${esc(rec.han || "…").replace(/\n/g, "<br>")}</p>
+  <p style="text-align:right;margin-top:16px"><i>Bà Nà, ngày …… tháng …… năm ……</i></p>
+  <div class="sig"><div>THỦ TRƯỞNG ĐƠN VỊ<br><small>(ký tên, đóng dấu)</small></div><div>NGƯỜI QUẢN LÝ TRỰC TIẾP<br><small>(ký, ghi rõ họ tên)</small></div><div>NGƯỜI TỰ ĐÁNH GIÁ<br><small>(ký, ghi rõ họ tên)</small><br><br><br><br>${esc(st.name)}</div></div>
+  <script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
+function pickFile(accept) {
+  return new Promise(res => { const i = document.createElement("input"); i.type = "file"; i.accept = accept; i.onchange = () => res(i.files[0]); i.click(); });
+}
+async function importStaff() {
+  const f = await pickFile(".xlsx,.xls,.csv"); if (!f) return;
+  try {
+    const X = await loadXLSX();
+    const wb = X.read(await f.arrayBuffer());
+    const rows = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: "" });
+    const hi = rows.findIndex(r => r.some(c => /họ.*tên/i.test(String(c))));
+    if (hi < 0) { toast("Không tìm thấy cột “Họ và tên” trong file."); return; }
+    const h = rows[hi].map(c => String(c).toLowerCase());
+    const col = re => h.findIndex(c => re.test(c));
+    const cN = col(/họ.*tên/), cC = col(/chức/), cT = col(/^tổ|tổ /), cL = col(/lớp/), cK = col(/loại|đối tượng/);
+    let n = 0;
+    for (const r of rows.slice(hi + 1)) {
+      const name = String(r[cN] || "").trim(); if (!name) continue;
+      const k = String(r[cK] ?? "").toLowerCase();
+      const cv = cC >= 0 ? String(r[cC]).trim() : "";
+      const type = /bm|bộ môn/.test(k) ? "gvbm" : /cbnv|nv|bgh|văn phòng/.test(k) || /hiệu|kế toán|thư viện|tổng phụ trách|nhân viên|văn thư|y tế|bảo vệ/i.test(cv) ? "cbnv" : "gvcn";
+      db.staff.push({ id: uid(), name, chucVu: cv || "Giáo viên", to: cT >= 0 ? String(r[cT]).trim() : "", lop: cL >= 0 ? String(r[cL]).trim() : "", type });
+      n++;
+    }
+    save(true); renderStaff(); toast(`Đã thêm ${n} người.`);
+  } catch (e) { toast("Không đọc được file: " + e.message); }
+}
+function aiPrompt() {
+  const { rows } = overviewData();
+  const lines = rows.map(r => r.a
+    ? `- ${r.st.name} (${r.st.chucVu}, ${r.st.to}): giao ${r.a.s.n}, hoàn thành ${r.a.s.done} (${pct(r.a.s.rHT)}), đúng/sớm hạn ${pct(r.a.s.rTD)}, đảm bảo CL ${pct(r.a.s.rCL)}, trễ hạn ${r.a.s.tre}, điểm ${fmt(r.a.score)}, xếp loại: ${r.a.rank.name}`
+    : `- ${r.st.name} (${r.st.chucVu}, ${r.st.to}): chưa có kết quả đánh giá`);
+  return `Bạn là trợ lý giúp Ban Giám hiệu ${db.school.name} tổng hợp kết quả theo dõi, đánh giá thực hiện nhiệm vụ của CB-GV-NV theo Nghị định 335/2025/NĐ-CP (Mẫu 01TKNV, Mẫu 03).
+
+Kỳ đánh giá: ${periodLabel(ui.period)}.
+Thang xếp loại: ≥90 điểm Hoàn thành xuất sắc; ≥70 Hoàn thành tốt; 50–<70 Hoàn thành; <50 Không hoàn thành nhiệm vụ.
+
+Số liệu từng người:
+${lines.join("\n")}
+
+Yêu cầu:
+1. Viết đoạn nhận xét chung về tiến độ, chất lượng thực hiện nhiệm vụ của tập thể trong kỳ (khoảng 150–200 chữ, văn phong hành chính).
+2. Nêu những cá nhân tiêu biểu và những trường hợp cần nhắc nhở, kèm lý do dựa trên số liệu.
+3. Đề xuất 3–5 giải pháp cụ thể cho kỳ tới.
+Chỉ dựa trên số liệu trên, không suy đoán thêm.`;
+}
+
+// =====================================================================
+// 14. ĐIỀU HƯỚNG & SỰ KIỆN
+// =====================================================================
+function setTab(t) {
+  ui.tab = t;
+  try { sessionStorage.setItem("tdgv-tab", t); } catch (e) {}
+  $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  render();
+  window.scrollTo({ top: 0 });
+}
+function render() {
+  if (!loaded) return;
+  $("#schoolLine").textContent = `${db.school.name} · ${db.school.donVi}`;
+  const bn = $("#demoBanner");
+  if (db.demo) bn.innerHTML = `<span>Đang có <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…) để xem thử. Trước khi nhập dữ liệu thật, hãy xoá dữ liệu mẫu.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
+  else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Nạp dữ liệu mẫu để xem thử, hoặc vào <b>Danh sách CB-GV-NV</b> để nhập danh sách thật.</span><span class="spacer"></span><button class="btn sm primary" data-act="loadDemo">Nạp dữ liệu mẫu</button>`;
+  bn.classList.toggle("hidden", !(db.demo || !db.staff.length));
+  ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData })[ui.tab]();
+}
+
+$("nav.tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); });
+
+document.addEventListener("input", e => {
+  if (ui.tab === "eval") { onEvalInput(e); return; }
+  const el = e.target;
+  if (ui.tab === "overview" && el.id === "fQ") { ui.filter.q = el.value; const pos = el.selectionStart; renderOverview(); const n = $("#fQ"); n.focus(); n.setSelectionRange(pos, pos); return; }
+  if (ui.tab === "staff" && el.dataset.s && el.tagName === "INPUT") { const s = staffById(el.closest("[data-sid]").dataset.sid); s[el.dataset.s] = el.value; save(); return; }
+  if (ui.tab === "data" && el.dataset.school) { db.school[el.dataset.school] = el.value; $("#schoolLine").textContent = `${db.school.name} · ${db.school.donVi}`; save(); }
+});
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (ui.tab === "overview") {
+    if (el.id === "pType") { ui.period = { type: el.value, value: defaultValue(el.value) }; renderOverview(); }
+    else if (el.id === "pValue") { ui.period.value = el.value; renderOverview(); }
+    else if (el.id === "fTo") { ui.filter.to = el.value; renderOverview(); }
+    else if (el.id === "fRank") { ui.filter.rank = el.value; renderOverview(); }
+    return;
+  }
+  if (ui.tab === "eval") {
+    if (el.id === "eStaff") { ui.evalStaff = el.value; renderEval(); return; }
+    if (el.id === "eMonth") { if (el.value) { ui.evalMonth = el.value; renderEval(); } return; }
+    if (el.matches("select[data-f], input[type=checkbox], input[type=number][data-c03]")) onEvalInput(e);
+    return;
+  }
+  if (ui.tab === "person") {
+    if (el.id === "pStaff") { ui.person = el.value; renderPerson(); }
+    if (el.id === "pYear") { ui.personYear = +el.value; renderPerson(); }
+    return;
+  }
+  if (ui.tab === "staff" && el.dataset.s && el.tagName === "SELECT") { staffById(el.closest("[data-sid]").dataset.sid).type = el.value; save(); }
+});
+
+document.addEventListener("click", async e => {
+  if (ui.tab === "overview" && !e.target.closest("button, select, input") && onOverviewClick(e)) return;
+  if (ui.tab === "person") { const tr = e.target.closest("[data-month]"); if (tr) { ui.evalStaff = ui.person; ui.evalMonth = tr.dataset.month; setTab("eval"); return; } }
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act;
+  const rec = ui.tab === "eval" ? getRec(false) : null;
+  switch (act) {
+    case "newRec": getRec(true); save(); renderEval(); break;
+    case "newRecCopy": { const r = getRec(true); r.tasks = copyTasksFrom(db.records[rkey(ui.evalStaff, addMonth(ui.evalMonth, -1))]); save(); renderEval(); toast(`Đã sao chép ${r.tasks.length} công việc. Hãy cập nhật kết quả từng việc.`); break; }
+    case "copyPrev": {
+      const p = db.records[rkey(ui.evalStaff, addMonth(ui.evalMonth, -1))];
+      if (!p || !p.tasks.length) { toast("Tháng trước chưa có công việc để sao chép."); break; }
+      if (rec.tasks.length && !confirm(`Thêm ${p.tasks.length} công việc từ tháng trước vào danh sách hiện có?`)) break;
+      rec.tasks.push(...copyTasksFrom(p)); save(); renderEval(); break;
+    }
+    case "addTask": rec.tasks.push({ id: uid(), g: +b.dataset.g, nd: "", tc: "bt", md: "chu", kq: "done", han: monthLabel(ui.evalMonth), td: "dung", tre: 0, cl: "dam", ah: false, kqnd: "" }); save(); renderEval();
+      setTimeout(() => { const last = rec.tasks[rec.tasks.length - 1]; const ta = $(`[data-tid="${last.id}"] textarea`); ta && ta.focus(); }, 0); break;
+    case "delTask": { const id = b.closest("[data-tid]").dataset.tid; const t = rec.tasks.find(x => x.id === id); if (t.nd && !confirm("Xoá công việc này?")) break; rec.tasks = rec.tasks.filter(x => x.id !== id); save(); renderEval(); break; }
+    case "fillMax": CRIT_ITEMS.forEach(c => { if (rec.a.tu[c.c] == null) rec.a.tu[c.c] = c.max; }); save(); renderEval(); break;
+    case "copyOff": rec.a.off = {}; save(); renderEval(); toast("Cột chính thức đã đặt bằng điểm tự chấm."); break;
+    case "addPl": {
+      const st = staffById(ui.evalStaff), i = +$("#plPick").value, x = CATALOG[STAFF_TYPES[st.type].pl][i];
+      rec.pl.push({ id: uid(), ref: i, t: x.t, p: x.p, qty: 1, note: "", ok: true }); save(); renderEval();
+      if (x.m) toast("Mục này có nhiều mức điểm – hãy kiểm tra lại ô “Điểm/lần”.");
+      break;
+    }
+    case "addPlCustom": rec.pl.push({ id: uid(), ref: null, t: "", p: 0, qty: 1, note: "", ok: true }); save(); renderEval(); break;
+    case "delPl": { const id = b.closest("[data-pid]").dataset.pid; rec.pl = rec.pl.filter(x => x.id !== id); save(); renderEval(); break; }
+    case "suggest": {
+      const sg = suggestComments(rec, staffById(ui.evalStaff));
+      if ((rec.uu || rec.han) && !confirm("Thay nội dung ưu điểm/hạn chế hiện có bằng gợi ý tự động?")) break;
+      rec.uu = sg.uu; rec.han = sg.han; save(); $('[data-r="uu"]').value = rec.uu; $('[data-r="han"]').value = rec.han; toast("Đã tạo gợi ý. Hãy đọc lại và chỉnh sửa trước khi dùng."); break;
+    }
+    case "setStatus": {
+      const s = b.dataset.s;
+      if (s !== "nhap") { const c = calc(rec); if (!rec.tasks.length) { toast("Chưa có công việc nào trong phiếu."); break; } if (c.aFilled < CRIT_ITEMS.length && !confirm(`Phần A còn ${CRIT_ITEMS.length - c.aFilled} tiêu chí chưa chấm. Vẫn chuyển trạng thái?`)) break; }
+      rec.status = s; rec.updated = new Date().toISOString(); save(); renderEval(); break;
+    }
+    case "delRec": if (confirm(`Xoá phiếu ${monthLabel(ui.evalMonth)} của ${staffById(ui.evalStaff).name}?`)) {
+      for (const e of [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || [])]) TB.removeFile(e.key).catch(() => {});
+      delete db.records[rkey(ui.evalStaff, ui.evalMonth)]; save(); renderEval(); } break;
+    case "print": printRecord(); break;
+    case "exportMau01": exportMau01(); break;
+    case "exportSummary": exportSummary(); break;
+    case "copyAI": {
+      const text = aiPrompt();
+      try { await navigator.clipboard.writeText(text); toast("Đã sao chép. Mở Gemini/ChatGPT/NotebookLM và dán (Ctrl+V)."); }
+      catch (err) { download("tro_ly_AI.txt", text, "text/plain;charset=utf-8"); toast("Không sao chép được, đã tải về file văn bản."); }
+      break;
+    }
+    case "addStaff": db.staff.push({ id: uid(), name: "", chucVu: "Giáo viên", to: "", lop: "", type: "gvcn" }); save(); renderStaff(); setTimeout(() => { const ins = $$('input[data-s="name"]'); ins[ins.length - 1].focus(); }, 0); break;
+    case "delStaff": {
+      const sid = b.closest("[data-sid]").dataset.sid, s = staffById(sid);
+      const n = Object.keys(db.records).filter(k => k.startsWith(sid + "|")).length;
+      if (!confirm(`Xoá ${s.name || "người này"}${n ? ` và ${n} phiếu đánh giá` : ""}?`)) break;
+      db.staff = db.staff.filter(x => x.id !== sid); for (const k of Object.keys(db.records)) if (k.startsWith(sid + "|")) delete db.records[k];
+      save(); renderStaff(); break;
+    }
+    case "importStaff": importStaff(); break;
+    case "backup": download(`sao_luu_danh_gia_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(db, null, 1), "application/json"); break;
+    case "clearDemo": {
+      if (!confirm("Xoá dữ liệu mẫu (những người tên giả và phiếu của họ)? Dữ liệu thật không bị ảnh hưởng.")) break;
+      const ids = new Set(db.staff.filter(x => x.demo).map(x => x.id));
+      db.staff = db.staff.filter(x => !ids.has(x.id));
+      for (const k of Object.keys(db.records)) if (ids.has(k.split("|")[0])) delete db.records[k];
+      db.demo = false; initUi(); toast("Đang xoá dữ liệu mẫu trên máy chủ…"); await sync(); render(); break;
+    }
+    case "loadDemo": {
+      if (db.demo && !confirm("Đã có dữ liệu mẫu. Nạp thêm một bộ nữa?")) break;
+      const d = demo();
+      db.staff.push(...d.staff); Object.assign(db.records, d.records); db.demo = true;
+      initUi(); render(); toast(`Đang lưu ${d.staff.length} người và ${Object.keys(d.records).length} phiếu mẫu lên máy chủ…`); await sync(); render(); break;
+    }
+    case "reload": reload(); break;
+    case "upEv": {
+      const files = await pickFiles(EV_ACCEPT); if (!files.length) break;
+      await uploadEvidence(evList(rec, b.dataset.scope), files); renderEval(); break;
+    }
+    case "delEv": {
+      const it = b.closest("[data-ei]"); const list = evList(rec, it.dataset.scope); const e = list[+it.dataset.ei];
+      if (!e || !confirm(`Xoá minh chứng “${e.name}”?`)) break;
+      try { await TB.removeFile(e.key); }
+      catch (err) { if (!/Không tìm thấy/.test(err.message)) { toast(err.message); break; } }
+      list.splice(+it.dataset.ei, 1); save(true); renderEval(); toast("Đã xoá minh chứng."); break;
+    }
+  }
+});
+
+const root = document.documentElement;
+try { const t = localStorage.getItem("tdgv-theme"); if (t) root.dataset.theme = t; } catch (e) {}
+$("#themeBtn").addEventListener("click", () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("tdgv-theme", root.dataset.theme); } catch (e) {}
+});
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (ui.tab === "overview") renderOverview(); if (ui.tab === "person") renderPerson(); }, 150); });
+
+$$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === ui.tab));
+(async () => {
+  try {
+    if (!window.TB) throw new Error("Không nạp được thư viện dùng chung /lib/thbana.js.");
+    await loadAll();
+    initUi();
+    setMark("Đã tải lúc " + hhmm());
+    setTab(ui.tab);
+  } catch (e) {
+    $("#view").innerHTML = `<div class="card"><h2>Chưa tải được dữ liệu</h2><p style="margin-top:6px">${esc(e.message)}${esc(infraHint(e.message))}</p><p class="small muted">Hãy tải lại trang. Nếu vẫn lỗi, báo quản trị viên kèm thông báo trên.</p><button class="btn" onclick="location.reload()">Tải lại trang</button></div>`;
+  }
+})();
+addEventListener("focus", () => { if (loaded) reload(true); });
+addEventListener("beforeunload", e => { if (loaded && (syncing || hasLocalChanges())) { sync(); e.preventDefault(); e.returnValue = ""; } });
 })();
 </script>
 </body>
