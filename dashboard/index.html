@@ -743,102 +743,6 @@ function aggregate(sid, months) {
 }
 
 // =====================================================================
-// 5. DỮ LIỆU MẪU
-// =====================================================================
-function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
-function demo() {
-  const r = rng(2026);
-  const staff = [
-    ["Giáo viên A", "gvcn", "Giáo viên", "Tổ 1", "1/1"],
-    ["Giáo viên B", "gvcn", "Tổ trưởng", "Tổ 1", "1/2"],
-    ["Giáo viên C", "gvcn", "Giáo viên", "Tổ 2", "2/1"],
-    ["Giáo viên D", "gvcn", "Giáo viên", "Tổ 3", "3/1"],
-    ["Giáo viên E", "gvcn", "Tổ trưởng", "Tổ 4-5", "5/3"],
-    ["Giáo viên F", "gvbm", "GV Tiếng Anh", "Tổ Bộ môn", ""],
-    ["Nhân viên G", "cbnv", "Nhân viên thư viện", "Tổ Văn phòng", ""],
-    ["Cán bộ H", "cbnv", "Phó Hiệu trưởng", "Ban Giám hiệu", ""],
-  ].map(([name, type, chucVu, to, lop]) => ({ id: uid(), name, type, chucVu, to, lop, demo: true }));
-
-  const T = {
-    gvcn: [
-      [1, "Thực hiện kế hoạch bài dạy, hoàn thành chương trình giảng dạy {m} lớp {lop}", "bt", "chu"],
-      [1, "Thực hiện công tác chủ nhiệm lớp {lop} (ổn định nền nếp, rèn luyện ý thức, tổ chức hoạt động lớp)", "pt", "chu"],
-      [1, "Phụ đạo học sinh chưa hoàn thành, bồi dưỡng học sinh năng khiếu", "bt", "chu"],
-      [2, "Tham gia sinh hoạt chuyên môn, xây dựng kế hoạch tổ chuyên môn {m}", "bt", "phoi"],
-      [2, "Cập nhật hồ sơ sổ sách, phần mềm quản lý học sinh đúng quy định", "bt", "chu"],
-      [2, "Dự giờ, thao giảng theo kế hoạch tổ chuyên môn", "bt", "chu"],
-      [3, "Hướng dẫn học sinh tham gia cuộc thi vẽ tranh cấp trường", "pt", "chu"],
-      [3, "Viết tham luận phục vụ Hội nghị viên chức", "bt", "phoi"],
-      [4, "Tham gia đầy đủ hội họp, tập huấn chuyên môn và phong trào của nhà trường", "bt", "phoi"],
-    ],
-    gvbm: [
-      [1, "Giảng dạy môn {mon} các lớp theo phân công, hoàn thành chương trình {m}", "bt", "chu"],
-      [1, "Bồi dưỡng đội tuyển học sinh năng khiếu môn {mon}", "pt", "chu"],
-      [2, "Tham gia sinh hoạt chuyên môn tổ bộ môn", "bt", "phoi"],
-      [2, "Cập nhật điểm, nhận xét học sinh trên phần mềm", "bt", "chu"],
-      [3, "Hỗ trợ tổ chức hoạt động ngoại khoá của trường", "pt", "phoi"],
-      [4, "Tham gia đầy đủ hội họp, tập huấn chuyên môn", "bt", "phoi"],
-    ],
-    cbnv: [
-      [1, "Xây dựng và triển khai kế hoạch công tác {m} theo vị trí việc làm", "pt", "chu"],
-      [1, "Thực hiện nhiệm vụ chuyên trách theo phân công ({cv})", "bt", "chu"],
-      [2, "Cập nhật hồ sơ sổ sách, báo cáo định kỳ đúng hạn", "bt", "chu"],
-      [2, "Phối hợp với tổ chuyên môn, đoàn thể trong các hoạt động chung", "bt", "phoi"],
-      [3, "Thực hiện nhiệm vụ đột xuất do Hiệu trưởng phân công", "pt", "chu"],
-      [4, "Tham gia hội họp, tập huấn, bồi dưỡng theo kế hoạch", "bt", "phoi"],
-    ],
-  };
-  const months = [];
-  for (let k = addMonth(CUR_MONTH, -9); k <= CUR_MONTH; k = addMonth(k, 1)) {
-    const m = +k.split("-")[1];
-    if (m >= 6 && m <= 8) continue;
-    if (k === CUR_MONTH && now.getDate() < 25) continue;
-    months.push(k);
-  }
-  const records = {};
-  staff.forEach((st, si) => {
-    const skill = 0.82 + r() * 0.17;
-    months.forEach((mk, mi) => {
-      const isLast = mi === months.length - 1;
-      if (isLast && (si === 3 || si === 6)) return; // chưa nộp
-      const rec = newRecord();
-      const tpl = T[st.type];
-      const mName = monthLabel(mk).toLowerCase();
-      tpl.forEach(([g, t, tc, md]) => {
-        if (g === 3 && r() < 0.5) return;
-        const done = r() < 0.94 + skill * 0.05;
-        const x = r();
-        const td = x < 0.12 * skill ? "som" : x < 1 - (1 - skill) * 0.9 ? "dung" : "tre";
-        const y = r();
-        const cl = y < 0.07 * skill ? "vuot" : y < 1 - (1 - skill) * 0.6 ? "dam" : "chua";
-        rec.tasks.push({
-          id: uid(), g, nd: t.replace("{m}", mName).replace("{lop}", st.lop).replace("{mon}", st.chucVu.replace("GV ", "")).replace("{cv}", st.chucVu),
-          tc, md, kq: done ? "done" : "notdone", han: monthLabel(mk), td: done ? td : "", tre: td === "tre" ? 1 + Math.floor(r() * 3) : 0,
-          cl: done ? cl : "", ah: !done && r() < 0.3, kqnd: done ? "Đã thực hiện đầy đủ theo yêu cầu." : "Chưa hoàn thành do trùng lịch công tác.",
-        });
-      });
-      for (const c of CRIT_ITEMS) {
-        const v = r() < 0.08 * (1.2 - skill) * 6 ? c.max * 0.8 : c.max;
-        rec.a.tu[c.c] = round2(v);
-        if (r() < 0.05) rec.a.off[c.c] = round2(c.max * 0.8);
-      }
-      const cat = CATALOG[STAFF_TYPES[st.type].pl].filter(x => x.k !== "khongche" && !x.m && (st.type !== "gvbm" || x.s !== "III"));
-      const nPl = Math.floor(r() * 3);
-      for (let i = 0; i < nPl; i++) {
-        const minus = cat.filter(x => x.k === "tru"), plus = cat.filter(x => x.k === "cong" && x.p <= 3);
-        const pick = r() < 0.55 ? minus[Math.floor(r() * minus.length)] : plus[Math.floor(r() * plus.length)];
-        const idx = CATALOG[STAFF_TYPES[st.type].pl].indexOf(pick);
-        rec.pl.push({ id: uid(), ref: idx, t: pick.t, p: pick.p, qty: 1, note: "", ok: true });
-      }
-      rec.status = isLast ? (r() < 0.6 ? "nop" : "duyet") : "duyet";
-      rec.updated = new Date().toISOString();
-      records[rkey(st.id, mk)] = rec;
-    });
-  });
-  return { staff, records };
-}
-
-// =====================================================================
 // 6. TRẠNG THÁI GIAO DIỆN
 // =====================================================================
 const latestMonth = () => {
@@ -1492,12 +1396,9 @@ function renderData() {
     <div class="row">
       <button class="btn" data-act="backup">⬇ Xuất bản sao lưu (.json)</button>
     </div>
-    <h2 style="margin-top:20px">Dữ liệu mẫu</h2>
-    <p class="small muted">Dữ liệu mẫu dùng tên giả (Giáo viên A, B…) để xem thử; xoá đi trước khi nhập dữ liệu thật.</p>
-    <div class="row" style="margin-top:8px">
-      <button class="btn" data-act="loadDemo">Nạp dữ liệu mẫu</button>
-      ${db.demo ? `<button class="btn danger" data-act="clearDemo">Xoá dữ liệu mẫu</button>` : ""}
-    </div>
+    ${db.demo ? `<h2 style="margin-top:20px">Dữ liệu mẫu còn sót</h2>
+    <p class="small muted">Hệ thống vẫn còn dữ liệu mẫu (tên giả Giáo viên A, B…). Xoá đi trước khi nhập dữ liệu thật.</p>
+    <div class="row" style="margin-top:8px"><button class="btn danger" data-act="clearDemo">Xoá dữ liệu mẫu</button></div>` : ""}
   </div>
   <div class="card help">
     <h2>Hướng dẫn nhanh</h2>
@@ -1675,7 +1576,7 @@ const PAGES = {
   eval: ["Đánh giá tháng", "Phiếu tự đánh giá theo Mẫu 01TKNV và Mẫu 03 cho từng người"],
   person: ["Theo dõi cá nhân", "Điểm, tiến độ và xếp loại của một người qua các tháng"],
   staff: ["Danh sách CB-GV-NV", "Người được theo dõi, đánh giá và phụ lục điểm cộng/trừ áp dụng"],
-  data: ["Dữ liệu & hướng dẫn", "Thông tin đơn vị, sao lưu, dữ liệu mẫu và cách tính điểm"],
+  data: ["Dữ liệu & hướng dẫn", "Thông tin đơn vị, sao lưu và cách tính điểm"],
 };
 function setTab(t) {
   ui.tab = t;
@@ -1690,13 +1591,14 @@ function render() {
   if (!loaded) return;
   $("#schoolLine").textContent = db.school.name;
   const bn = $("#demoBanner");
-  if (db.demo) bn.innerHTML = `<span>Đang có <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…) để xem thử. Trước khi nhập dữ liệu thật, hãy xoá dữ liệu mẫu.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
-  else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Nạp dữ liệu mẫu để xem thử, hoặc vào <b>Danh sách CB-GV-NV</b> để nhập danh sách thật.</span><span class="spacer"></span><button class="btn sm primary" data-act="loadDemo">Nạp dữ liệu mẫu</button>`;
+  if (db.demo) bn.innerHTML = `<span>Hệ thống còn <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…). Hãy xoá trước khi nhập dữ liệu thật.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
+  else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Vào <b>Danh sách CB-GV-NV</b> để thêm người hoặc nhập danh sách từ Excel.</span><span class="spacer"></span><button class="btn sm primary" data-tab-go="staff">Mở danh sách CB-GV-NV</button>`;
   bn.classList.toggle("hidden", !(db.demo || !db.staff.length));
   ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData })[ui.tab]();
 }
 
 $("nav.tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); });
+$("#demoBanner").addEventListener("click", e => { const b = e.target.closest("[data-tab-go]"); if (b) setTab(b.dataset.tabGo); });
 
 document.addEventListener("input", e => {
   if (ui.tab === "eval") { onEvalInput(e); return; }
@@ -1794,12 +1696,6 @@ document.addEventListener("click", async e => {
       db.staff = db.staff.filter(x => !ids.has(x.id));
       for (const k of Object.keys(db.records)) if (ids.has(k.split("|")[0])) delete db.records[k];
       db.demo = false; initUi(); toast("Đang xoá dữ liệu mẫu trên máy chủ…"); await sync(); render(); break;
-    }
-    case "loadDemo": {
-      if (db.demo && !confirm("Đã có dữ liệu mẫu. Nạp thêm một bộ nữa?")) break;
-      const d = demo();
-      db.staff.push(...d.staff); Object.assign(db.records, d.records); db.demo = true;
-      initUi(); render(); toast(`Đang lưu ${d.staff.length} người và ${Object.keys(d.records).length} phiếu mẫu lên máy chủ…`); await sync(); render(); break;
     }
     case "reload": reload(); break;
     case "upEv": {
