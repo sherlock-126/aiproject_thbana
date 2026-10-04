@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bảng điều khiển</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f4f2;
+    --surface-1: #fcfcfb;
+    --surface-2: #f0efec;
+    --border: #e2e1dc;
+    --grid: #ebeae6;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #7a7974;
+    --series-1: #2a78d6;
+    --series-ref: #a3a29c;
+    --bar-1: #2a78d6;
+    --good: #0ca30c;
+    --good-text: #006300;
+    --warning: #fab219;
+    --serious: #ec835a;
+    --critical: #d03b3b;
+    --critical-text: #b42f2f;
+    --focus: #2a78d6;
+    --shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #111110;
+      --surface-1: #1a1a19;
+      --surface-2: #232321;
+      --border: #2e2e2c;
+      --grid: #2a2a28;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8e86;
+      --series-1: #3987e5;
+      --series-ref: #6b6a64;
+      --bar-1: #3987e5;
+      --good-text: #4cc94c;
+      --critical-text: #e66767;
+      --focus: #3987e5;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #111110;
+    --surface-1: #1a1a19;
+    --surface-2: #232321;
+    --border: #2e2e2c;
+    --grid: #2a2a28;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --series-1: #3987e5;
+    --series-ref: #6b6a64;
+    --bar-1: #3987e5;
+    --good-text: #4cc94c;
+    --critical-text: #e66767;
+    --focus: #3987e5;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+  header.top {
+    display: flex; flex-wrap: wrap; gap: 12px 16px;
+    align-items: center; justify-content: space-between; margin-bottom: 20px;
+  }
+  h1 { font-size: 22px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
+  .sub { color: var(--text-secondary); margin: 2px 0 0; font-size: 13px; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .seg {
+    display: inline-flex; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 2px;
+  }
+  .seg button {
+    border: 0; background: transparent; color: var(--text-secondary);
+    font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] {
+    background: var(--surface-1); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,.12);
+  }
+  select, .btn {
+    font: inherit; font-size: 13px; color: var(--text-primary);
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 10px; cursor: pointer;
+  }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; box-shadow: var(--shadow); min-width: 0;
+  }
+  .kpi .label { color: var(--text-secondary); font-size: 13px; }
+  .kpi .value { font-size: 26px; font-weight: 650; letter-spacing: -.02em; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+  .delta { font-size: 12px; font-weight: 600; display: inline-flex; gap: 4px; align-items: center; }
+  .delta.up { color: var(--good-text); }
+  .delta.down { color: var(--critical-text); }
+  .delta .vs { color: var(--text-muted); font-weight: 400; }
+
+  .grid2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .card-head h2 { font-size: 15px; margin: 0; font-weight: 620; }
+  .card-head p { margin: 2px 0 0; color: var(--text-muted); font-size: 12px; }
+  .linkbtn {
+    border: 0; background: none; color: var(--text-secondary); font: inherit; font-size: 12px;
+    cursor: pointer; padding: 4px 6px; border-radius: 6px; white-space: nowrap;
+  }
+  .linkbtn:hover { background: var(--surface-2); }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 14px; height: 0; border-top: 2px solid; display: inline-block; }
+  .sw.dash { border-top-style: dashed; }
+
+  .chart { position: relative; width: 100%; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart text { fill: var(--text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .chart .lbl { fill: var(--text-secondary); font-size: 12px; }
+  .chart .val { fill: var(--text-primary); font-size: 12px; font-weight: 600; }
+
+  .tip {
+    position: absolute; pointer-events: none; z-index: 5;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.14);
+    min-width: 150px; opacity: 0; transition: opacity .08s; white-space: nowrap;
+  }
+  .tip.on { opacity: 1; }
+  .tip .t { color: var(--text-secondary); margin-bottom: 4px; }
+  .tip .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  .tip .row b { font-variant-numeric: tabular-nums; }
+  .tip .k { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-muted); font-weight: 500; font-size: 12px; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: 0; }
+  .table-scroll { overflow-x: auto; }
+  #ordersTable { min-width: 600px; }
+  #ordersTable td { white-space: nowrap; }
+  .status { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+  .status svg { flex: none; }
+  .hidden { display: none !important; }
+
+  @media (max-width: 900px) {
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid2 { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 420px) {
+    .kpi .value { font-size: 22px; }
+    .kpis { gap: 8px; }
+    .card { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Bảng điều khiển bán hàng</h1>
+      <p class="sub" id="rangeText">Dữ liệu mẫu</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Khoảng thời gian" id="rangeSeg">
+        <button data-range="7" aria-pressed="false">7 ngày</button>
+        <button data-range="30" aria-pressed="true">30 ngày</button>
+        <button data-range="90" aria-pressed="false">90 ngày</button>
+      </div>
+      <select id="channelSel" aria-label="Kênh bán">
+        <option value="all">Tất cả kênh</option>
+      </select>
+      <button class="btn" id="themeBtn" aria-label="Đổi giao diện sáng/tối">◐ Giao diện</button>
+    </div>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Chỉ số chính"></section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Doanh thu theo ngày</h2>
+          <p>So với kỳ trước cùng độ dài</p>
+        </div>
+        <button class="linkbtn" data-toggle="trend">Xem bảng</button>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="border-color:var(--series-1)"></i>Kỳ này</span>
+        <span><i class="sw dash" style="border-color:var(--series-ref)"></i>Kỳ trước</span>
+      </div>
+      <div class="chart" id="trendChart"></div>
+      <div class="table-scroll hidden" id="trendTable"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Doanh thu theo kênh</h2>
+          <p>Tổng trong kỳ</p>
+        </div>
+        <button class="linkbtn" data-toggle="channel">Xem bảng</button>
+      </div>
+      <div class="chart" id="channelChart"></div>
+      <div class="table-scroll hidden" id="channelTable"></div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Đơn hàng gần đây</h2>
+          <p>10 đơn mới nhất</p>
+        </div>
+      </div>
+      <div class="table-scroll"><table id="ordersTable"></table></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Sản phẩm bán chạy</h2>
+          <p>Theo số lượng bán</p>
+        </div>
+      </div>
+      <div class="table-scroll"><table id="productsTable"></table></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  // ---------- Dữ liệu mẫu (thay bằng API thật khi tích hợp) ----------
+  const CHANNELS = ["Website", "Shopee", "Facebook", "Zalo", "Cửa hàng"];
+  const CHANNEL_WEIGHT = [1.0, 1.35, 0.7, 0.55, 0.85];
+  const PRODUCTS = ["Áo thun basic", "Quần jean slim", "Giày sneaker", "Túi tote vải", "Mũ lưỡi trai", "Áo khoác gió"];
+  const CUSTOMERS = ["Nguyễn Văn An", "Trần Thị Bình", "Lê Minh Châu", "Phạm Quốc Dũng", "Hoàng Thu Hà", "Vũ Đức Khang", "Đặng Mai Linh", "Bùi Gia Huy", "Đỗ Ngọc Lan", "Ngô Thanh Tùng"];
+  const STATUSES = [
+    { key: "good", label: "Hoàn thành" },
+    { key: "warning", label: "Đang giao" },
+    { key: "serious", label: "Chờ xử lý" },
+    { key: "critical", label: "Đã huỷ" },
+  ];
+
+  function rng(seed) {
+    let s = seed >>> 0;
+    return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+  }
+
+  const DAYS = 180;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const daily = []; // daily[i] = { date, byChannel: [{rev, orders, newCust}] }
+  {
+    const r = rng(42);
+    for (let i = DAYS - 1; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      const t = (DAYS - i) / DAYS;
+      const weekend = d.getDay() === 0 || d.getDay() === 6 ? 1.25 : 1;
+      daily.push({
+        date: d,
+        byChannel: CHANNEL_WEIGHT.map(w => {
+          const orders = Math.round((18 + 10 * t) * w * weekend * (0.75 + r() * 0.5));
+          const aov = 320000 + r() * 160000;
+          return { rev: orders * aov, orders, newCust: Math.round(orders * (0.25 + r() * 0.15)) };
+        }),
+      });
+    }
+  }
+
+  // ---------- Trạng thái ----------
+  const state = { range: 30, channel: "all", view: { trend: "chart", channel: "chart" } };
+
+  const fmtVND = n => new Intl.NumberFormat("vi-VN").format(Math.round(n)) + " ₫";
+  const fmtShort = n => {
+    const a = Math.abs(n);
+    if (a >= 1e9) return (n / 1e9).toFixed(a >= 1e10 ? 0 : 1).replace(".", ",") + " tỷ";
+    if (a >= 1e6) return (n / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(".", ",") + " tr";
+    if (a >= 1e3) return Math.round(n / 1e3) + "k";
+    return String(Math.round(n));
+  };
+  const fmtInt = n => new Intl.NumberFormat("vi-VN").format(Math.round(n));
+  const fmtDate = d => d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+  const fmtDateLong = d => d.toLocaleDateString("vi-VN", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function pick(day) {
+    if (state.channel === "all") {
+      return day.byChannel.reduce((a, c) => ({ rev: a.rev + c.rev, orders: a.orders + c.orders, newCust: a.newCust + c.newCust }), { rev: 0, orders: 0, newCust: 0 });
+    }
+    return day.byChannel[+state.channel];
+  }
+
+  function periods() {
+    const n = state.range;
+    const cur = daily.slice(-n);
+    const prev = daily.slice(-2 * n, -n);
+    return { cur, prev };
+  }
+
+  function sum(days) {
+    return days.map(pick).reduce((a, c) => ({ rev: a.rev + c.rev, orders: a.orders + c.orders, newCust: a.newCust + c.newCust }), { rev: 0, orders: 0, newCust: 0 });
+  }
+
+  // ---------- KPI ----------
+  function renderKpis() {
+    const { cur, prev } = periods();
+    const a = sum(cur), b = sum(prev);
+    const items = [
+      { label: "Doanh thu", v: a.rev, p: b.rev, f: fmtShort, full: fmtVND },
+      { label: "Đơn hàng", v: a.orders, p: b.orders, f: fmtInt },
+      { label: "Khách hàng mới", v: a.newCust, p: b.newCust, f: fmtInt },
+      { label: "Giá trị TB / đơn", v: a.rev / a.orders, p: b.rev / b.orders, f: fmtShort, full: fmtVND },
+    ];
+    document.getElementById("kpis").innerHTML = items.map(it => {
+      const pct = it.p ? (it.v - it.p) / it.p * 100 : 0;
+      const up = pct >= 0;
+      return `<div class="card kpi">
+        <div class="label">${it.label}</div>
+        <div class="value" title="${it.full ? it.full(it.v) : fmtInt(it.v)}">${it.f(it.v)}</div>
+        <div class="delta ${up ? "up" : "down"}">${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(1).replace(".", ",")}%
+          <span class="vs">so với kỳ trước</span></div>
+      </div>`;
+    }).join("");
+    const first = cur[0].date, last = cur[cur.length - 1].date;
+    document.getElementById("rangeText").textContent =
+      `${fmtDateLong(first)} – ${fmtDateLong(last)} · Dữ liệu mẫu`;
+  }
+
+  // ---------- Tooltip ----------
+  function tipFor(container) {
+    let tip = container.querySelector(".tip");
+    if (!tip) { tip = document.createElement("div"); tip.className = "tip"; container.appendChild(tip); }
+    return {
+      show(html, x, y) {
+        tip.innerHTML = html; tip.classList.add("on");
+        const cw = container.clientWidth, tw = tip.offsetWidth, th = tip.offsetHeight;
+        let left = x + 14; if (left + tw > cw) left = x - tw - 14; if (left < 0) left = Math.max(0, cw - tw);
+        let top = y - th - 10; if (top < 0) top = y + 14;
+        tip.style.left = left + "px"; tip.style.top = top + "px";
+      },
+      hide() { tip.classList.remove("on"); },
+    };
+  }
+
+  function niceMax(v) {
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+    return v;
+  }
+
+  const NS = "http://www.w3.org/2000/svg";
+
+  // ---------- Biểu đồ đường ----------
+  function renderTrend() {
+    const el = document.getElementById("trendChart");
+    const { cur, prev } = periods();
+    const a = cur.map(d => pick(d).rev);
+    const b = prev.map(d => pick(d).rev);
+    const W = Math.max(280, el.clientWidth), H = W < 500 ? 220 : 280;
+    const m = { t: 12, r: 12, b: 26, l: 48 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const max = niceMax(Math.max(...a, ...b) * 1.05);
+    const x = i => m.l + (a.length === 1 ? iw / 2 : i * iw / (a.length - 1));
+    const y = v => m.t + ih - v / max * ih;
+    const path = arr => arr.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+
+    const ticks = 4;
+    let grid = "";
+    for (let i = 0; i <= ticks; i++) {
+      const v = max * i / ticks, yy = y(v);
+      grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="var(--${i ? "grid" : "border"})" stroke-width="1"/>`;
+      grid += `<text x="${m.l - 8}" y="${yy + 4}" text-anchor="end">${fmtShort(v)}</text>`;
+    }
+    const step = Math.ceil(a.length / Math.max(2, Math.floor(iw / 70)));
+    let xl = "";
+    for (let i = 0; i < a.length; i += step) xl += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${fmtDate(cur[i].date)}</text>`;
+
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Biểu đồ doanh thu theo ngày, kỳ này so với kỳ trước">
+      ${grid}${xl}
+      <path d="${path(b)}" fill="none" stroke="var(--series-ref)" stroke-width="2" stroke-dasharray="4 4" stroke-linejoin="round"/>
+      <path d="${path(a)}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <g id="trendHover" visibility="hidden">
+        <line y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-muted)" stroke-width="1"/>
+        <circle r="4" fill="var(--series-ref)" stroke="var(--surface-1)" stroke-width="2" data-s="b"/>
+        <circle r="5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2" data-s="a"/>
+      </g>
+      <rect x="${m.l}" y="0" width="${iw}" height="${H}" fill="transparent" id="trendHit"/>
+    </svg>`;
+
+    const svg = el.querySelector("svg"), hit = el.querySelector("#trendHit"), g = el.querySelector("#trendHover");
+    const tip = tipFor(el);
+    const move = ev => {
+      const rect = svg.getBoundingClientRect();
+      const px = (ev.clientX - rect.left) * W / rect.width;
+      const i = Math.max(0, Math.min(a.length - 1, Math.round((px - m.l) / iw * (a.length - 1))));
+      const xx = x(i);
+      g.setAttribute("visibility", "visible");
+      g.querySelector("line").setAttribute("x1", xx); g.querySelector("line").setAttribute("x2", xx);
+      const ca = g.querySelector('[data-s="a"]'), cb = g.querySelector('[data-s="b"]');
+      ca.setAttribute("cx", xx); ca.setAttribute("cy", y(a[i]));
+      cb.setAttribute("cx", xx); cb.setAttribute("cy", y(b[i] ?? 0));
+      const pct = b[i] ? ((a[i] - b[i]) / b[i] * 100) : 0;
+      tip.show(`<div class="t">${fmtDateLong(cur[i].date)}</div>
+        <div class="row"><span class="k"><i class="sw" style="border-color:var(--series-1)"></i>Kỳ này</span><b>${fmtVND(a[i])}</b></div>
+        <div class="row"><span class="k"><i class="sw dash" style="border-color:var(--series-ref)"></i>Kỳ trước (${fmtDate(prev[i].date)})</span><b>${fmtVND(b[i])}</b></div>
+        <div class="row"><span class="k">Chênh lệch</span><b>${pct >= 0 ? "+" : ""}${pct.toFixed(1).replace(".", ",")}%</b></div>`,
+        xx * rect.width / W, y(a[i]) * rect.height / H);
+    };
+    hit.addEventListener("pointermove", move);
+    hit.addEventListener("pointerdown", move);
+    hit.addEventListener("pointerleave", () => { g.setAttribute("visibility", "hidden"); tip.hide(); });
+
+    document.getElementById("trendTable").innerHTML = `<table>
+      <thead><tr><th>Ngày</th><th class="num">Kỳ này</th><th class="num">Kỳ trước</th></tr></thead>
+      <tbody>${cur.map((d, i) => `<tr><td>${fmtDate(d.date)}</td><td class="num">${fmtVND(a[i])}</td><td class="num">${fmtVND(b[i])}</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  // ---------- Biểu đồ cột ngang theo kênh ----------
+  function renderChannels() {
+    const el = document.getElementById("channelChart");
+    const { cur } = periods();
+    const rows = CHANNELS.map((name, ci) => ({
+      name, ci, rev: cur.reduce((s, d) => s + d.byChannel[ci].rev, 0),
+    })).sort((p, q) => q.rev - p.rev);
+    const total = rows.reduce((s, r) => s + r.rev, 0);
+    const W = Math.max(260, el.clientWidth);
+    const rowH = 40, barH = 14, labelW = 76, valW = 64;
+    const H = rows.length * rowH + 4;
+    const iw = W - labelW - valW;
+    const max = rows[0].rev;
+    const sel = state.channel;
+
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Doanh thu theo kênh bán">
+      ${rows.map((r, i) => {
+        const yy = i * rowH + (rowH - barH) / 2;
+        const w = Math.max(4, r.rev / max * iw);
+        const dim = sel !== "all" && +sel !== r.ci;
+        return `<g data-i="${i}" opacity="${dim ? 0.35 : 1}">
+          <rect x="0" y="${i * rowH}" width="${W}" height="${rowH}" fill="transparent"/>
+          <text class="lbl" x="0" y="${yy + barH / 2 + 4}">${esc(r.name)}</text>
+          <path d="M${labelW},${yy} h${w - 4} a4,4 0 0 1 4,4 v${barH - 8} a4,4 0 0 1 -4,4 h${-(w - 4)} z" fill="var(--bar-1)"/>
+          <text class="val" x="${W}" y="${yy + barH / 2 + 4}" text-anchor="end">${fmtShort(r.rev)}</text>
+        </g>`;
+      }).join("")}
+    </svg>`;
+
+    const tip = tipFor(el), svg = el.querySelector("svg");
+    el.querySelectorAll("g[data-i]").forEach(g => {
+      const r = rows[+g.dataset.i];
+      const show = ev => {
+        const rect = el.getBoundingClientRect();
+        tip.show(`<div class="t">${esc(r.name)}</div>
+          <div class="row"><span class="k">Doanh thu</span><b>${fmtVND(r.rev)}</b></div>
+          <div class="row"><span class="k">Tỷ trọng</span><b>${(r.rev / total * 100).toFixed(1).replace(".", ",")}%</b></div>`,
+          ev.clientX - rect.left, ev.clientY - rect.top);
+      };
+      g.addEventListener("pointermove", show);
+      g.addEventListener("pointerdown", show);
+      g.addEventListener("pointerleave", () => tip.hide());
+    });
+
+    document.getElementById("channelTable").innerHTML = `<table>
+      <thead><tr><th>Kênh</th><th class="num">Doanh thu</th><th class="num">Tỷ trọng</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${fmtVND(r.rev)}</td><td class="num">${(r.rev / total * 100).toFixed(1).replace(".", ",")}%</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  // ---------- Bảng ----------
+  const STATUS_ICON = {
+    good: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--good)"/><path d="M4 7.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    warning: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--warning)"/><path d="M7 3.6V7l2.2 1.4" stroke="#3a2a00" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+    serious: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--serious)"/><circle cx="4.2" cy="7" r="1" fill="#fff"/><circle cx="7" cy="7" r="1" fill="#fff"/><circle cx="9.8" cy="7" r="1" fill="#fff"/></svg>',
+    critical: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--critical)"/><path d="M4.8 4.8l4.4 4.4M9.2 4.8l-4.4 4.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  };
+
+  function renderOrders() {
+    const r = rng(7 + state.range + (state.channel === "all" ? 0 : +state.channel + 1) * 13);
+    const rows = Array.from({ length: 10 }, (_, i) => {
+      const ci = state.channel === "all" ? Math.floor(r() * CHANNELS.length) : +state.channel;
+      const roll = r();
+      const st = roll < 0.55 ? STATUSES[0] : roll < 0.8 ? STATUSES[1] : roll < 0.93 ? STATUSES[2] : STATUSES[3];
+      const t = new Date(Date.now() - (i * 47 + Math.floor(r() * 40)) * 60000);
+      return {
+        id: "DH" + String(10480 - i * 3 - Math.floor(r() * 3)).padStart(6, "0"),
+        cust: CUSTOMERS[Math.floor(r() * CUSTOMERS.length)],
+        ch: CHANNELS[ci], amount: Math.round((200 + r() * 1800) * 1000), st, t,
+      };
+    });
+    document.getElementById("ordersTable").innerHTML = `
+      <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Kênh</th><th>Trạng thái</th><th class="num">Giá trị</th></tr></thead>
+      <tbody>${rows.map(o => `<tr>
+        <td><span title="${o.t.toLocaleString("vi-VN")}">${o.id}</span></td>
+        <td>${esc(o.cust)}</td><td>${esc(o.ch)}</td>
+        <td><span class="status">${STATUS_ICON[o.st.key]}${o.st.label}</span></td>
+        <td class="num">${fmtVND(o.amount)}</td></tr>`).join("")}</tbody>`;
+  }
+
+  function renderProducts() {
+    const r = rng(99 + state.range * 3 + (state.channel === "all" ? 0 : +state.channel + 1) * 31);
+    const scale = state.range / 30 * (state.channel === "all" ? 1 : 0.22);
+    const rows = PRODUCTS.map(p => ({ p, q: Math.round((120 + r() * 520) * scale), price: Math.round((150 + r() * 650) * 1000) }))
+      .sort((a, b) => b.q - a.q);
+    document.getElementById("productsTable").innerHTML = `
+      <thead><tr><th>Sản phẩm</th><th class="num">SL</th><th class="num">Doanh thu</th></tr></thead>
+      <tbody>${rows.map(x => `<tr><td>${esc(x.p)}</td><td class="num">${fmtInt(x.q)}</td><td class="num">${fmtShort(x.q * x.price)}</td></tr>`).join("")}</tbody>`;
+  }
+
+  function renderAll() {
+    renderKpis(); renderTrend(); renderChannels(); renderOrders(); renderProducts();
+  }
+
+  // ---------- Điều khiển ----------
+  const sel = document.getElementById("channelSel");
+  CHANNELS.forEach((c, i) => sel.insertAdjacentHTML("beforeend", `<option value="${i}">${esc(c)}</option>`));
+  sel.addEventListener("change", () => { state.channel = sel.value; renderAll(); });
+
+  document.querySelectorAll("#rangeSeg button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("#rangeSeg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    state.range = +b.dataset.range; renderAll();
+  }));
+
+  document.querySelectorAll("[data-toggle]").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.toggle;
+    const toTable = state.view[k] === "chart";
+    state.view[k] = toTable ? "table" : "chart";
+    document.getElementById(k + "Chart").classList.toggle("hidden", toTable);
+    document.getElementById(k + "Table").classList.toggle("hidden", !toTable);
+    b.textContent = toTable ? "Xem biểu đồ" : "Xem bảng";
+  }));
+
+  const root = document.documentElement;
+  try { const t = localStorage.getItem("dash-theme"); if (t) root.dataset.theme = t; } catch (e) {}
+  document.getElementById("themeBtn").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("dash-theme", root.dataset.theme); } catch (e) {}
+  });
+
+  let rt;
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { renderTrend(); renderChannels(); }, 120); });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
