@@ -43,16 +43,19 @@ export async function onRequest(ctx) {
   if (BLOCKED.some(r => r.test(url.pathname))) return new Response("Không tìm thấy", { status: 404 });
 
   const local = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  const accessOn = !!(env.ACCESS_TEAM_DOMAIN && env.ACCESS_AUD);
   let email = null;
   if (local) email = "dev@localhost";
-  else if (env.ACCESS_TEAM_DOMAIN && env.ACCESS_AUD) {
+  else if (accessOn) {
     const token = request.headers.get("Cf-Access-Jwt-Assertion");
     if (token) { try { email = await verifyAccessJwt(token, env); } catch (e) { email = null; } }
   }
-  ctx.data.email = email;
+  // ponytail: hiện CHƯA bật đăng nhập → ai có link cũng dùng được, người dùng ghi là "khach".
+  // Bật Cloudflare Access + đặt ACCESS_TEAM_DOMAIN, ACCESS_AUD là tự chuyển sang bắt đăng nhập.
+  ctx.data.email = email || "khach";
+  ctx.data.accessOn = accessOn;
 
-  // API luôn yêu cầu đăng nhập (đóng khi chưa cấu hình Access)
-  if (url.pathname.startsWith("/api/") && !email) {
+  if (accessOn && url.pathname.startsWith("/api/") && !email) {
     return Response.json({ error: "Chưa đăng nhập. Hãy tải lại trang để đăng nhập bằng email trường." }, { status: 401 });
   }
   return ctx.next();
