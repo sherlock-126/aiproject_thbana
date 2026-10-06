@@ -447,7 +447,7 @@
     .public-note { margin-top: 0; }
 
     nav.tabs.tabbar {
-      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; flex-direction: row; overflow: visible; margin: 0;
+      display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0; flex-direction: row; overflow: visible; margin: 0;
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
       padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
       background: color-mix(in srgb, var(--surface-1) 90%, transparent); backdrop-filter: saturate(1.6) blur(18px); -webkit-backdrop-filter: saturate(1.6) blur(18px);
@@ -488,6 +488,53 @@
     table.rtable td:first-child > input { max-width: 100%; }
     table.rtable td:not([data-label]):not(:first-child) { justify-content: flex-end; flex-wrap: wrap; }
   }
+  /* ---------- Tự đánh giá của tôi ---------- */
+  fieldset.plain { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 12px; }
+  .self-head { display: grid; gap: 14px; }
+  .self-top { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; }
+  .self-id { display: flex; gap: 12px; align-items: center; min-width: 0; }
+  .avatar.lg { width: 48px; height: 48px; font-size: 18px; }
+  .month-nav { display: flex; align-items: center; gap: 6px; }
+  .month-nav input { min-width: 150px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip-s { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 13px; color: var(--text-secondary); }
+  .chip-s b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .chip-s.ok { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
+  details.step { padding: 0; overflow: hidden; }
+  details.step > summary { list-style: none; display: flex; gap: 14px; align-items: center; padding: 16px 20px; cursor: pointer; }
+  details.step > summary::-webkit-details-marker { display: none; }
+  details.step > summary::after { content: ""; width: 9px; height: 9px; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(45deg); margin-left: auto; transition: transform .15s; flex: none; }
+  details.step[open] > summary::after { transform: rotate(-135deg); }
+  details.step[open] > summary { border-bottom: 1px solid var(--border); }
+  .step-n { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: var(--on-brand); font-weight: 700; flex: none; }
+  .step-n.done { background: var(--good); }
+  .step-t { display: grid; min-width: 0; }
+  .step-t b { font-size: 15.5px; }
+  .step-t small { color: var(--text-muted); font-size: 12.5px; }
+  .step-body { padding: 16px 20px 20px; display: grid; gap: 14px; }
+  .stask, .scrit, .spl { border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: grid; gap: 10px; background: var(--surface-1); }
+  .stask-top { display: flex; gap: 8px; align-items: center; }
+  .stask-top select { flex: 0 1 auto; }
+  .form-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .crit-h { font-size: 14px; font-weight: 650; margin-top: 6px; color: var(--text-primary); }
+  .crit-sub { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+  .scrit { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  .scrit > .ev-wrap { grid-column: 1 / -1; }
+  .scrit p { font-size: 13.5px; }
+  .score-ctl { display: flex; gap: 6px; align-items: center; }
+  .score-ctl input { width: 76px; }
+  .ev-wrap { display: grid; gap: 2px; }
+  .ev-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+  .ev-wrap .ev { margin-top: 2px; }
+  .submit-box { display: grid; gap: 10px; padding: 16px; border-radius: 12px; background: var(--surface-2); }
+  @media (max-width: 960px) {
+    .form-grid3 { grid-template-columns: minmax(0, 1fr); }
+    details.step > summary { padding: 14px 16px; }
+    .step-body { padding: 14px 14px 16px; }
+    .scrit { grid-template-columns: minmax(0, 1fr); }
+    .month-nav { width: 100%; }
+    .month-nav input { flex: 1; }
+  }
   @media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; animation: none !important; } }
   @media print { body { background: #fff; } .side { display: none; } }
 </style>
@@ -503,6 +550,7 @@
       <div class="nav-label">Chức năng</div>
       <nav class="tabs" role="tablist" aria-label="Chức năng">
         <button role="tab" data-tab="overview"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Tổng quan</span></button>
+        <button role="tab" data-tab="self"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 20.5c.9-3.6 3.6-5.8 7-5.8"/><path d="m14.5 18 2 2 4-4.5"/></svg><span>Tự đánh giá của tôi</span></button>
         <button role="tab" data-tab="eval"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="m9 13 2 2 4-4"/></svg><span>Đánh giá tháng</span></button>
         <button role="tab" data-tab="person"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="m5 16 4-5 4 3 6-8"/></svg><span>Theo dõi cá nhân</span></button>
         <button role="tab" data-tab="staff"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.6.9 2.7 2.6 3 5.2"/></svg><span>Danh sách CB-GV-NV</span></button>
@@ -546,6 +594,7 @@
 </div>
 <nav class="tabs tabbar" aria-label="Chức năng" hidden>
   <button role="tab" data-tab="overview"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Tổng quan</span></button>
+  <button role="tab" data-tab="self"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 20.5c.9-3.6 3.6-5.8 7-5.8"/><path d="m14.5 18 2 2 4-4.5"/></svg><span>Tự đánh giá</span></button>
   <button role="tab" data-tab="eval"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="m9 13 2 2 4-4"/></svg><span>Đánh giá</span></button>
   <button role="tab" data-tab="person"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="m5 16 4-5 4 3 6-8"/></svg><span>Cá nhân</span></button>
   <button role="tab" data-tab="staff"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.6.9 2.7 2.6 3 5.2"/></svg><span>Nhân sự</span></button>
@@ -555,6 +604,7 @@
   <div class="grabber" aria-hidden="true"></div>
   <div class="sheet-user" id="sheetUser"></div>
   <div class="sheet-list">
+    <button data-sheet-tab="self" id="sheetSelf" hidden><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 20.5c.9-3.6 3.6-5.8 7-5.8"/><path d="m14.5 18 2 2 4-4.5"/></svg><span>Tự đánh giá của tôi</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
     <button data-sheet-tab="data"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V12"/></svg><span>Dữ liệu &amp; hướng dẫn</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
     <button data-sheet-tab="accounts" id="sheetAcc" hidden><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg><span>Tài khoản &amp; nhật ký</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
     <button data-act="theme"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg><span>Đổi giao diện sáng/tối</span></button>
@@ -864,8 +914,11 @@ function evHtml(list, scope, editable = true) {
     </div>`).join("")}
     ${editable ? `<button class="btn sm" data-act="upEv" data-scope="${scope}" title="Ảnh, PDF, Word, Excel… tối đa 10 MB">⤒ Tải minh chứng</button>` : ""}</div>`;
 }
+const allEv = rec => [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || []), ...Object.values(rec.aEv || {}).flat(), ...rec.pl.flatMap(e => e.ev || [])];
 function evList(rec, scope) {
   if (scope === "gen") return (rec.evGen ||= []);
+  if (scope.startsWith("a:")) { rec.aEv ||= {}; return (rec.aEv[scope.slice(2)] ||= []); }
+  if (scope.startsWith("pl:")) { const e = rec.pl.find(x => x.id === scope.slice(3)); return e ? (e.ev ||= []) : []; }
   const t = rec.tasks.find(x => x.id === scope); return t ? (t.ev ||= []) : [];
 }
 
@@ -1380,7 +1433,7 @@ function renderEval() {
     <div class="scroll"><table class="crit">
       <thead><tr><th></th><th>Tiêu chí</th><th class="num">Tối đa</th><th class="num">Tự chấm</th><th class="num">Chính thức</th></tr></thead>
       <tbody>${CRIT_A.map(c => c.c
-        ? `<tr><td>${esc(c.c.slice(2))}</td><td>${esc(c.t)}</td><td class="num">${fmt(c.max)}</td>
+        ? `<tr><td>${esc(c.c.slice(2))}</td><td>${esc(c.t)}${(rec.aEv?.[c.c] || []).length ? evHtml(rec.aEv[c.c], "a:" + c.c) : ""}</td><td class="num">${fmt(c.max)}</td>
             <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="tu" data-c="${c.c}" value="${rec.a.tu[c.c] ?? ""}" aria-label="Tự chấm ${esc(c.c)}"></td>
             <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="off" data-c="${c.c}" value="${rec.a.off[c.c] ?? ""}" placeholder="${rec.a.tu[c.c] ?? ""}" aria-label="Chính thức ${esc(c.c)}"></td></tr>`
         : `<tr class="grp"><td>${esc(c.h)}</td><td ${c.sub ? 'style="font-weight:600"' : ""}>${esc(c.t)}</td><td class="num">${fmt(c.max)}</td><td></td><td></td></tr>`).join("")}
@@ -1414,14 +1467,14 @@ function renderEval() {
         <td class="num"><input type="number" min="0" step="1" data-p="qty" value="${e.qty}" aria-label="Số lần"></td>
         <td class="num"><input type="number" step="0.25" data-p="p" value="${e.p ?? ""}" aria-label="Điểm mỗi lần"></td>
         <td class="num" data-sum>${fmt((e.qty || 0) * (e.p || 0))}</td>
-        <td><input type="text" data-p="note" value="${esc(e.note)}" placeholder="Ngày, minh chứng…" style="width:100%;min-width:140px"></td>
+        <td><input type="text" data-p="note" value="${esc(e.note)}" placeholder="Ngày, minh chứng…" style="width:100%;min-width:140px">${evHtml(e.ev, "pl:" + e.id)}</td>
         <td class="c"><input type="checkbox" data-p="ok" ${e.ok !== false ? "checked" : ""} aria-label="Được duyệt"></td>
         <td><button class="btn ghost sm danger" data-act="delPl" aria-label="Xoá mục">✕</button></td></tr>`; }).join("") || `<tr><td colspan="7" class="muted">Chưa có mục điểm cộng/trừ nào.</td></tr>`}</tbody>
     </table></div>
     <h3 style="margin:16px 0 6px">Minh chứng chung của phiếu</h3>
     <p class="small muted" style="margin:0">Giấy khen, quyết định, ảnh hoạt động… dùng làm căn cứ cho điểm cộng/trừ. Minh chứng của từng công việc tải ở mục 1.</p>
     ${evHtml(rec.evGen, "gen")}
-    ${(() => { const imgs = [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || [])].filter(isImg); return imgs.length ? `<h3 style="margin:16px 0 6px">Ảnh minh chứng trong phiếu (${imgs.length})</h3><div class="ev-gallery">${imgs.map(e => `<figure><a href="${esc(e.url)}" target="_blank" rel="noopener"><img src="${esc(e.url)}" alt="${esc(e.name)}" loading="lazy"></a><figcaption>${esc(e.name)}</figcaption></figure>`).join("")}</div>` : ""; })()}
+    ${(() => { const imgs = allEv(rec).filter(isImg); return imgs.length ? `<h3 style="margin:16px 0 6px">Ảnh minh chứng trong phiếu (${imgs.length})</h3><div class="ev-gallery">${imgs.map(e => `<figure><a href="${esc(e.url)}" target="_blank" rel="noopener"><img src="${esc(e.url)}" alt="${esc(e.name)}" loading="lazy"></a><figcaption>${esc(e.name)}</figcaption></figure>`).join("")}</div>` : ""; })()}
     <h3 style="margin:16px 0 6px">Khống chế (mỗi mục vi phạm → hạ 1 bậc xếp loại)</h3>
     ${cat.filter(x => x.s === "VII").map(x => `<label class="row small" style="margin:4px 0;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" data-kc="${x.i}" ${rec.kc.includes(x.i) ? "checked" : ""}> <span>${esc(x.t)}</span></label>`).join("")}
   </div>
@@ -1519,6 +1572,8 @@ function suggestComments(rec, st) {
   return { uu: uu.join("\n"), han: han.join("\n") };
 }
 
+const rerenderForm = () => ui.tab === "self" ? renderSelf() : renderEval();
+const updateTotals = () => ui.tab === "self" ? updateSelfTotals() : updateEvalTotals();
 function onEvalInput(ev) {
   const el = ev.target, rec = getRec(false); if (!rec) return false;
   const tRow = el.closest("[data-tid]");
@@ -1526,25 +1581,25 @@ function onEvalInput(ev) {
     const t = rec.tasks.find(x => x.id === tRow.dataset.tid); const f = el.dataset.f;
     t[f] = el.type === "checkbox" ? el.checked : el.type === "number" ? (num(el.value) ?? 0) : el.value;
     if (f === "kq" && t.kq === "done") { t.td ||= "dung"; t.cl ||= "dam"; }
-    if (f === "kq" || f === "td") { if (ev.type === "change") { renderEval(); save(); } return true; }
-    updateEvalTotals(); save(); return true;
+    if (f === "kq" || f === "td") { if (ev.type === "change") { rerenderForm(); save(); } return true; }
+    updateTotals(); save(); return true;
   }
   if (el.dataset.a) {
     const v = num(el.value); const c = CRIT_ITEMS.find(x => x.c === el.dataset.c);
     if (v == null) delete rec.a[el.dataset.a][c.c]; else rec.a[el.dataset.a][c.c] = Math.max(0, Math.min(c.max, v));
     if (el.dataset.a === "tu") { const off = $(`[data-a="off"][data-c="${c.c}"]`); if (off) off.placeholder = el.value; }
-    updateEvalTotals(); save(); return true;
+    updateTotals(); save(); return true;
   }
-  if (el.dataset.c03) { rec.c03[el.dataset.c03] = Math.max(0, Math.floor(num(el.value) || 0)); if (ev.type === "change") updateEvalTotals(); save(); return true; }
+  if (el.dataset.c03) { rec.c03[el.dataset.c03] = Math.max(0, Math.floor(num(el.value) || 0)); if (ev.type === "change") updateTotals(); save(); return true; }
   const pRow = el.closest("[data-pid]");
   if (pRow && el.dataset.p) {
     const e = rec.pl.find(x => x.id === pRow.dataset.pid); const f = el.dataset.p;
     e[f] = f === "ok" ? el.checked : (f === "qty" || f === "p") ? num(el.value) : el.value;
-    updateEvalTotals(); save(); return true;
+    updateTotals(); save(); return true;
   }
   if (el.dataset.kc != null && el.type === "checkbox") {
     const i = +el.dataset.kc; rec.kc = rec.kc.filter(x => x !== i); if (el.checked) rec.kc.push(i);
-    updateEvalTotals(); save(); return true;
+    updateTotals(); save(); return true;
   }
   if (el.dataset.r) { rec[el.dataset.r] = el.value; save(); return true; }
   return false;
@@ -1555,10 +1610,148 @@ function copyTasksFrom(prevRec) {
 }
 
 // =====================================================================
+// 9b. TAB: TỰ ĐÁNH GIÁ CỦA TÔI (giáo viên tự chấm, tải minh chứng theo từng tiêu chí)
+// =====================================================================
+function renderSelf() {
+  const v = $("#view");
+  const st = me && staffById(me.staffId);
+  if (!st) {
+    v.innerHTML = `<div class="card"><h2>Tài khoản chưa gắn với tên trong danh sách</h2><p class="muted" style="margin-top:6px">Nhờ quản trị viên vào <b>Tài khoản &amp; nhật ký</b> và gắn tài khoản <b>${esc(me?.email || "")}</b> với tên của bạn trong danh sách CB-GV-NV. Sau đó tải lại trang.</p></div>`;
+    return;
+  }
+  ui.selfMonth ||= CUR_MONTH;
+  ui.evalStaff = st.id; ui.evalMonth = ui.selfMonth;
+  const rec = getRec(false);
+  const ini = esc((st.name || "?").trim().split(/\s+/).pop().slice(0, 1).toUpperCase());
+  const head = `<section class="card self-head">
+    <div class="self-top">
+      <div class="self-id"><span class="avatar lg" aria-hidden="true">${ini}</span><div><h2>${esc(st.name)}</h2><p class="small muted">${esc([st.chucVu, st.to, st.lop ? "Lớp " + st.lop : ""].filter(Boolean).join(" · "))}</p></div></div>
+      <div class="month-nav"><button class="btn sm" data-act="selfPrev" aria-label="Tháng trước">‹</button><input type="month" id="selfMonth" value="${ui.selfMonth}" aria-label="Tháng tự đánh giá"><button class="btn sm" data-act="selfNext" aria-label="Tháng sau">›</button></div>
+    </div>
+    <div class="chips" id="selfProg"></div>
+  </section>`;
+  if (!rec) {
+    const prev = db.records[rkey(st.id, addMonth(ui.selfMonth, -1))];
+    v.innerHTML = head + `<div class="card" style="text-align:center;padding:32px 20px">
+      <h2>Chưa có phiếu tự đánh giá ${monthLabel(ui.selfMonth).toLowerCase()}</h2>
+      <p class="muted" style="margin:6px auto 18px;max-width:520px">Bắt đầu phiếu để ghi các nhiệm vụ trong tháng, tự chấm các tiêu chí và tải minh chứng. Phiếu được lưu tự động, bạn có thể làm dần và nộp khi xong.</p>
+      <div class="row" style="justify-content:center">
+        ${prev ? `<button class="btn primary" data-act="newRecCopy">Bắt đầu, chép nhiệm vụ từ ${monthLabel(addMonth(ui.selfMonth, -1)).toLowerCase()}</button>` : ""}
+        <button class="btn ${prev ? "" : "primary"}" data-act="newRec">Bắt đầu phiếu trống</button>
+      </div></div>`;
+    $("#selfProg").innerHTML = "";
+    return;
+  }
+  const locked = rec.status !== "nhap";
+  const cat = catFor(st);
+  const o = (map, val) => Object.entries(map).map(([k, l]) => `<option value="${k}" ${val === k ? "selected" : ""}>${l}</option>`).join("");
+  const tasks = rec.tasks.slice().sort((a, b) => a.g - b.g);
+  const nAll = rec.tasks.length, nEv = rec.tasks.filter(t => (t.ev || []).length).length;
+  const aDone = CRIT_ITEMS.filter(c => rec.a.tu[c.c] != null).length;
+
+  const taskCard = t => `<div class="stask" data-tid="${t.id}">
+      <div class="stask-top"><select data-f="g" aria-label="Nhóm nhiệm vụ">${GROUPS.map(G => `<option value="${G.g}" ${t.g === G.g ? "selected" : ""}>${esc(G.t.length > 46 ? G.t.slice(0, 44) + "…" : G.t)}</option>`).join("")}</select><span class="spacer"></span>${locked ? "" : `<button class="btn ghost sm danger" data-act="delTask" aria-label="Xoá nhiệm vụ">✕ Xoá</button>`}</div>
+      <label class="field">Nội dung nhiệm vụ được giao<textarea data-f="nd" rows="2" placeholder="Ví dụ: Hoàn thành kế hoạch bài dạy tháng ${+ui.selfMonth.split("-")[1]}">${esc(t.nd)}</textarea></label>
+      <label class="field">Kết quả, sản phẩm đã thực hiện${t.kq !== "done" ? " (hoặc lý do chưa hoàn thành)" : ""}<textarea data-f="kqnd" rows="2">${esc(t.kqnd)}</textarea></label>
+      <div class="form-grid3">
+        <label class="field">Kết quả<select data-f="kq">${o(KET_QUA, t.kq)}</select></label>
+        <label class="field">Tiến độ<select data-f="td" ${t.kq !== "done" ? "disabled" : ""}>${o(TIEN_DO, t.td || "dung")}</select></label>
+        <label class="field">Tự đánh giá chất lượng<select data-f="cl" ${t.kq !== "done" ? "disabled" : ""}>${o(CHAT_LUONG, t.cl || "dam")}</select></label>
+      </div>
+      ${t.kq === "done" && t.td === "tre" ? `<label class="field" style="max-width:200px">Số ngày trễ<input type="number" min="0" data-f="tre" value="${t.tre || 0}"></label>` : ""}
+      <div class="ev-wrap"><span class="ev-label">Minh chứng</span>${evHtml(t.ev, t.id, !locked)}</div>
+    </div>`;
+
+  const crit = CRIT_A.map(c => {
+    if (!c.c) return c.sub ? `<p class="crit-sub">${esc(c.h)}. ${esc(c.t)} <span class="muted">(${fmt(c.max)} đ)</span></p>` : `<h4 class="crit-h">${esc(c.h)}. ${esc(c.t)} <span class="muted">(${fmt(c.max)} đ)</span></h4>`;
+    const list = rec.aEv?.[c.c] || [];
+    return `<div class="scrit">
+      <div><p>${esc(c.t)}</p><span class="small muted">Tối đa ${fmt(c.max)} điểm</span></div>
+      <div class="score-ctl"><input type="number" step="0.25" min="0" max="${c.max}" data-a="tu" data-c="${c.c}" value="${rec.a.tu[c.c] ?? ""}" placeholder="–" aria-label="Tự chấm: ${esc(c.t)}">${locked ? "" : `<button class="btn sm" data-act="critMax" data-c="${c.c}">Tối đa</button>`}</div>
+      ${locked && !list.length ? "" : `<div class="ev-wrap"><span class="ev-label">Minh chứng (nếu có)</span>${evHtml(list, "a:" + c.c, !locked)}</div>`}
+    </div>`;
+  }).join("");
+
+  const plItems = rec.pl.map(e => { const ref = e.ref != null ? CATALOG[STAFF_TYPES[st.type].pl][e.ref] : null; return `<div class="spl" data-pid="${e.id}">
+      <div class="stask-top"><span class="pill ${(e.p || 0) >= 0 ? "ok" : ""}">${(e.p || 0) >= 0 ? "Điểm cộng" : "Điểm trừ"}</span><span class="spacer"></span>${locked ? "" : `<button class="btn ghost sm danger" data-act="delPl" aria-label="Xoá mục">✕ Xoá</button>`}</div>
+      ${ref ? `<p>${esc(e.t)}</p><span class="small muted">Quy định: ${esc(ref.n)}</span>` : `<label class="field">Nội dung<input type="text" data-p="t" value="${esc(e.t)}"></label>`}
+      <div class="form-grid3">
+        <label class="field">Số lần<input type="number" min="0" step="1" data-p="qty" value="${e.qty}"></label>
+        <label class="field">Điểm mỗi lần<input type="number" step="0.25" data-p="p" value="${e.p ?? ""}"></label>
+        <label class="field">Thành điểm<span class="bigscore" style="font-size:20px" data-sum>${fmt((e.qty || 0) * (e.p || 0))}</span></label>
+      </div>
+      <label class="field">Ghi chú (ngày, nội dung)<input type="text" data-p="note" value="${esc(e.note)}"></label>
+      <div class="ev-wrap"><span class="ev-label">Minh chứng</span>${evHtml(e.ev, "pl:" + e.id, !locked)}</div>
+    </div>`; }).join("");
+  const secNames = {}; cat.forEach(x => secNames[x.s] = x.s + ". " + (x.s === "I" ? "Nền nếp" : x.s === "II" ? "Chuyên môn" : x.s === "III" ? (STAFF_TYPES[st.type].pl === "PL1" ? "Chủ nhiệm" : "Phối hợp") : x.s === "IV" ? "Đoàn thể" : x.s === "V" ? "Công tác khác" : x.s === "VI" ? "Điểm cộng" : "Khống chế"));
+
+  const stepHead = (n, title, sub, done) => `<summary><span class="step-n ${done ? "done" : ""}">${done ? "✓" : n}</span><span class="step-t"><b>${title}</b><small>${sub}</small></span></summary>`;
+  v.innerHTML = head + `
+  ${rec.status === "nop" ? `<div class="banner" style="margin-bottom:0">${statusHtml("warning", "Đã nộp")}<span>Phiếu đang chờ tổ/BGH duyệt nên tạm khoá. Cần sửa thì bấm <b>Rút lại để sửa</b> ở cuối trang.</span></div>` : ""}
+  ${rec.status === "duyet" ? `<div class="banner" style="margin-bottom:0">${statusHtml("good", "Đã duyệt")}<span>Phiếu đã được duyệt. Điểm chính thức: <b>${fmt(calc(rec).totOff)}</b> – ${esc(calc(rec).rankOff.name)}.</span></div>` : ""}
+  <details class="card step" open>${stepHead(1, "Nhiệm vụ trong tháng", `Mẫu 01TKNV · ${nAll} nhiệm vụ · ${nEv}/${nAll} có minh chứng`, nAll && nEv === nAll)}
+    <div class="step-body"><fieldset class="plain" ${locked ? "disabled" : ""}>
+      ${tasks.map(taskCard).join("") || `<p class="muted">Chưa có nhiệm vụ nào. Bấm “Thêm nhiệm vụ”.</p>`}
+      ${locked ? "" : `<div class="row"><button class="btn primary" data-act="addTask" data-g="1">+ Thêm nhiệm vụ</button><button class="btn" data-act="copyPrev">Chép nhiệm vụ tháng trước</button></div>`}
+    </fieldset></div>
+  </details>
+  <details class="card step" ${nAll ? "open" : ""}>${stepHead(2, "Tiêu chí chung (30 điểm)", `Mẫu 03 phần A · đã chấm ${aDone}/${CRIT_ITEMS.length} tiêu chí`, aDone === CRIT_ITEMS.length)}
+    <div class="step-body"><fieldset class="plain" ${locked ? "disabled" : ""}>
+      ${locked ? "" : `<div class="row"><span class="small muted">Chấm từng tiêu chí; tải minh chứng nếu có. Ô để trống là chưa chấm.</span><span class="spacer"></span><button class="btn sm" data-act="fillMax">Chấm tối đa các ô còn trống</button></div>`}
+      ${crit}
+    </fieldset></div>
+  </details>
+  <details class="card step" ${rec.pl.length ? "open" : ""}>${stepHead(3, "Điểm cộng, điểm trừ", `${esc(STAFF_TYPES[st.type].plName)} · ${rec.pl.length} mục`, false)}
+    <div class="step-body"><fieldset class="plain" ${locked ? "disabled" : ""}>
+      ${locked ? "" : `<div class="row"><select id="plPick" style="flex:1;min-width:0" aria-label="Chọn mục điểm cộng/trừ">${Object.keys(secNames).filter(x => x !== "VII").map(x => `<optgroup label="${esc(secNames[x])}">${cat.filter(y => y.s === x).map(y => `<option value="${y.i}">${y.p != null ? (y.p > 0 ? "+" : "") + fmt(y.p) : "±"} │ ${esc((y.g ? y.g + ": " : "") + y.t.slice(0, 90))}</option>`).join("")}</optgroup>`).join("")}</select><button class="btn" data-act="addPl">+ Thêm</button></div>`}
+      ${plItems || `<p class="muted">Không có mục điểm cộng/trừ. Thêm nếu bạn có thành tích (giải thưởng, chuyên đề…) hoặc vi phạm cần ghi nhận.</p>`}
+    </fieldset></div>
+  </details>
+  <details class="card step" open>${stepHead(4, "Tổng hợp và nộp", "Điểm tự tính theo Mẫu 03", rec.status !== "nhap")}
+    <div class="step-body"><fieldset class="plain" ${locked ? "disabled" : ""}>
+      <div class="scroll" id="selfTotals"></div>
+      <div class="form-grid3">
+        <label class="field">Số lần bị nhắc nhở, phê bình<input type="number" min="0" data-c03="vp" value="${rec.c03.vp || 0}"></label>
+        <label class="field">Việc mới, phức tạp đã hoàn thành<input type="number" min="0" data-c03="moi" value="${rec.c03.moi || 0}"></label>
+      </div>
+      <div class="row" style="justify-content:space-between"><b>Ưu điểm</b>${locked ? "" : `<button class="btn sm" data-act="suggest">✨ Gợi ý nhận xét</button>`}</div>
+      <textarea rows="3" data-r="uu" placeholder="Ưu điểm trong tháng…">${esc(rec.uu)}</textarea>
+      <b>Hạn chế, khuyết điểm</b>
+      <textarea rows="3" data-r="han" placeholder="Hạn chế, hướng khắc phục…">${esc(rec.han)}</textarea>
+    </fieldset>
+    <div class="submit-box">
+      ${rec.status === "nhap" ? `<button class="btn primary block" data-act="setStatus" data-s="nop">Nộp tự đánh giá ${monthLabel(ui.selfMonth).toLowerCase()}</button><span class="small muted">Sau khi nộp, phiếu tạm khoá để tổ/BGH duyệt. Phiếu được lưu tự động nên bạn có thể làm dần.</span>` : ""}
+      ${rec.status === "nop" ? `<button class="btn block" data-act="setStatus" data-s="nhap">Rút lại để sửa</button>` : ""}
+      ${rec.status === "duyet" ? `<span class="small muted">Phiếu đã duyệt. Cần điều chỉnh, liên hệ quản trị viên.</span>` : ""}
+    </div></div>
+  </details>`;
+  updateSelfTotals();
+}
+function updateSelfTotals() {
+  const rec = getRec(false); if (!rec || !$("#selfTotals")) return;
+  const c = calc(rec), all = allEv(rec);
+  $("#selfTotals").innerHTML = `<table>
+    <thead><tr><th>Phần</th><th class="num">Tối đa</th><th class="num">Tự chấm</th></tr></thead><tbody>
+    <tr><td>A. Tiêu chí chung</td><td class="num">30</td><td class="num">${fmt(c.Atu)}${c.aFilled < CRIT_ITEMS.length ? ` <span class="small muted">(còn ${CRIT_ITEMS.length - c.aFilled} ô)</span>` : ""}</td></tr>
+    <tr><td>B. Kết quả thực hiện nhiệm vụ <span class="small muted">(tự tính từ mục 1)</span></td><td class="num">70</td><td class="num">${fmt(c.Btot)}</td></tr>
+    <tr><td>C. Điểm cộng, trừ (Mẫu 03 và phụ lục)</td><td class="num"></td><td class="num">${fmt(c.C03 + c.PLtu)}</td></tr>
+    <tr class="tot"><td>Tổng điểm tự chấm</td><td></td><td class="num"><span class="bigscore">${fmt(c.totTu)}</span></td></tr>
+    <tr><td>Tự xếp loại</td><td></td><td class="num">${rankHtml(c.rankTu)}</td></tr></tbody></table>`;
+  $$("[data-pid]").forEach(el => { const e = rec.pl.find(x => x.id === el.dataset.pid); const sm = el.querySelector("[data-sum]"); if (e && sm) sm.textContent = fmt((e.qty || 0) * (e.p || 0)); });
+  const s = c.s;
+  $("#selfProg").innerHTML = `${recStatusHtml(rec.status).replace('class="status"', 'class="chip-s"')}
+    <span class="chip-s ${s.n && rec.tasks.every(t => (t.ev || []).length) ? "ok" : ""}">Nhiệm vụ <b>${s.done}/${s.n}</b> hoàn thành</span>
+    <span class="chip-s ${c.aFilled === CRIT_ITEMS.length ? "ok" : ""}">Tiêu chí <b>${c.aFilled}/${CRIT_ITEMS.length}</b> đã chấm</span>
+    <span class="chip-s">Minh chứng <b>${all.length}</b> tệp</span>
+    <span class="chip-s">Tự chấm <b>${fmt(c.totTu)}</b> điểm · ${esc(c.rankTu.short)}</span>`;
+}
+
+// =====================================================================
 // 10. TAB: THEO DÕI CÁ NHÂN
 // =====================================================================
 function renderPerson() {
   if (!db.staff.length) { $("#view").innerHTML = `<div class="card"><p>Chưa có CB-GV-NV.</p></div>`; return; }
+  if (!isAdmin()) { ui.person = me?.staffId; if (!staffById(ui.person)) { $("#view").innerHTML = `<div class="card"><p>Tài khoản của bạn chưa gắn với tên trong danh sách CB-GV-NV. Nhờ quản trị viên gắn giúp.</p></div>`; return; } }
   if (!staffById(ui.person)) ui.person = db.staff[0].id;
   const st = staffById(ui.person);
   const years = new Set(Object.keys(db.records).map(k => schoolYearOf(k.split("|")[1]))); years.add(schoolYearOf(CUR_MONTH));
@@ -1571,7 +1764,7 @@ function renderPerson() {
 
   $("#view").innerHTML = `
   <div class="row" style="margin-bottom:12px">
-    ${staffSelect("pStaff", ui.person)}
+    ${isAdmin() ? staffSelect("pStaff", ui.person) : `<b>${esc(st.name)}</b>`}
     <select id="pYear" aria-label="Năm học">${[...years].sort().reverse().map(y => `<option value="${y}" ${+ui.personYear === y ? "selected" : ""}>Năm học ${y}-${y + 1}</option>`).join("")}</select>
     <span class="small muted">${esc(st.chucVu)}${st.lop ? " · Lớp " + esc(st.lop) : ""} · ${esc(st.to)} · ${esc(STAFF_TYPES[st.type]?.name || "")}</span>
   </div>
@@ -1633,7 +1826,7 @@ function renderStaff() {
 function renderData() {
   const nRec = Object.keys(db.records).length;
   $("#view").innerHTML = `<div class="grid g2e">
-  <div class="card">
+  <div class="card" ${isAdmin() ? "" : "hidden"}>
     <h2>Thông tin đơn vị</h2>
     <div style="display:grid;gap:8px;margin-top:10px">
       <label class="small muted">Tên trường<input type="text" data-school="name" value="${esc(db.school.name)}" style="width:100%"></label>
@@ -1862,12 +2055,16 @@ function loginScreen(bootstrap) {
 async function startSession(a, fresh) {
   me = a;
   try { localStorage.setItem(SESSION_KEY, JSON.stringify({ rid: a.rid, email: a.email })); } catch (e) {}
-  if (fresh) { a.lastLogin = new Date().toISOString(); saveAccount(a).catch(() => {}); logAct("Đăng nhập"); }
+  if (fresh) {
+    a.lastLogin = new Date().toISOString(); saveAccount(a).catch(() => {}); logAct("Đăng nhập");
+    try { await loadAll(); } catch (e) { toast("Chưa tải được dữ liệu mới nhất: " + e.message); }
+  }
   $("#login")?.remove();
   document.querySelector(".app").hidden = false; $(".tabbar").hidden = false;
   const chip = $("#userChip"); chip.hidden = false;
   chip.innerHTML = `<span class="avatar" aria-hidden="true">${esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase())}</span><span class="uname"><b>${esc(a.name)}</b>${a.role === "admin" ? ' <span class="pill tag-admin">Quản trị</span>' : ""}</span><button class="btn ghost sm" data-act="logout" title="Đăng xuất">Đăng xuất</button>`;
-  $('nav.tabs [data-tab="accounts"]').hidden = !isAdmin(); $("#sheetAcc").hidden = !isAdmin();
+  $$("nav.tabs [data-tab]").forEach(b => { b.hidden = !allowedTab(b.dataset.tab) || (isAdmin() && b.dataset.tab === "self" && !!b.closest(".tabbar")); });
+  $("#sheetAcc").hidden = !isAdmin(); $("#sheetSelf").hidden = !isAdmin();
   const initial = esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase());
   $("#mAvatar").textContent = (a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase();
   $("#sheetUser").innerHTML = `<span class="avatar" aria-hidden="true">${initial}</span><span><b>${esc(a.name)}</b><span class="small muted">${esc(a.email)} · ${a.role === "admin" ? "Quản trị" : "Giáo viên"}</span></span>`;
@@ -1977,9 +2174,14 @@ const PAGES = {
   staff: ["Danh sách CB-GV-NV", "Người được theo dõi, đánh giá và phụ lục điểm cộng/trừ áp dụng"],
   data: ["Dữ liệu & hướng dẫn", "Thông tin đơn vị, sao lưu và cách tính điểm"],
   accounts: ["Tài khoản & nhật ký", "Cấp tài khoản cho giáo viên và xem ai đã làm gì, lúc nào"],
+  self: ["Tự đánh giá của tôi", "Tự đánh giá nhiệm vụ hằng tháng và tải minh chứng theo từng tiêu chí"],
 };
+const ADMIN_TABS = ["overview", "eval", "staff", "accounts"];
+const allowedTab = t => isAdmin() || !ADMIN_TABS.includes(t);
 function setTab(t) {
-  if (t === "accounts" && !isAdmin()) t = "overview";
+  if (!PAGES[t] || !allowedTab(t)) t = isAdmin() ? "overview" : "self";
+  if (t === "self" && ui.tab !== "self") ui._ev = [ui.evalStaff, ui.evalMonth];
+  if (ui.tab === "self" && t !== "self" && ui._ev) { [ui.evalStaff, ui.evalMonth] = ui._ev; ui._ev = null; }
   ui.tab = t;
   $("#pageTitle").textContent = PAGES[t][0]; $("#pageDesc").textContent = PAGES[t][1]; $("#mTitle").textContent = PAGES[t][0];
   $(".tabbar .more").classList.toggle("on", t === "data" || t === "accounts");
@@ -1995,8 +2197,8 @@ function render() {
   const bn = $("#demoBanner");
   if (db.demo) bn.innerHTML = `<span>Hệ thống còn <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…). Hãy xoá trước khi nhập dữ liệu thật.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
   else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Vào <b>Danh sách CB-GV-NV</b> để thêm người hoặc nhập danh sách từ Excel.</span><span class="spacer"></span><button class="btn sm primary" data-tab-go="staff">Mở danh sách CB-GV-NV</button>`;
-  bn.classList.toggle("hidden", !(db.demo || !db.staff.length));
-  ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData, accounts: renderAccounts })[ui.tab]();
+  bn.classList.toggle("hidden", !isAdmin() || !(db.demo || !db.staff.length));
+  ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData, accounts: renderAccounts, self: renderSelf })[ui.tab]();
 }
 
 $$("nav.tabs").forEach(n => n.addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); }));
@@ -2016,7 +2218,7 @@ sheet.addEventListener("click", ev => {
 $("#demoBanner").addEventListener("click", e => { const b = e.target.closest("[data-tab-go]"); if (b) setTab(b.dataset.tabGo); });
 
 document.addEventListener("input", e => {
-  if (ui.tab === "eval") { onEvalInput(e); return; }
+  if (ui.tab === "eval" || ui.tab === "self") { onEvalInput(e); return; }
   const el = e.target;
   if (ui.tab === "accounts" && el.id === "lgQ") { logFilter.q = el.value; const pos = el.selectionStart; renderAccounts(); const n = $("#lgQ"); n.focus(); n.setSelectionRange(pos, pos); return; }
   if (ui.tab === "overview" && el.id === "fQ") { ui.filter.q = el.value; const pos = el.selectionStart; renderOverview(); const n = $("#fQ"); n.focus(); n.setSelectionRange(pos, pos); return; }
@@ -2047,9 +2249,14 @@ document.addEventListener("change", async e => {
     else if (el.id === "fRank") { ui.filter.rank = el.value; renderOverview(); }
     return;
   }
+  if (ui.tab === "self") {
+    if (el.id === "selfMonth") { if (el.value) { ui.selfMonth = el.value; renderSelf(); } return; }
+    if (el.matches("select[data-f], input[type=checkbox], input[type=number][data-c03]")) onEvalInput(e);
+    return;
+  }
   if (ui.tab === "eval") {
-    if (el.id === "eStaff") { ui.evalStaff = el.value; renderEval(); return; }
-    if (el.id === "eMonth") { if (el.value) { ui.evalMonth = el.value; renderEval(); } return; }
+    if (el.id === "eStaff") { ui.evalStaff = el.value; rerenderForm(); return; }
+    if (el.id === "eMonth") { if (el.value) { ui.evalMonth = el.value; rerenderForm(); } return; }
     if (el.matches("select[data-f], input[type=checkbox], input[type=number][data-c03]")) onEvalInput(e);
     return;
   }
@@ -2063,45 +2270,49 @@ document.addEventListener("change", async e => {
 
 document.addEventListener("click", async e => {
   if (ui.tab === "overview" && !e.target.closest("button, select, input") && onOverviewClick(e)) return;
-  if (ui.tab === "person") { const tr = e.target.closest("[data-month]"); if (tr) { ui.evalStaff = ui.person; ui.evalMonth = tr.dataset.month; setTab("eval"); return; } }
+  if (ui.tab === "person") { const tr = e.target.closest("[data-month]"); if (tr) { if (isAdmin()) { ui.evalStaff = ui.person; ui.evalMonth = tr.dataset.month; setTab("eval"); } else { ui.selfMonth = tr.dataset.month; setTab("self"); } return; } }
   const b = e.target.closest("[data-act]"); if (!b) return;
   const act = b.dataset.act;
-  const rec = ui.tab === "eval" ? getRec(false) : null;
+  const rec = ui.tab === "eval" || ui.tab === "self" ? getRec(false) : null;
   switch (act) {
-    case "newRec": getRec(true); save(); renderEval(); break;
-    case "newRecCopy": { const r = getRec(true); r.tasks = copyTasksFrom(db.records[rkey(ui.evalStaff, addMonth(ui.evalMonth, -1))]); save(); renderEval(); toast(`Đã sao chép ${r.tasks.length} công việc. Hãy cập nhật kết quả từng việc.`); break; }
+    case "newRec": getRec(true); save(); rerenderForm(); break;
+    case "newRecCopy": { const r = getRec(true); r.tasks = copyTasksFrom(db.records[rkey(ui.evalStaff, addMonth(ui.evalMonth, -1))]); save(); rerenderForm(); toast(`Đã sao chép ${r.tasks.length} công việc. Hãy cập nhật kết quả từng việc.`); break; }
     case "copyPrev": {
       const p = db.records[rkey(ui.evalStaff, addMonth(ui.evalMonth, -1))];
       if (!p || !p.tasks.length) { toast("Tháng trước chưa có công việc để sao chép."); break; }
       if (rec.tasks.length && !confirm(`Thêm ${p.tasks.length} công việc từ tháng trước vào danh sách hiện có?`)) break;
-      rec.tasks.push(...copyTasksFrom(p)); save(); renderEval(); break;
+      rec.tasks.push(...copyTasksFrom(p)); save(); rerenderForm(); break;
     }
-    case "addTask": rec.tasks.push({ id: uid(), g: +b.dataset.g, nd: "", tc: "bt", md: "chu", kq: "done", han: monthLabel(ui.evalMonth), td: "dung", tre: 0, cl: "dam", ah: false, kqnd: "" }); save(); renderEval();
+    case "addTask": rec.tasks.push({ id: uid(), g: +b.dataset.g, nd: "", tc: "bt", md: "chu", kq: "done", han: monthLabel(ui.evalMonth), td: "dung", tre: 0, cl: "dam", ah: false, kqnd: "" }); save(); rerenderForm();
       setTimeout(() => { const last = rec.tasks[rec.tasks.length - 1]; const ta = $(`[data-tid="${last.id}"] textarea`); ta && ta.focus(); }, 0); break;
-    case "delTask": { const id = b.closest("[data-tid]").dataset.tid; const t = rec.tasks.find(x => x.id === id); if (t.nd && !confirm("Xoá công việc này?")) break; rec.tasks = rec.tasks.filter(x => x.id !== id); save(); renderEval(); break; }
-    case "fillMax": CRIT_ITEMS.forEach(c => { if (rec.a.tu[c.c] == null) rec.a.tu[c.c] = c.max; }); save(); renderEval(); break;
-    case "copyOff": rec.a.off = {}; save(); renderEval(); toast("Cột chính thức đã đặt bằng điểm tự chấm."); break;
+    case "delTask": { const id = b.closest("[data-tid]").dataset.tid; const t = rec.tasks.find(x => x.id === id); if (t.nd && !confirm("Xoá công việc này?")) break; rec.tasks = rec.tasks.filter(x => x.id !== id); save(); rerenderForm(); break; }
+    case "fillMax": CRIT_ITEMS.forEach(c => { if (rec.a.tu[c.c] == null) rec.a.tu[c.c] = c.max; }); save(); rerenderForm(); break;
+    case "copyOff": rec.a.off = {}; save(); rerenderForm(); toast("Cột chính thức đã đặt bằng điểm tự chấm."); break;
     case "addPl": {
       const st = staffById(ui.evalStaff), i = +$("#plPick").value, x = CATALOG[STAFF_TYPES[st.type].pl][i];
-      rec.pl.push({ id: uid(), ref: i, t: x.t, p: x.p, qty: 1, note: "", ok: true }); save(); renderEval();
+      rec.pl.push({ id: uid(), ref: i, t: x.t, p: x.p, qty: 1, note: "", ok: true }); save(); rerenderForm();
       if (x.m) toast("Mục này có nhiều mức điểm – hãy kiểm tra lại ô “Điểm/lần”.");
       break;
     }
-    case "addPlCustom": rec.pl.push({ id: uid(), ref: null, t: "", p: 0, qty: 1, note: "", ok: true }); save(); renderEval(); break;
-    case "delPl": { const id = b.closest("[data-pid]").dataset.pid; rec.pl = rec.pl.filter(x => x.id !== id); save(); renderEval(); break; }
+    case "addPlCustom": rec.pl.push({ id: uid(), ref: null, t: "", p: 0, qty: 1, note: "", ok: true }); save(); rerenderForm(); break;
+    case "delPl": { const id = b.closest("[data-pid]").dataset.pid; rec.pl = rec.pl.filter(x => x.id !== id); save(); rerenderForm(); break; }
     case "suggest": {
       const sg = suggestComments(rec, staffById(ui.evalStaff));
       if ((rec.uu || rec.han) && !confirm("Thay nội dung ưu điểm/hạn chế hiện có bằng gợi ý tự động?")) break;
       rec.uu = sg.uu; rec.han = sg.han; save(); $('[data-r="uu"]').value = rec.uu; $('[data-r="han"]').value = rec.han; toast("Đã tạo gợi ý. Hãy đọc lại và chỉnh sửa trước khi dùng."); break;
     }
+    case "selfPrev": case "selfNext": ui.selfMonth = addMonth(ui.selfMonth || CUR_MONTH, act === "selfPrev" ? -1 : 1); renderSelf(); break;
+    case "critMax": { const c = CRIT_ITEMS.find(x => x.c === b.dataset.c); rec.a.tu[c.c] = c.max; save(); rerenderForm(); break; }
     case "setStatus": {
       const s = b.dataset.s;
+      if (!isAdmin() && (s === "duyet" || rec.status === "duyet")) { toast("Chỉ quản trị viên được duyệt phiếu."); break; }
+      if (ui.tab === "self" && s === "nop") { const miss = rec.tasks.filter(t => !(t.ev || []).length).length; if (miss && !confirm(`Còn ${miss} nhiệm vụ chưa có minh chứng. Vẫn nộp?`)) break; }
       if (s !== "nhap") { const c = calc(rec); if (!rec.tasks.length) { toast("Chưa có công việc nào trong phiếu."); break; } if (c.aFilled < CRIT_ITEMS.length && !confirm(`Phần A còn ${CRIT_ITEMS.length - c.aFilled} tiêu chí chưa chấm. Vẫn chuyển trạng thái?`)) break; }
-      rec.status = s; rec.updated = new Date().toISOString(); save(); renderEval(); logAct("Chuyển trạng thái phiếu: " + RECORD_STATUS[s].label, recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
+      rec.status = s; rec.updated = new Date().toISOString(); save(); rerenderForm(); logAct("Chuyển trạng thái phiếu: " + RECORD_STATUS[s].label, recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
     }
     case "delRec": if (confirm(`Xoá phiếu ${monthLabel(ui.evalMonth)} của ${staffById(ui.evalStaff).name}?`)) {
-      for (const e of [...(rec.evGen || []), ...rec.tasks.flatMap(t => t.ev || [])]) TB.removeFile(e.key).catch(() => {});
-      delete db.records[rkey(ui.evalStaff, ui.evalMonth)]; save(); renderEval(); } break;
+      for (const e of allEv(rec)) TB.removeFile(e.key).catch(() => {});
+      delete db.records[rkey(ui.evalStaff, ui.evalMonth)]; save(); rerenderForm(); } break;
     case "print": printRecord(); logAct("In phiếu", recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
     case "exportMau01": exportMau01(); logAct("Xuất Excel Mẫu 01", recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
     case "exportSummary": exportSummary(); logAct("Xuất Excel tổng hợp", periodLabel(ui.period)); break;
@@ -2162,14 +2373,14 @@ document.addEventListener("click", async e => {
     }
     case "upEv": {
       const files = await pickFiles(EV_ACCEPT); if (!files.length) break;
-      await uploadEvidence(evList(rec, b.dataset.scope), files); renderEval(); break;
+      await uploadEvidence(evList(rec, b.dataset.scope), files); rerenderForm(); break;
     }
     case "delEv": {
       const it = b.closest("[data-ei]"); const list = evList(rec, it.dataset.scope); const e = list[+it.dataset.ei];
       if (!e || !confirm(`Xoá minh chứng “${e.name}”?`)) break;
       try { await TB.removeFile(e.key); }
       catch (err) { if (!/Không tìm thấy/.test(err.message)) { toast(err.message); break; } }
-      list.splice(+it.dataset.ei, 1); save(true); renderEval(); toast("Đã xoá minh chứng."); logAct("Xoá minh chứng", `${e.name} – ${recLabel(rkey(ui.evalStaff, ui.evalMonth))}`); break;
+      list.splice(+it.dataset.ei, 1); save(true); rerenderForm(); toast("Đã xoá minh chứng."); logAct("Xoá minh chứng", `${e.name} – ${recLabel(rkey(ui.evalStaff, ui.evalMonth))}`); break;
     }
   }
 });
