@@ -930,7 +930,7 @@ const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const uid = () => Math.random().toString(36).slice(2, 10);
 const round2 = n => Math.round(n * 100) / 100;
-const fmt = (n, d = 2) => n == null || isNaN(n) ? "–" : round2(n).toLocaleString("vi-VN", { maximumFractionDigits: d });
+const fmt = (n, d = 2) => n == null || isNaN(n) ? "–" : (round2(n) + 0).toLocaleString("vi-VN", { maximumFractionDigits: d });
 const pct = n => n == null || isNaN(n) ? "–" : (Math.round(n * 10) / 10).toLocaleString("vi-VN") + "%";
 const num = v => { const x = parseFloat(String(v).replace(",", ".")); return isNaN(x) ? null : x; };
 const ym = (y, m) => `${y}-${String(m).padStart(2, "0")}`;
