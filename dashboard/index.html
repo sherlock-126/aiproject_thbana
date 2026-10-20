@@ -526,6 +526,12 @@
   .ev-wrap { display: grid; gap: 2px; }
   .ev-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
   .ev-wrap .ev { margin-top: 2px; }
+  .sel-bar { gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 12px; margin: 4px 0 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); }
+  .name-cell { display: flex; align-items: center; gap: 10px; width: 100%; }
+  .name-cell input[type=checkbox] { width: 18px; height: 18px; flex: none; margin: 0; }
+  .name-cell input[type=text] { flex: 1; min-width: 170px; }
+  @media (max-width: 720px) { .name-cell input[type=text] { min-width: 0; } }
+  tr:has(input[data-pick]:checked) > td { background: color-mix(in srgb, var(--critical-text) 8%, transparent); }
   .submit-box { display: grid; gap: 10px; padding: 16px; border-radius: 12px; background: var(--surface-2); }
   @media (max-width: 960px) {
     .form-grid3 { grid-template-columns: minmax(0, 1fr); }
@@ -1800,14 +1806,42 @@ function renderPerson() {
 // =====================================================================
 // 11. TAB: DANH SÁCH
 // =====================================================================
+const staffSel = new Set();
+// Xoá nhiều người cùng lúc: xoá cả phiếu đánh giá của họ và bỏ gắn tài khoản đang trỏ tới họ
+async function removeStaff(ids, label) {
+  const set = new Set(ids); if (!set.size) return;
+  const recKeys = Object.keys(db.records).filter(k => set.has(k.split("|")[0]));
+  const linked = accounts.filter(a => set.has(a.staffId));
+  const msg = `${label}\n\nSẽ xoá ${set.size} người` + (recKeys.length ? ` và ${recKeys.length} phiếu đánh giá của họ` : "") +
+    (linked.length ? `; ${linked.length} tài khoản sẽ được bỏ gắn (tài khoản vẫn còn)` : "") + ".\nViệc này không hoàn tác được. Tiếp tục?";
+  if (!confirm(msg)) return;
+  const names = db.staff.filter(x => set.has(x.id)).map(x => x.name || "(chưa có tên)");
+  db.staff = db.staff.filter(x => !set.has(x.id));
+  for (const k of recKeys) delete db.records[k];
+  for (const id of set) staffSel.delete(id);
+  for (const a of linked) { a.staffId = ""; try { await saveAccount(a); } catch (e) { toast("Không bỏ gắn được tài khoản " + a.email + ": " + e.message); } }
+  logAct("Xoá người khỏi danh sách", `${set.size} người: ${names.slice(0, 5).join(", ")}${names.length > 5 ? "…" : ""}`);
+  save(true); renderStaff(); toast(`Đã xoá ${set.size} người.`);
+}
+function updateStaffSel() {
+  const n = staffSel.size, b = $('[data-act="delStaffSel"]'), all = $("#staffAll");
+  if (b) { b.disabled = !n; b.textContent = `🗑 Xoá đã chọn (${n})`; }
+  if (all) { all.checked = n > 0 && n === db.staff.length; all.indeterminate = n > 0 && n < db.staff.length; }
+}
 function renderStaff() {
+  for (const id of [...staffSel]) if (!staffById(id)) staffSel.delete(id);
   $("#view").innerHTML = `<div class="card">
     <div class="card-head"><div><h2>Danh sách cán bộ, giáo viên, nhân viên</h2><p>Loại quyết định dùng phụ lục điểm cộng/trừ nào. Sửa trực tiếp trong bảng, tự động lưu.</p></div>
       <div class="row"><button class="btn" data-act="importStaff">⬆ Nhập từ Excel</button><button class="btn primary" data-act="addStaff">+ Thêm người</button></div></div>
+    ${db.staff.length ? `<div class="row sel-bar">
+      <label class="row small" style="gap:6px;margin:0"><input type="checkbox" id="staffAll" ${staffSel.size && staffSel.size === db.staff.length ? "checked" : ""}> Chọn tất cả (${db.staff.length} người)</label>
+      <span style="flex:1"></span>
+      <button class="btn sm danger" data-act="delStaffSel" ${staffSel.size ? "" : "disabled"}>🗑 Xoá đã chọn (${staffSel.size})</button>
+      <button class="btn sm ghost danger" data-act="delStaffAll">Xoá toàn bộ danh sách</button></div>` : ""}
     <div class="scroll"><table class="rtable">
       <thead><tr><th>Họ và tên</th><th>Chức vụ</th><th>Tổ</th><th>Lớp CN</th><th>Loại</th><th class="num">Số phiếu</th><th></th></tr></thead>
       <tbody>${db.staff.map((s, i) => `<tr data-sid="${s.id}">
-        <td><input type="text" data-s="name" value="${esc(s.name)}" aria-label="Họ và tên" placeholder="Họ và tên" style="min-width:170px;width:100%"></td>
+        <td><div class="name-cell"><input type="checkbox" data-pick ${staffSel.has(s.id) ? "checked" : ""} aria-label="Chọn ${esc(s.name || "người này")}"><input type="text" data-s="name" value="${esc(s.name)}" aria-label="Họ và tên" placeholder="Họ và tên"></div></td>
         <td data-label="Chức vụ"><input type="text" data-s="chucVu" value="${esc(s.chucVu)}" aria-label="Chức vụ" style="min-width:130px;width:100%"></td>
         <td data-label="Tổ"><input type="text" data-s="to" value="${esc(s.to)}" aria-label="Tổ" style="width:110px" list="toList"></td>
         <td data-label="Lớp CN"><input type="text" data-s="lop" value="${esc(s.lop)}" aria-label="Lớp" style="width:64px"></td>
@@ -2265,6 +2299,8 @@ document.addEventListener("change", async e => {
     if (el.id === "pYear") { ui.personYear = +el.value; renderPerson(); }
     return;
   }
+  if (ui.tab === "staff" && el.dataset.pick != null) { const id = el.closest("[data-sid]").dataset.sid; el.checked ? staffSel.add(id) : staffSel.delete(id); updateStaffSel(); return; }
+  if (ui.tab === "staff" && el.id === "staffAll") { staffSel.clear(); if (el.checked) db.staff.forEach(x => staffSel.add(x.id)); $$("[data-pick]").forEach(c => c.checked = el.checked); updateStaffSel(); return; }
   if (ui.tab === "staff" && el.dataset.s && el.tagName === "SELECT") { staffById(el.closest("[data-sid]").dataset.sid).type = el.value; save(); }
 });
 
@@ -2325,11 +2361,10 @@ document.addEventListener("click", async e => {
     case "addStaff": db.staff.push({ id: uid(), name: "", chucVu: "Giáo viên", to: "", lop: "", type: "gvcn" }); save(); renderStaff(); setTimeout(() => { const ins = $$('input[data-s="name"]'); ins[ins.length - 1].focus(); }, 0); break;
     case "delStaff": {
       const sid = b.closest("[data-sid]").dataset.sid, s = staffById(sid);
-      const n = Object.keys(db.records).filter(k => k.startsWith(sid + "|")).length;
-      if (!confirm(`Xoá ${s.name || "người này"}${n ? ` và ${n} phiếu đánh giá` : ""}?`)) break;
-      db.staff = db.staff.filter(x => x.id !== sid); for (const k of Object.keys(db.records)) if (k.startsWith(sid + "|")) delete db.records[k];
-      save(); renderStaff(); break;
+      await removeStaff([sid], `Xoá ${s.name || "người này"} khỏi danh sách?`); break;
     }
+    case "delStaffSel": await removeStaff([...staffSel], `Xoá ${staffSel.size} người đã chọn?`); break;
+    case "delStaffAll": await removeStaff(db.staff.map(x => x.id), `XOÁ TOÀN BỘ danh sách CB-GV-NV (${db.staff.length} người)?`); break;
     case "importStaff": importStaff(); break;
     case "backup": download(`sao_luu_danh_gia_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(db, null, 1), "application/json"); break;
     case "clearDemo": {
