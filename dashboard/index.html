@@ -527,6 +527,19 @@
   .ev-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
   .ev-wrap .ev { margin-top: 2px; }
   .sel-bar { gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 12px; margin: 4px 0 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); }
+  table.multi .bigscore { font-size: 22px; }
+  table.multi th, table.multi td { padding-left: 5px; padding-right: 5px; }
+  table.multi th { font-size: 10.5px; letter-spacing: 0; }
+  table.multi .rank, table.multi td { font-size: 13.5px; }
+  .flow { list-style: none; display: flex; gap: 6px; padding: 0; margin: 0 0 12px; flex-wrap: wrap; }
+  .flow li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: var(--surface-2); color: var(--text-muted); font-size: 14px; }
+  .flow li span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--border); color: var(--text-primary); font-size: 12px; font-weight: 700; }
+  .flow li.done { color: var(--text-primary); } .flow li.done span { background: var(--good); color: #fff; }
+  .flow li.now { color: var(--text-primary); font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--accent); } .flow li.now span { background: var(--accent); color: #fff; }
+  details.queue > summary { cursor: pointer; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+  .q-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .q-item { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); color: var(--text-primary); font: inherit; font-size: 14px; cursor: pointer; }
+  .q-item.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
   .name-cell { display: flex; align-items: center; gap: 10px; width: 100%; }
   .name-cell input[type=checkbox] { width: 18px; height: 18px; flex: none; margin: 0; }
   .name-cell input[type=text] { flex: 1; min-width: 170px; }
@@ -691,8 +704,9 @@ const STAFF_TYPES = {
 };
 const RECORD_STATUS = {
   nhap: { label: "Đang nhập", key: "serious" },
-  nop: { label: "Đã tự đánh giá", key: "warning" },
-  duyet: { label: "Đã duyệt", key: "good" },
+  nop: { label: "Chờ tổ trưởng", key: "warning" },
+  tt: { label: "Chờ Hiệu trưởng duyệt", key: "info" },
+  duyet: { label: "Hiệu trưởng đã duyệt", key: "good" },
 };
 const RANKS = [
   { k: "xs", name: "Hoàn thành xuất sắc nhiệm vụ", short: "Xuất sắc", min: 90, color: "var(--r-xs)" },
@@ -833,6 +847,16 @@ async function sha256(t) {
 const hashPw = (salt, pw) => sha256(salt + "|" + pw);
 const normEmail = e => String(e || "").trim().toLowerCase();
 const isAdmin = () => me?.role === "admin";
+const isTT = () => me?.role === "tt";
+const myTo = () => (db.staff.find(s => s.id === me?.staffId)?.to || "").trim();
+const toName = t => /^tổ(\s|$)/i.test(t) ? t : "tổ " + t;
+// Những người mình được đánh giá: quản trị = cả trường; tổ trưởng = thành viên cùng tổ (trừ chính mình)
+function reviewScope() {
+  if (isAdmin()) return db.staff;
+  if (isTT()) { const to = myTo(); return to ? db.staff.filter(s => s.id !== me.staffId && (s.to || "").trim() === to) : []; }
+  return [];
+}
+const canReview = sid => reviewScope().some(s => s.id === sid);
 const genPw = () => Array.from({ length: 8 }, () => "abcdefghjkmnpqrstuvwxyz23456789"[Math.floor(Math.random() * 31)]).join("");
 const localDate = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 async function loadAccounts() { accounts = (await TB.list(APP, COL_ACC)).map(r => ({ rid: r.id, ...r.data })); }
@@ -964,6 +988,7 @@ const ICON = {
   serious: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--serious)"/><circle cx="4.2" cy="7" r="1" fill="#fff"/><circle cx="7" cy="7" r="1" fill="#fff"/><circle cx="9.8" cy="7" r="1" fill="#fff"/></svg>',
   critical: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--critical)"/><path d="M7 3.5v4.2" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/><circle cx="7" cy="10.2" r="1" fill="#fff"/></svg>',
 };
+ICON.info = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="var(--r-tot)"/><path d="M3.8 7.3l2 2 4.4-4.6" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const statusHtml = (key, label) => `<span class="status">${ICON[key]}${esc(label)}</span>`;
 const recStatusHtml = st => st ? statusHtml(RECORD_STATUS[st].key, RECORD_STATUS[st].label) : statusHtml("critical", "Chưa có phiếu");
 const rankHtml = r => r ? `<span class="rank"><i class="chip" style="background:${r.color}"></i>${esc(r.short)}</span>` : '<span class="muted">–</span>';
@@ -975,7 +1000,7 @@ const bandHT = r => r >= 100 ? 20 : r >= 90 ? 15 : r >= 80 ? 10 : r >= 70 ? 5 : 
 const bandCL = r => r >= 95 ? 30 : r >= 90 ? 25 : r >= 80 ? 20 : r >= 70 ? 15 : r >= 60 ? 10 : r >= 50 ? 5 : 0;
 
 function newRecord() {
-  return { tasks: [], a: { tu: {}, off: {} }, c03: { vp: 0, moi: 0 }, pl: [], kc: [], uu: "", han: "", status: "nhap", updated: null };
+  return { tasks: [], a: { tu: {}, tt: {}, off: {} }, c03: { vp: 0, moi: 0 }, pl: [], kc: [], uu: "", han: "", status: "nhap", updated: null };
 }
 
 function taskStats(tasks) {
@@ -1004,11 +1029,12 @@ function calc(rec) {
   const s = taskStats(rec.tasks);
   const B = s.n ? { ht: bandHT(s.rHT), td: bandHT(s.rTD), cl: bandCL(s.rCL) } : null;
   const Btot = B ? B.ht + B.td + B.cl : 0;
-  let Atu = 0, Aoff = 0, aFilled = 0;
+  let Atu = 0, Att = 0, Aoff = 0, aFilled = 0;
   for (const c of CRIT_ITEMS) {
-    const tu = rec.a.tu[c.c], off = rec.a.off[c.c];
+    const tu = rec.a.tu[c.c], tt = rec.a.tt?.[c.c], off = rec.a.off[c.c];
     if (tu != null) { Atu += tu; aFilled++; }
-    Aoff += off != null ? off : (tu ?? 0);
+    Att += tt ?? tu ?? 0;            // tổ trưởng bỏ trống = giữ điểm tự chấm
+    Aoff += off ?? tt ?? tu ?? 0;    // Hiệu trưởng bỏ trống = giữ điểm tổ trưởng
   }
   const c = {
     dotxuat: Math.min(1, 0.5 * s.dotxuat),
@@ -1022,10 +1048,11 @@ function calc(rec) {
   let PLtu = 0, PLoff = 0;
   for (const e of rec.pl) { const v = (e.qty || 0) * (e.p || 0); PLtu += v; if (e.ok !== false) PLoff += v; }
   const totTu = Atu + Btot + C03 + PLtu;
+  const totTT = Att + Btot + C03 + PLoff;
   const totOff = Aoff + Btot + C03 + PLoff;
-  const final = rec.status === "duyet" ? totOff : totTu;
+  const final = rec.status === "duyet" ? totOff : rec.status === "tt" ? totTT : totTu;
   const down = rec.kc.length ? 1 : 0;
-  return { s, B, Btot, Atu, Aoff, aFilled, c, C03, PLtu, PLoff, totTu, totOff, final, down, rank: rankOf(final, down), rankTu: rankOf(totTu, down), rankOff: rankOf(totOff, down) };
+  return { s, B, Btot, Atu, Att, Aoff, aFilled, c, C03, PLtu, PLoff, totTu, totTT, totOff, final, down, rank: rankOf(final, down), rankTu: rankOf(totTu, down), rankTT: rankOf(totTT, down), rankOff: rankOf(totOff, down) };
 }
 function rankOf(score, down = 0) {
   let i = RANKS.findIndex(r => score >= r.min);
@@ -1371,19 +1398,32 @@ function catFor(st) {
   const t = STAFF_TYPES[st.type] || STAFF_TYPES.gvcn;
   return CATALOG[t.pl].map((x, i) => ({ ...x, i })).filter(x => !(st.type === "gvbm" && x.s === "III"));
 }
-function staffSelect(id, value) {
+function staffSelect(id, value, list = db.staff) {
   const groups = {};
-  db.staff.forEach(s => (groups[s.to || "(Chưa có tổ)"] ||= []).push(s));
+  list.forEach(s => (groups[s.to || "(Chưa có tổ)"] ||= []).push(s));
   return `<select id="${id}" aria-label="Chọn người">${Object.entries(groups).map(([g, arr]) => `<optgroup label="${esc(g)}">${arr.map(s => `<option value="${s.id}" ${s.id === value ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</optgroup>`).join("")}</select>`;
 }
 
 function renderEval() {
   if (!db.staff.length) { $("#view").innerHTML = `<div class="card"><p>Chưa có CB-GV-NV nào. Vào tab <b>Danh sách CB-GV-NV</b> để thêm.</p></div>`; return; }
-  if (!staffById(ui.evalStaff)) ui.evalStaff = db.staff[0].id;
+  const scope = reviewScope();
+  if (!scope.length) { $("#view").innerHTML = `<div class="card"><h2>Chưa có giáo viên nào trong tổ của bạn</h2><p class="muted" style="margin-top:6px">Tài khoản tổ trưởng cần được gắn với tên của bạn trong danh sách CB-GV-NV, và cột <b>Tổ</b> của bạn phải trùng với cột Tổ của các giáo viên trong tổ. Nhờ quản trị viên kiểm tra giúp.</p></div>`; return; }
+  if (!scope.some(s => s.id === ui.evalStaff)) ui.evalStaff = scope[0].id;
   const st = staffById(ui.evalStaff);
   const rec = getRec(false);
+  if (rec && !rec.a.tt) rec.a.tt = {};
+  // Tổ trưởng chỉ sửa khi giáo viên đã nộp và Hiệu trưởng chưa duyệt
+  const lockTT = isTT() && (!rec || !["nop", "tt"].includes(rec.status));
+  const queue = scope.map(x => ({ x, r: db.records[rkey(x.id, ui.evalMonth)] }));
+  const waitTT = queue.filter(q => q.r?.status === "nop").length, waitHT = queue.filter(q => q.r?.status === "tt").length;
+  const qList = isAdmin() ? queue.filter(q => ["nop", "tt"].includes(q.r?.status)) : queue;
+  const queueHtml = `<details class="card queue" ${isTT() || qList.length ? "open" : ""}>
+    <summary><b>${isTT() ? `Giáo viên ${esc(toName(myTo()))}` : "Phiếu đang chờ đánh giá"} – ${monthLabel(ui.evalMonth)}</b>
+      <span class="small muted">${waitTT} chờ tổ trưởng · ${waitHT} chờ Hiệu trưởng duyệt${isTT() ? ` · ${queue.filter(q => q.r?.status === "duyet").length} đã duyệt` : ""}</span></summary>
+    <div class="q-list">${qList.map(q => `<button class="q-item ${q.x.id === ui.evalStaff ? "on" : ""}" data-qsid="${q.x.id}"><span>${esc(q.x.name || "(chưa có tên)")}</span>${q.r ? recStatusHtml(q.r.status) : statusHtml("critical", "Chưa có phiếu")}</button>`).join("") || `<span class="muted small">Không có phiếu nào đang chờ.</span>`}</div>
+  </details>`;
   const head = `<div class="stickybar"><div class="row">
-      ${staffSelect("eStaff", ui.evalStaff)}
+      ${staffSelect("eStaff", ui.evalStaff, scope)}
       <input type="month" id="eMonth" value="${ui.evalMonth}" aria-label="Tháng đánh giá">
       <span class="small muted">${esc(st.chucVu)}${st.lop ? " · Lớp " + esc(st.lop) : ""} · ${esc(st.to)}</span>
       <span class="spacer"></span>
@@ -1391,13 +1431,13 @@ function renderEval() {
       ${rec.suaBoi ? `<span class="small muted">Sửa lần cuối: <b>${esc(rec.suaBoi.name)}</b> · ${new Date(rec.suaBoi.at).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}</span>` : ""}
       <button class="btn" data-act="print">🖨 In phiếu</button>
       <button class="btn" data-act="exportMau01">⬇ Excel Mẫu 01</button>` : ""}
-    </div></div>`;
+    </div></div>` + queueHtml;
   if (!rec) {
     const prev = db.records[rkey(ui.evalStaff, addMonth(ui.evalMonth, -1))];
     $("#view").innerHTML = head + `<div class="card"><h2>${esc(st.name)} – ${monthLabel(ui.evalMonth)}</h2>
-      <p class="muted">Chưa có phiếu đánh giá cho tháng này.</p>
-      <div class="row"><button class="btn primary" data-act="newRec">+ Tạo phiếu trống</button>
-      ${prev ? `<button class="btn" data-act="newRecCopy">Tạo phiếu, sao chép danh sách công việc từ ${monthLabel(addMonth(ui.evalMonth, -1))}</button>` : ""}</div></div>`;
+      <p class="muted">Chưa có phiếu đánh giá cho tháng này${isTT() ? ". Giáo viên cần tự đánh giá và nộp trước, sau đó tổ trưởng mới đánh giá." : "."}</p>
+      ${isAdmin() ? `<div class="row"><button class="btn primary" data-act="newRec">+ Tạo phiếu trống</button>
+      ${prev ? `<button class="btn" data-act="newRecCopy">Tạo phiếu, sao chép danh sách công việc từ ${monthLabel(addMonth(ui.evalMonth, -1))}</button>` : ""}</div>` : ""}</div>`;
     return;
   }
   const cat = catFor(st);
@@ -1421,7 +1461,10 @@ function renderEval() {
       <div><button class="btn ghost sm danger" data-act="delTask" aria-label="Xoá công việc" title="Xoá">✕</button></div>
     </div>`;
 
-  let html = head + `<div class="card">
+  const flow = [["Giáo viên tự đánh giá", rec.status !== "nhap"], ["Tổ trưởng đánh giá", ["tt", "duyet"].includes(rec.status)], ["Hiệu trưởng duyệt", rec.status === "duyet"]];
+  let html = head + `<ol class="flow">${flow.map(([l, d], i) => `<li class="${d ? "done" : (i === 0 || flow[i - 1][1]) ? "now" : ""}"><span>${d ? "✓" : i + 1}</span>${l}</li>`).join("")}</ol>
+  ${lockTT ? `<div class="banner">${recStatusHtml(rec.status)}<span>${rec.status === "nhap" ? "Giáo viên chưa nộp phiếu nên tổ trưởng chưa đánh giá được." : "Hiệu trưởng đã duyệt phiếu này, tổ trưởng chỉ xem."}</span></div>` : ""}
+  <fieldset class="plain" ${lockTT ? "disabled" : ""}><div class="card">
     <div class="sec-title"><div><h2>1. Bảng thống kê, tự đánh giá kết quả thực hiện nhiệm vụ</h2><p class="small muted" style="margin:2px 0 0">Mẫu 01TKNV · ${esc(st.name)} · ${monthLabel(ui.evalMonth)}</p></div>
       <button class="btn sm" data-act="copyPrev">Sao chép công việc từ tháng trước</button></div>
     ${GROUPS.map(G => {
@@ -1434,16 +1477,17 @@ function renderEval() {
   </div>
 
   <div class="card">
-    <div class="sec-title"><div><h2>2. Tiêu chí chung (A – tối đa 30 điểm)</h2><p class="small muted" style="margin:2px 0 0">Mẫu 03 · bỏ trống cột “Chính thức” nghĩa là giữ nguyên điểm tự chấm</p></div>
-      <div class="row"><button class="btn sm" data-act="fillMax">Tự chấm tối đa các ô trống</button><button class="btn sm" data-act="copyOff">Chính thức = tự chấm</button></div></div>
+    <div class="sec-title"><div><h2>2. Tiêu chí chung (A – tối đa 30 điểm)</h2><p class="small muted" style="margin:2px 0 0">Mẫu 03 · ô bỏ trống nghĩa là đồng ý với điểm của cấp trước (tổ trưởng giữ điểm tự chấm, Hiệu trưởng giữ điểm tổ trưởng)</p></div>
+      <div class="row">${isAdmin() ? `<button class="btn sm" data-act="fillMax">Tự chấm tối đa các ô trống</button>` : ""}<button class="btn sm" data-act="copyTT">Tổ trưởng đồng ý điểm tự chấm</button>${isAdmin() ? `<button class="btn sm" data-act="copyOff">Hiệu trưởng đồng ý điểm tổ trưởng</button>` : ""}</div></div>
     <div class="scroll"><table class="crit">
-      <thead><tr><th></th><th>Tiêu chí</th><th class="num">Tối đa</th><th class="num">Tự chấm</th><th class="num">Chính thức</th></tr></thead>
+      <thead><tr><th></th><th>Tiêu chí</th><th class="num">Tối đa</th><th class="num">Tự chấm</th><th class="num">Tổ trưởng</th><th class="num">Hiệu trưởng</th></tr></thead>
       <tbody>${CRIT_A.map(c => c.c
         ? `<tr><td>${esc(c.c.slice(2))}</td><td>${esc(c.t)}${(rec.aEv?.[c.c] || []).length ? evHtml(rec.aEv[c.c], "a:" + c.c) : ""}</td><td class="num">${fmt(c.max)}</td>
-            <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="tu" data-c="${c.c}" value="${rec.a.tu[c.c] ?? ""}" aria-label="Tự chấm ${esc(c.c)}"></td>
-            <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="off" data-c="${c.c}" value="${rec.a.off[c.c] ?? ""}" placeholder="${rec.a.tu[c.c] ?? ""}" aria-label="Chính thức ${esc(c.c)}"></td></tr>`
-        : `<tr class="grp"><td>${esc(c.h)}</td><td ${c.sub ? 'style="font-weight:600"' : ""}>${esc(c.t)}</td><td class="num">${fmt(c.max)}</td><td></td><td></td></tr>`).join("")}
-        <tr class="tot"><td></td><td>Cộng phần A</td><td class="num">30</td><td class="num" id="aTu"></td><td class="num" id="aOff"></td></tr>
+            <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="tu" data-c="${c.c}" value="${rec.a.tu[c.c] ?? ""}" aria-label="Tự chấm ${esc(c.c)}" ${isAdmin() ? "" : "disabled"}></td>
+            <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="tt" data-c="${c.c}" value="${rec.a.tt[c.c] ?? ""}" placeholder="${rec.a.tu[c.c] ?? ""}" aria-label="Tổ trưởng chấm ${esc(c.c)}"></td>
+            <td class="num"><input type="number" step="0.25" min="0" max="${c.max}" data-a="off" data-c="${c.c}" value="${rec.a.off[c.c] ?? ""}" placeholder="${rec.a.tt[c.c] ?? rec.a.tu[c.c] ?? ""}" aria-label="Hiệu trưởng chấm ${esc(c.c)}" ${isAdmin() ? "" : "disabled"}></td></tr>`
+        : `<tr class="grp"><td>${esc(c.h)}</td><td ${c.sub ? 'style="font-weight:600"' : ""}>${esc(c.t)}</td><td class="num">${fmt(c.max)}</td><td></td><td></td><td></td></tr>`).join("")}
+        <tr class="tot"><td></td><td>Cộng phần A</td><td class="num">30</td><td class="num" id="aTu"></td><td class="num" id="aTT"></td><td class="num" id="aOff"></td></tr>
       </tbody></table></div>
   </div>
 
@@ -1490,17 +1534,28 @@ function renderEval() {
     <div class="grid g2e" style="margin:0">
       <div class="scroll" id="partTotal"></div>
       <div>
-        <div class="row" style="justify-content:space-between;margin-bottom:6px"><b>Ưu điểm</b><button class="btn sm" data-act="suggest" title="Tạo gợi ý nhận xét từ số liệu đã nhập">✨ Gợi ý nhận xét</button></div>
-        <textarea rows="4" data-r="uu" placeholder="Ưu điểm…">${esc(rec.uu)}</textarea>
+        <div class="row" style="justify-content:space-between;margin-bottom:6px"><b>Ưu điểm <span class="small muted">(cá nhân tự nhận xét)</span></b>${isAdmin() ? `<button class="btn sm" data-act="suggest" title="Tạo gợi ý nhận xét từ số liệu đã nhập">✨ Gợi ý nhận xét</button>` : ""}</div>
+        <textarea rows="4" data-r="uu" placeholder="Ưu điểm…" ${isAdmin() ? "" : "disabled"}>${esc(rec.uu)}</textarea>
         <div style="margin:10px 0 6px"><b>Hạn chế, khuyết điểm</b></div>
-        <textarea rows="4" data-r="han" placeholder="Hạn chế, khuyết điểm…">${esc(rec.han)}</textarea>
+        <textarea rows="4" data-r="han" placeholder="Hạn chế, khuyết điểm…" ${isAdmin() ? "" : "disabled"}>${esc(rec.han)}</textarea>
       </div>
     </div>
+  </div></fieldset>
+  <div class="card review-box">
+    <div class="sec-title"><h2>7. Ý kiến đánh giá của tổ trưởng và Hiệu trưởng</h2></div>
+    <div class="grid g2e" style="margin:0">
+      <div><b>Ý kiến của tổ trưởng</b>${rec.ttBy ? ` <span class="small muted">· ${esc(rec.ttBy.name)}, ${new Date(rec.ttBy.at).toLocaleDateString("vi-VN")}</span>` : ""}
+        <textarea rows="4" data-r="ttNx" placeholder="Nhận xét, đề nghị mức xếp loại; lý do nếu trả lại phiếu…" ${isAdmin() || (isTT() && !lockTT) ? "" : "disabled"}>${esc(rec.ttNx || "")}</textarea></div>
+      <div><b>Kết luận của Hiệu trưởng</b>${rec.htBy ? ` <span class="small muted">· ${esc(rec.htBy.name)}, ${new Date(rec.htBy.at).toLocaleDateString("vi-VN")}</span>` : ""}
+        <textarea rows="4" data-r="htNx" placeholder="${isAdmin() ? "Kết luận, xếp loại chính thức…" : "Hiệu trưởng ghi kết luận khi duyệt"}" ${isAdmin() ? "" : "disabled"}>${esc(rec.htNx || "")}</textarea></div>
+    </div>
     <div class="row" style="margin-top:14px">
-      <span class="small muted">Trạng thái phiếu:</span>
-      ${Object.entries(RECORD_STATUS).map(([k, v]) => `<button class="btn ${rec.status === k ? "primary" : ""}" data-act="setStatus" data-s="${k}">${esc(v.label)}</button>`).join("")}
+      ${isTT() ? (lockTT ? "" : `<button class="btn" data-act="setStatus" data-s="nhap">↩ Trả lại giáo viên sửa</button>
+        ${rec.status === "nop" ? `<button class="btn primary" data-act="setStatus" data-s="tt">✓ Xác nhận, chuyển Hiệu trưởng duyệt</button>` : `<span class="small muted">Đã chuyển Hiệu trưởng. Vẫn sửa được điểm, ý kiến cho tới khi Hiệu trưởng duyệt.</span>`}`)
+      : `<span class="small muted">Trạng thái phiếu:</span>
+      ${Object.entries(RECORD_STATUS).map(([k, v]) => `<button class="btn ${rec.status === k ? "primary" : ""}" data-act="setStatus" data-s="${k}">${esc(k === "nhap" ? "Trả lại GV (đang nhập)" : k === "duyet" ? "✓ Hiệu trưởng duyệt" : v.label)}</button>`).join("")}
       <span class="spacer"></span>
-      <button class="btn ghost danger" data-act="delRec">Xoá phiếu tháng này</button>
+      <button class="btn ghost danger" data-act="delRec">Xoá phiếu tháng này</button>`}
     </div>
   </div>`;
   $("#view").innerHTML = html;
@@ -1515,6 +1570,7 @@ function updateEvalTotals() {
     <tr class="small muted"><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)=(2)/(1)</td><td>(5)</td><td>(6)</td><td>(7)</td><td>(8)=(5+6)/(1)</td><td>(9)</td><td>(10)</td><td>(11)</td><td>(12)=(9+10)/(1)</td></tr></thead>
     <tbody><tr><td>${s.n}</td><td>${s.done}</td><td>${s.notdone}</td><td><b>${pct(s.rHT)}</b></td><td>${s.som}</td><td>${s.dung}</td><td>${s.tre}</td><td><b>${pct(s.rTD)}</b></td><td>${s.dam}</td><td>${s.vuot}</td><td>${s.chua}</td><td><b>${pct(s.rCL)}</b></td></tr></tbody></table>`;
   $("#aTu").innerHTML = `<b>${fmt(c.Atu)}</b>${c.aFilled < CRIT_ITEMS.length ? `<div class="small muted">còn ${CRIT_ITEMS.length - c.aFilled} ô trống</div>` : ""}`;
+  $("#aTT").innerHTML = `<b>${fmt(c.Att)}</b>`;
   $("#aOff").innerHTML = `<b>${fmt(c.Aoff)}</b>`;
   $("#partB").innerHTML = c.B ? `<table>
     <thead><tr><th>Tiêu chí</th><th class="num">Tỷ lệ</th><th class="num">Tối đa</th><th class="num">Điểm</th></tr></thead>
@@ -1540,13 +1596,13 @@ function updateEvalTotals() {
     <tr class="tot"><td>Cộng</td><td></td><td class="num">${fmt(c.C03)}</td></tr></tbody></table>`;
   $$("#plBody tr[data-pid]").forEach(tr => { const e = rec.pl.find(x => x.id === tr.dataset.pid); if (e) tr.querySelector("[data-sum]").textContent = fmt((e.qty || 0) * (e.p || 0)); });
   $("#partTotal").innerHTML = `<table>
-    <thead><tr><th>Phần</th><th class="num">Tự chấm</th><th class="num">Chính thức</th></tr></thead><tbody>
-    <tr><td>A. Tiêu chí chung</td><td class="num">${fmt(c.Atu)}</td><td class="num">${fmt(c.Aoff)}</td></tr>
-    <tr><td>B. Kết quả thực hiện nhiệm vụ</td><td class="num">${fmt(c.Btot)}</td><td class="num">${fmt(c.Btot)}</td></tr>
-    <tr><td>C.I–II. Cộng/trừ Mẫu 03</td><td class="num">${fmt(c.C03)}</td><td class="num">${fmt(c.C03)}</td></tr>
-    <tr><td>C.III. Cộng/trừ theo phụ lục</td><td class="num">${fmt(c.PLtu)}</td><td class="num">${fmt(c.PLoff)}</td></tr>
-    <tr class="tot"><td>Tổng điểm</td><td class="num"><span class="bigscore">${fmt(c.totTu)}</span></td><td class="num"><span class="bigscore">${fmt(c.totOff)}</span></td></tr>
-    <tr><td>Xếp loại${c.down ? ' <span class="pill">hạ 1 bậc do khống chế</span>' : ""}</td><td class="num">${rankHtml(c.rankTu)}</td><td class="num">${rankHtml(c.rankOff)}</td></tr>
+    <thead><tr><th>Phần</th><th class="num">Tự chấm</th><th class="num">Tổ trưởng</th><th class="num">Hiệu trưởng</th></tr></thead><tbody>
+    <tr><td>A. Tiêu chí chung</td><td class="num">${fmt(c.Atu)}</td><td class="num">${fmt(c.Att)}</td><td class="num">${fmt(c.Aoff)}</td></tr>
+    <tr><td>B. Kết quả thực hiện nhiệm vụ</td><td class="num">${fmt(c.Btot)}</td><td class="num">${fmt(c.Btot)}</td><td class="num">${fmt(c.Btot)}</td></tr>
+    <tr><td>C.I–II. Cộng/trừ Mẫu 03</td><td class="num">${fmt(c.C03)}</td><td class="num">${fmt(c.C03)}</td><td class="num">${fmt(c.C03)}</td></tr>
+    <tr><td>C.III. Cộng/trừ theo phụ lục</td><td class="num">${fmt(c.PLtu)}</td><td class="num">${fmt(c.PLoff)}</td><td class="num">${fmt(c.PLoff)}</td></tr>
+    <tr class="tot"><td>Tổng điểm</td><td class="num"><span class="bigscore">${fmt(c.totTu)}</span></td><td class="num"><span class="bigscore">${fmt(c.totTT)}</span></td><td class="num"><span class="bigscore">${fmt(c.totOff)}</span></td></tr>
+    <tr><td>Xếp loại${c.down ? ' <span class="pill">hạ 1 bậc do khống chế</span>' : ""}</td><td class="num">${rankHtml(c.rankTu)}</td><td class="num">${rankHtml(c.rankTT)}</td><td class="num">${rankHtml(c.rankOff)}</td></tr>
     </tbody></table>
     <p class="small muted" style="margin:8px 0 0">${esc(c.rankOff.name)}. Ngưỡng: ≥90 xuất sắc · ≥70 tốt · 50–70 hoàn thành · &lt;50 không hoàn thành.</p>`;
   $("#eStatus") && ($("#eStatus").innerHTML = recStatusHtml(rec.status));
@@ -1592,8 +1648,12 @@ function onEvalInput(ev) {
   }
   if (el.dataset.a) {
     const v = num(el.value); const c = CRIT_ITEMS.find(x => x.c === el.dataset.c);
+    rec.a[el.dataset.a] ||= {};
     if (v == null) delete rec.a[el.dataset.a][c.c]; else rec.a[el.dataset.a][c.c] = Math.max(0, Math.min(c.max, v));
-    if (el.dataset.a === "tu") { const off = $(`[data-a="off"][data-c="${c.c}"]`); if (off) off.placeholder = el.value; }
+    rec.a.tt ||= {};
+    const ttIn = $(`[data-a="tt"][data-c="${c.c}"]`), offIn = $(`[data-a="off"][data-c="${c.c}"]`);
+    if (ttIn) ttIn.placeholder = rec.a.tu[c.c] ?? "";
+    if (offIn) offIn.placeholder = rec.a.tt[c.c] ?? rec.a.tu[c.c] ?? "";
     updateTotals(); save(); return true;
   }
   if (el.dataset.c03) { rec.c03[el.dataset.c03] = Math.max(0, Math.floor(num(el.value) || 0)); if (ev.type === "change") updateTotals(); save(); return true; }
@@ -1693,8 +1753,10 @@ function renderSelf() {
 
   const stepHead = (n, title, sub, done) => `<summary><span class="step-n ${done ? "done" : ""}">${done ? "✓" : n}</span><span class="step-t"><b>${title}</b><small>${sub}</small></span></summary>`;
   v.innerHTML = head + `
-  ${rec.status === "nop" ? `<div class="banner" style="margin-bottom:0">${statusHtml("warning", "Đã nộp")}<span>Phiếu đang chờ tổ/BGH duyệt nên tạm khoá. Cần sửa thì bấm <b>Rút lại để sửa</b> ở cuối trang.</span></div>` : ""}
-  ${rec.status === "duyet" ? `<div class="banner" style="margin-bottom:0">${statusHtml("good", "Đã duyệt")}<span>Phiếu đã được duyệt. Điểm chính thức: <b>${fmt(calc(rec).totOff)}</b> – ${esc(calc(rec).rankOff.name)}.</span></div>` : ""}
+  ${rec.status === "nop" ? `<div class="banner" style="margin-bottom:0">${statusHtml("warning", "Đã nộp")}<span>Phiếu đang chờ <b>tổ trưởng</b> đánh giá nên tạm khoá. Cần sửa thì bấm <b>Rút lại để sửa</b> ở cuối trang.</span></div>` : ""}
+  ${rec.status === "tt" ? `<div class="banner" style="margin-bottom:0">${statusHtml("info", "Tổ trưởng đã đánh giá")}<span>Tổ trưởng chấm <b>${fmt(calc(rec).totTT)}</b> điểm – ${esc(calc(rec).rankTT.name)}. Phiếu đang chờ <b>Hiệu trưởng</b> duyệt.</span></div>` : ""}
+  ${rec.status === "nhap" && rec.traLai ? `<div class="banner" style="margin-bottom:0">${statusHtml("serious", "Được trả lại")}<span><b>${esc(rec.traLai.name)}</b> đã trả phiếu để bạn sửa${rec.ttNx || rec.htNx ? `: “${esc(rec.htNx || rec.ttNx)}”` : ""}. Sửa xong bấm Nộp lại.</span></div>` : ""}
+  ${rec.status === "duyet" ? `<div class="banner" style="margin-bottom:0">${statusHtml("good", "Đã duyệt")}<span>Hiệu trưởng đã duyệt. Điểm chính thức: <b>${fmt(calc(rec).totOff)}</b> – ${esc(calc(rec).rankOff.name)}.</span></div>` : ""}
   <details class="card step" open>${stepHead(1, "Nhiệm vụ trong tháng", `Mẫu 01TKNV · ${nAll} nhiệm vụ · ${nEv}/${nAll} có minh chứng`, nAll && nEv === nAll)}
     <div class="step-body"><fieldset class="plain" ${locked ? "disabled" : ""}>
       ${tasks.map(taskCard).join("") || `<p class="muted">Chưa có nhiệm vụ nào. Bấm “Thêm nhiệm vụ”.</p>`}
@@ -1726,9 +1788,10 @@ function renderSelf() {
       <textarea rows="3" data-r="han" placeholder="Hạn chế, hướng khắc phục…">${esc(rec.han)}</textarea>
     </fieldset>
     <div class="submit-box">
-      ${rec.status === "nhap" ? `<button class="btn primary block" data-act="setStatus" data-s="nop">Nộp tự đánh giá ${monthLabel(ui.selfMonth).toLowerCase()}</button><span class="small muted">Sau khi nộp, phiếu tạm khoá để tổ/BGH duyệt. Phiếu được lưu tự động nên bạn có thể làm dần.</span>` : ""}
+      ${rec.status === "nhap" ? `<button class="btn primary block" data-act="setStatus" data-s="nop">Nộp tự đánh giá ${monthLabel(ui.selfMonth).toLowerCase()}</button><span class="small muted">Sau khi nộp, phiếu chuyển tổ trưởng đánh giá rồi Hiệu trưởng duyệt. Phiếu được lưu tự động nên bạn có thể làm dần.</span>` : ""}
       ${rec.status === "nop" ? `<button class="btn block" data-act="setStatus" data-s="nhap">Rút lại để sửa</button>` : ""}
-      ${rec.status === "duyet" ? `<span class="small muted">Phiếu đã duyệt. Cần điều chỉnh, liên hệ quản trị viên.</span>` : ""}
+      ${rec.status === "tt" ? `<span class="small muted">Tổ trưởng đã đánh giá, phiếu đang chờ Hiệu trưởng duyệt. Cần sửa, liên hệ tổ trưởng để được trả lại.</span>` : ""}
+      ${rec.status === "duyet" ? `<span class="small muted">Hiệu trưởng đã duyệt. Cần điều chỉnh, liên hệ Ban Giám hiệu.</span>` : ""}
     </div></div>
   </details>`;
   updateSelfTotals();
@@ -1736,13 +1799,18 @@ function renderSelf() {
 function updateSelfTotals() {
   const rec = getRec(false); if (!rec || !$("#selfTotals")) return;
   const c = calc(rec), all = allEv(rec);
-  $("#selfTotals").innerHTML = `<table>
-    <thead><tr><th>Phần</th><th class="num">Tối đa</th><th class="num">Tự chấm</th></tr></thead><tbody>
-    <tr><td>A. Tiêu chí chung</td><td class="num">30</td><td class="num">${fmt(c.Atu)}${c.aFilled < CRIT_ITEMS.length ? ` <span class="small muted">(còn ${CRIT_ITEMS.length - c.aFilled} ô)</span>` : ""}</td></tr>
-    <tr><td>B. Kết quả thực hiện nhiệm vụ <span class="small muted">(tự tính từ mục 1)</span></td><td class="num">70</td><td class="num">${fmt(c.Btot)}</td></tr>
-    <tr><td>C. Điểm cộng, trừ (Mẫu 03 và phụ lục)</td><td class="num"></td><td class="num">${fmt(c.C03 + c.PLtu)}</td></tr>
-    <tr class="tot"><td>Tổng điểm tự chấm</td><td></td><td class="num"><span class="bigscore">${fmt(c.totTu)}</span></td></tr>
-    <tr><td>Tự xếp loại</td><td></td><td class="num">${rankHtml(c.rankTu)}</td></tr></tbody></table>`;
+  const lv = rec.status === "duyet" ? 2 : rec.status === "tt" ? 1 : 0;
+  const col = (t, o) => (lv >= 1 ? `<td class="num">${fmt(t)}</td>` : "") + (lv >= 2 ? `<td class="num">${fmt(o)}</td>` : "");
+  const mx = v => lv ? "" : `<td class="num">${v}</td>`;
+  $("#selfTotals").innerHTML = `<table class="${lv ? "multi" : ""}">
+    <thead><tr><th>Phần</th>${lv ? "" : '<th class="num">Tối đa</th>'}<th class="num">Tự chấm</th>${lv >= 1 ? '<th class="num">Tổ trưởng</th>' : ""}${lv >= 2 ? '<th class="num">Hiệu trưởng</th>' : ""}</tr></thead><tbody>
+    <tr><td>A. Tiêu chí chung</td>${mx(30)}<td class="num">${fmt(c.Atu)}${c.aFilled < CRIT_ITEMS.length ? ` <span class="small muted">(còn ${CRIT_ITEMS.length - c.aFilled} ô)</span>` : ""}</td>${col(c.Att, c.Aoff)}</tr>
+    <tr><td>B. Kết quả ${lv ? "nhiệm vụ" : `thực hiện nhiệm vụ <span class="small muted">(tự tính từ mục 1)</span>`}</td>${mx(70)}<td class="num">${fmt(c.Btot)}</td>${col(c.Btot, c.Btot)}</tr>
+    <tr><td>C. ${lv ? "Cộng, trừ" : "Điểm cộng, trừ (Mẫu 03 và phụ lục)"}</td>${mx("")}<td class="num">${fmt(c.C03 + c.PLtu)}</td>${col(c.C03 + c.PLoff, c.C03 + c.PLoff)}</tr>
+    <tr class="tot"><td>Tổng điểm</td>${mx("")}<td class="num"><span class="bigscore">${fmt(c.totTu)}</span></td>${lv >= 1 ? `<td class="num"><span class="bigscore">${fmt(c.totTT)}</span></td>` : ""}${lv >= 2 ? `<td class="num"><span class="bigscore">${fmt(c.totOff)}</span></td>` : ""}</tr>
+    <tr><td>Xếp loại</td>${mx("")}<td class="num">${rankHtml(c.rankTu)}</td>${lv >= 1 ? `<td class="num">${rankHtml(c.rankTT)}</td>` : ""}${lv >= 2 ? `<td class="num">${rankHtml(c.rankOff)}</td>` : ""}</tr></tbody></table>
+    ${rec.ttNx ? `<p class="small" style="margin:10px 0 0"><b>Ý kiến tổ trưởng:</b> ${esc(rec.ttNx)}</p>` : ""}
+    ${rec.htNx ? `<p class="small" style="margin:6px 0 0"><b>Kết luận của Hiệu trưởng:</b> ${esc(rec.htNx)}</p>` : ""}`;
   $$("[data-pid]").forEach(el => { const e = rec.pl.find(x => x.id === el.dataset.pid); const sm = el.querySelector("[data-sum]"); if (e && sm) sm.textContent = fmt((e.qty || 0) * (e.p || 0)); });
   const s = c.s;
   $("#selfProg").innerHTML = `${recStatusHtml(rec.status).replace('class="status"', 'class="chip-s"')}
@@ -1757,7 +1825,9 @@ function updateSelfTotals() {
 // =====================================================================
 function renderPerson() {
   if (!db.staff.length) { $("#view").innerHTML = `<div class="card"><p>Chưa có CB-GV-NV.</p></div>`; return; }
-  if (!isAdmin()) { ui.person = me?.staffId; if (!staffById(ui.person)) { $("#view").innerHTML = `<div class="card"><p>Tài khoản của bạn chưa gắn với tên trong danh sách CB-GV-NV. Nhờ quản trị viên gắn giúp.</p></div>`; return; } }
+  const pList = isAdmin() ? db.staff : [staffById(me?.staffId), ...reviewScope()].filter(Boolean);
+  if (!isAdmin() && !pList.some(x => x.id === ui.person)) ui.person = me?.staffId;
+  if (!isAdmin()) { if (!staffById(ui.person)) { $("#view").innerHTML = `<div class="card"><p>Tài khoản của bạn chưa gắn với tên trong danh sách CB-GV-NV. Nhờ quản trị viên gắn giúp.</p></div>`; return; } }
   if (!staffById(ui.person)) ui.person = db.staff[0].id;
   const st = staffById(ui.person);
   const years = new Set(Object.keys(db.records).map(k => schoolYearOf(k.split("|")[1]))); years.add(schoolYearOf(CUR_MONTH));
@@ -1770,7 +1840,7 @@ function renderPerson() {
 
   $("#view").innerHTML = `
   <div class="row" style="margin-bottom:12px">
-    ${isAdmin() ? staffSelect("pStaff", ui.person) : `<b>${esc(st.name)}</b>`}
+    ${pList.length > 1 ? staffSelect("pStaff", ui.person, pList) : `<b>${esc(st.name)}</b>`}
     <select id="pYear" aria-label="Năm học">${[...years].sort().reverse().map(y => `<option value="${y}" ${+ui.personYear === y ? "selected" : ""}>Năm học ${y}-${y + 1}</option>`).join("")}</select>
     <span class="small muted">${esc(st.chucVu)}${st.lop ? " · Lớp " + esc(st.lop) : ""} · ${esc(st.to)} · ${esc(STAFF_TYPES[st.type]?.name || "")}</span>
   </div>
@@ -1881,7 +1951,8 @@ function renderData() {
       <li><b>Danh sách CB-GV-NV:</b> nhập hoặc dán từ Excel danh sách người, chọn đúng <i>Loại</i> để dùng đúng phụ lục điểm cộng/trừ (Phụ lục 1 cho giáo viên, Phụ lục 3 cho BGH, TPT, thư viện, văn phòng).</li>
       <li><b>Đánh giá tháng:</b> chọn người và tháng → tạo phiếu (có thể sao chép danh sách công việc từ tháng trước) → nhập từng công việc theo Mẫu 01TKNV: kết quả, tiến độ, chất lượng.</li>
       <li>Phần <b>B (70 điểm)</b> và điểm cộng/trừ Mẫu 03 được <b>tự tính</b> từ bảng công việc. Chỉ cần chấm phần <b>A (30 điểm)</b> và thêm các mục cộng/trừ theo phụ lục.</li>
-      <li>Chuyển trạng thái phiếu: <i>Đang nhập</i> → <i>Đã tự đánh giá</i> → <i>Đã duyệt</i>. Khi đã duyệt, điểm <b>chính thức</b> được dùng để tổng hợp.</li>
+      <li>Quy trình 3 cấp: <b>giáo viên</b> tự đánh giá và nộp → <b>tổ trưởng</b> chấm cột “Tổ trưởng”, ghi ý kiến, xác nhận (hoặc trả lại) → <b>Hiệu trưởng</b> chấm cột “Hiệu trưởng”, ghi kết luận, duyệt. Ô bỏ trống nghĩa là đồng ý điểm của cấp trước. Khi đã duyệt, điểm của Hiệu trưởng là điểm <b>chính thức</b>.</li>
+      <li><b>Tổ trưởng:</b> vào <i>Tài khoản &amp; nhật ký</i>, đặt vai trò <i>Tổ trưởng</i> và gắn tài khoản với tên người đó; tổ trưởng sẽ đánh giá những người có cùng cột <i>Tổ</i> trong danh sách CB-GV-NV.</li>
       <li><b>Tổng quan:</b> chọn Tháng / Quý / Năm / Năm học để xem tiến độ toàn trường, cảnh báo, xếp loại; xuất Excel tổng hợp.</li>
       <li><b>✨ Sao chép cho Trợ lý AI:</b> sao chép số liệu kèm câu lệnh để dán vào Gemini, ChatGPT hoặc NotebookLM, nhờ viết báo cáo, nhận xét.</li>
     </ol>
@@ -1983,15 +2054,17 @@ function printRecord() {
   </table>
   <p>Được giao: ${s.n} · Hoàn thành: ${s.done} (${pct(s.rHT)}) · Đúng/sớm hạn: ${s.som + s.dung} (${pct(s.rTD)}) · Đảm bảo chất lượng trở lên: ${s.dam + s.vuot} (${pct(s.rCL)})</p>
   <h3>II. Tổng hợp điểm</h3>
-  <table><tr><th>Nội dung</th><th>Tối đa</th><th>Tự chấm</th><th>Chính thức</th></tr>
-  <tr><td>A. Tiêu chí chung</td><td class="n">30</td><td class="n">${fmt(c.Atu)}</td><td class="n">${fmt(c.Aoff)}</td></tr>
-  <tr><td>B. Kết quả thực hiện nhiệm vụ (hoàn thành ${c.B?.ht ?? 0} + tiến độ ${c.B?.td ?? 0} + chất lượng ${c.B?.cl ?? 0})</td><td class="n">70</td><td class="n">${fmt(c.Btot)}</td><td class="n">${fmt(c.Btot)}</td></tr>
-  <tr><td>C. Điểm cộng, điểm trừ theo Mẫu 03</td><td></td><td class="n">${fmt(c.C03)}</td><td class="n">${fmt(c.C03)}</td></tr>
+  <table><tr><th>Nội dung</th><th>Tối đa</th><th>Tự chấm</th><th>Tổ trưởng</th><th>Hiệu trưởng</th></tr>
+  <tr><td>A. Tiêu chí chung</td><td class="n">30</td><td class="n">${fmt(c.Atu)}</td><td class="n">${fmt(c.Att)}</td><td class="n">${fmt(c.Aoff)}</td></tr>
+  <tr><td>B. Kết quả thực hiện nhiệm vụ (hoàn thành ${c.B?.ht ?? 0} + tiến độ ${c.B?.td ?? 0} + chất lượng ${c.B?.cl ?? 0})</td><td class="n">70</td><td class="n">${fmt(c.Btot)}</td><td class="n">${fmt(c.Btot)}</td><td class="n">${fmt(c.Btot)}</td></tr>
+  <tr><td>C. Điểm cộng, điểm trừ theo Mẫu 03</td><td></td><td class="n">${fmt(c.C03)}</td><td class="n">${fmt(c.C03)}</td><td class="n">${fmt(c.C03)}</td></tr>
   <tr><td>C.III. Điểm cộng, điểm trừ theo phụ lục${rec.pl.length ? "<br><small>" + rec.pl.map(e => `${esc(e.t.slice(0, 80))}: ${fmt((e.qty || 0) * (e.p || 0))}${e.ok === false ? " (không duyệt)" : ""}`).join("<br>") + "</small>" : ""}</td><td></td><td class="n">${fmt(c.PLtu)}</td><td class="n">${fmt(c.PLoff)}</td></tr>
-  <tr><th style="text-align:left">Tổng điểm</th><th></th><th class="n">${fmt(c.totTu)}</th><th class="n">${fmt(c.totOff)}</th></tr>
-  <tr><td>Xếp loại${c.down ? " (hạ 1 bậc do khống chế)" : ""}</td><td></td><td>${esc(c.rankTu.name)}</td><td>${esc(c.rankOff.name)}</td></tr></table>
+  <tr><th style="text-align:left">Tổng điểm</th><th></th><th class="n">${fmt(c.totTu)}</th><th class="n">${fmt(c.totTT)}</th><th class="n">${fmt(c.totOff)}</th></tr>
+  <tr><td>Xếp loại${c.down ? " (hạ 1 bậc do khống chế)" : ""}</td><td></td><td>${esc(c.rankTu.name)}</td><td>${esc(c.rankTT.name)}</td><td>${esc(c.rankOff.name)}</td></tr></table>
   <p><b>Ưu điểm:</b><br>${esc(rec.uu || "…").replace(/\n/g, "<br>")}</p>
   <p><b>Hạn chế, khuyết điểm:</b><br>${esc(rec.han || "…").replace(/\n/g, "<br>")}</p>
+  <p><b>Ý kiến của tổ trưởng:</b><br>${esc(rec.ttNx || "…").replace(/\n/g, "<br>")}</p>
+  <p><b>Kết luận của Hiệu trưởng:</b><br>${esc(rec.htNx || "…").replace(/\n/g, "<br>")}</p>
   <p style="text-align:right;margin-top:16px"><i>Bà Nà, ngày …… tháng …… năm ……</i></p>
   <div class="sig"><div>THỦ TRƯỞNG ĐƠN VỊ<br><small>(ký tên, đóng dấu)</small></div><div>NGƯỜI QUẢN LÝ TRỰC TIẾP<br><small>(ký, ghi rõ họ tên)</small></div><div>NGƯỜI TỰ ĐÁNH GIÁ<br><small>(ký, ghi rõ họ tên)</small><br><br><br><br>${esc(st.name)}</div></div>
   <script>window.onload=()=>window.print()<\/script></body></html>`);
@@ -2046,7 +2119,7 @@ Chỉ dựa trên số liệu trên, không suy đoán thêm.`;
 // =====================================================================
 // 13b. ĐĂNG NHẬP, TÀI KHOẢN & NHẬT KÝ
 // =====================================================================
-const ROLE = { admin: "Quản trị", gv: "Giáo viên" };
+const ROLE = { admin: "Quản trị (Hiệu trưởng)", tt: "Tổ trưởng", gv: "Giáo viên" };
 let logsCache = null, logFilter = { email: "", from: "", to: "", q: "" }, newPwNotice = null;
 
 function loginScreen(bootstrap) {
@@ -2096,12 +2169,13 @@ async function startSession(a, fresh) {
   $("#login")?.remove();
   document.querySelector(".app").hidden = false; $(".tabbar").hidden = false;
   const chip = $("#userChip"); chip.hidden = false;
-  chip.innerHTML = `<span class="avatar" aria-hidden="true">${esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase())}</span><span class="uname"><b>${esc(a.name)}</b>${a.role === "admin" ? ' <span class="pill tag-admin">Quản trị</span>' : ""}</span><button class="btn ghost sm" data-act="logout" title="Đăng xuất">Đăng xuất</button>`;
+  chip.innerHTML = `<span class="avatar" aria-hidden="true">${esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase())}</span><span class="uname"><b>${esc(a.name)}</b>${a.role === "admin" ? ' <span class="pill tag-admin">Quản trị</span>' : a.role === "tt" ? ' <span class="pill tag-admin">Tổ trưởng</span>' : ""}</span><button class="btn ghost sm" data-act="logout" title="Đăng xuất">Đăng xuất</button>`;
   $$("nav.tabs [data-tab]").forEach(b => { b.hidden = !allowedTab(b.dataset.tab) || (isAdmin() && b.dataset.tab === "self" && !!b.closest(".tabbar")); });
   $("#sheetAcc").hidden = !isAdmin(); $("#sheetSelf").hidden = !isAdmin();
+  $$('nav.tabs [data-tab="eval"] span').forEach(sp => { sp.dataset.l0 ||= sp.textContent; sp.textContent = isTT() ? "Tổ đánh giá" : sp.dataset.l0; });
   const initial = esc((a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase());
   $("#mAvatar").textContent = (a.name || a.email).trim().split(/\s+/).pop().slice(0, 1).toUpperCase();
-  $("#sheetUser").innerHTML = `<span class="avatar" aria-hidden="true">${initial}</span><span><b>${esc(a.name)}</b><span class="small muted">${esc(a.email)} · ${a.role === "admin" ? "Quản trị" : "Giáo viên"}</span></span>`;
+  $("#sheetUser").innerHTML = `<span class="avatar" aria-hidden="true">${initial}</span><span><b>${esc(a.name)}</b><span class="small muted">${esc(a.email)} · ${esc(ROLE[a.role] || "Giáo viên")}</span></span>`;
   initUi();
   setMark("Đã tải lúc " + hhmm());
   setTab(ui.tab);
@@ -2124,7 +2198,7 @@ function renderAccounts() {
         <label class="field">Họ và tên<input type="text" id="acName" required></label>
         <label class="field">Email<input type="email" id="acEmail" required></label>
         <label class="field">Mật khẩu<span class="row" style="flex-wrap:nowrap"><input type="text" id="acPw" value="${genPw()}" style="flex:1"><button class="btn sm" type="button" data-act="genPw" title="Tạo mật khẩu ngẫu nhiên">↻</button></span></label>
-        <label class="field">Vai trò<select id="acRole"><option value="gv">Giáo viên</option><option value="admin">Quản trị</option></select></label>
+        <label class="field">Vai trò<select id="acRole"><option value="gv">Giáo viên</option><option value="tt">Tổ trưởng</option><option value="admin">Quản trị (Hiệu trưởng)</option></select></label>
         <label class="field" style="grid-column:1/-1">Gắn với người trong danh sách CB-GV-NV<select id="acStaff">${staffOpts("")}</select></label>
         <div style="grid-column:1/-1" class="row"><span class="spacer"></span><button class="btn primary" type="submit">+ Thêm tài khoản</button></div>
       </form>
@@ -2211,15 +2285,16 @@ const PAGES = {
   self: ["Tự đánh giá của tôi", "Tự đánh giá nhiệm vụ hằng tháng và tải minh chứng theo từng tiêu chí"],
 };
 const ADMIN_TABS = ["overview", "eval", "staff", "accounts"];
-const allowedTab = t => isAdmin() || !ADMIN_TABS.includes(t);
+const allowedTab = t => isAdmin() || (isTT() && t === "eval") || !ADMIN_TABS.includes(t);
 function setTab(t) {
   if (!PAGES[t] || !allowedTab(t)) t = isAdmin() ? "overview" : "self";
   if (t === "self" && ui.tab !== "self") ui._ev = [ui.evalStaff, ui.evalMonth];
   if (ui.tab === "self" && t !== "self" && ui._ev) { [ui.evalStaff, ui.evalMonth] = ui._ev; ui._ev = null; }
   ui.tab = t;
-  $("#pageTitle").textContent = PAGES[t][0]; $("#pageDesc").textContent = PAGES[t][1]; $("#mTitle").textContent = PAGES[t][0];
+  const pg = t === "eval" && isTT() ? ["Tổ đánh giá", `Đánh giá phiếu tự đánh giá của giáo viên ${myTo() ? toName(myTo()) : "trong tổ"}`] : PAGES[t];
+  $("#pageTitle").textContent = pg[0]; $("#pageDesc").textContent = pg[1]; $("#mTitle").textContent = pg[0];
   $(".tabbar .more").classList.toggle("on", t === "data" || t === "accounts");
-  document.title = PAGES[t][0] + " · Theo dõi nhiệm vụ · TH Bà Nà";
+  document.title = pg[0] + " · Theo dõi nhiệm vụ · TH Bà Nà";
   try { sessionStorage.setItem("tdgv-tab", t); } catch (e) {}
   $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
   render();
@@ -2306,7 +2381,8 @@ document.addEventListener("change", async e => {
 
 document.addEventListener("click", async e => {
   if (ui.tab === "overview" && !e.target.closest("button, select, input") && onOverviewClick(e)) return;
-  if (ui.tab === "person") { const tr = e.target.closest("[data-month]"); if (tr) { if (isAdmin()) { ui.evalStaff = ui.person; ui.evalMonth = tr.dataset.month; setTab("eval"); } else { ui.selfMonth = tr.dataset.month; setTab("self"); } return; } }
+  if (ui.tab === "person") { const tr = e.target.closest("[data-month]"); if (tr) { if (isAdmin() || (isTT() && canReview(ui.person))) { ui.evalStaff = ui.person; ui.evalMonth = tr.dataset.month; setTab("eval"); } else { ui.selfMonth = tr.dataset.month; setTab("self"); } return; } }
+  const qb = e.target.closest("[data-qsid]"); if (qb) { ui.evalStaff = qb.dataset.qsid; renderEval(); return; }
   const b = e.target.closest("[data-act]"); if (!b) return;
   const act = b.dataset.act;
   const rec = ui.tab === "eval" || ui.tab === "self" ? getRec(false) : null;
@@ -2323,7 +2399,8 @@ document.addEventListener("click", async e => {
       setTimeout(() => { const last = rec.tasks[rec.tasks.length - 1]; const ta = $(`[data-tid="${last.id}"] textarea`); ta && ta.focus(); }, 0); break;
     case "delTask": { const id = b.closest("[data-tid]").dataset.tid; const t = rec.tasks.find(x => x.id === id); if (t.nd && !confirm("Xoá công việc này?")) break; rec.tasks = rec.tasks.filter(x => x.id !== id); save(); rerenderForm(); break; }
     case "fillMax": CRIT_ITEMS.forEach(c => { if (rec.a.tu[c.c] == null) rec.a.tu[c.c] = c.max; }); save(); rerenderForm(); break;
-    case "copyOff": rec.a.off = {}; save(); rerenderForm(); toast("Cột chính thức đã đặt bằng điểm tự chấm."); break;
+    case "copyOff": rec.a.off = {}; save(); rerenderForm(); toast("Cột Hiệu trưởng đã đặt bằng điểm tổ trưởng."); break;
+    case "copyTT": rec.a.tt = {}; save(); rerenderForm(); toast("Cột tổ trưởng đã đặt bằng điểm tự chấm."); break;
     case "addPl": {
       const st = staffById(ui.evalStaff), i = +$("#plPick").value, x = CATALOG[STAFF_TYPES[st.type].pl][i];
       rec.pl.push({ id: uid(), ref: i, t: x.t, p: x.p, qty: 1, note: "", ok: true }); save(); rerenderForm();
@@ -2341,9 +2418,16 @@ document.addEventListener("click", async e => {
     case "critMax": { const c = CRIT_ITEMS.find(x => x.c === b.dataset.c); rec.a.tu[c.c] = c.max; save(); rerenderForm(); break; }
     case "setStatus": {
       const s = b.dataset.s;
-      if (!isAdmin() && (s === "duyet" || rec.status === "duyet")) { toast("Chỉ quản trị viên được duyệt phiếu."); break; }
+      const selfOk = ui.tab === "self" && ((s === "nop" && rec.status === "nhap") || (s === "nhap" && rec.status === "nop"));
+      const ttOk = isTT() && ui.tab === "eval" && canReview(ui.evalStaff) && ["nhap", "tt"].includes(s) && ["nop", "tt"].includes(rec.status);
+      if (!isAdmin() && !selfOk && !ttOk) { toast(s === "duyet" ? "Chỉ Hiệu trưởng (quản trị) được duyệt phiếu." : "Bạn không có quyền chuyển trạng thái này."); break; }
+      if (ui.tab === "eval" && s === "nhap" && rec.status !== "nhap" && !confirm("Trả phiếu lại cho giáo viên sửa? Nên ghi lý do ở ô ý kiến trước khi trả.")) break;
       if (ui.tab === "self" && s === "nop") { const miss = rec.tasks.filter(t => !(t.ev || []).length).length; if (miss && !confirm(`Còn ${miss} nhiệm vụ chưa có minh chứng. Vẫn nộp?`)) break; }
       if (s !== "nhap") { const c = calc(rec); if (!rec.tasks.length) { toast("Chưa có công việc nào trong phiếu."); break; } if (c.aFilled < CRIT_ITEMS.length && !confirm(`Phần A còn ${CRIT_ITEMS.length - c.aFilled} tiêu chí chưa chấm. Vẫn chuyển trạng thái?`)) break; }
+      const stamp = { name: me?.name || "", email: me?.email || "", at: new Date().toISOString() };
+      if (s === "tt") rec.ttBy = stamp;
+      if (s === "duyet") { rec.htBy = stamp; if (!rec.ttBy && rec.status === "nop") rec.ttBy = null; }
+      if (s === "nhap" && ui.tab === "eval") rec.traLai = stamp; else if (s !== "nhap") rec.traLai = null;
       rec.status = s; rec.updated = new Date().toISOString(); save(); rerenderForm(); logAct("Chuyển trạng thái phiếu: " + RECORD_STATUS[s].label, recLabel(rkey(ui.evalStaff, ui.evalMonth))); break;
     }
     case "delRec": if (confirm(`Xoá phiếu ${monthLabel(ui.evalMonth)} của ${staffById(ui.evalStaff).name}?`)) {
