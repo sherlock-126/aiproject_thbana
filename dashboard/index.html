@@ -536,6 +536,7 @@
   .judge-link > span:first-child { font-size: 26px; }
   .judge-link b { display: block; font-size: 14.5px; } .judge-link small { display: block; font-size: 13px; margin-top: 2px; color: #6b5214; }
   .judge-link .go { margin-left: auto; font-weight: 700; white-space: nowrap; }
+  .judge-link.strip { margin: 0 0 14px; padding: 8px 12px; } .judge-link.strip > span:first-child { font-size: 20px; }
   .demo-acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; font-size: 14px; }
   .demo-acc b { width: 100%; }
   .flow { list-style: none; display: flex; gap: 6px; padding: 0; margin: 0 0 12px; flex-wrap: wrap; }
@@ -612,6 +613,7 @@
         </div>
       </header>
 
+      <a id="judgeStrip" class="judge-link strip" href="?minhhoa"><span>🏆</span><span><b>Ban Giám khảo cuộc thi AI 2026: xem bản trình diễn</b><small>Đủ 3 cấp đánh giá, có tài khoản dùng thử. Dữ liệu minh họa, tên ẩn danh.</small></span><span class="go">Xem →</span></a>
       <div id="demoBanner" class="banner hidden"></div>
 
       <main id="view"><div class="loading">Đang tải dữ liệu chung của trường…</div></main>
@@ -2320,6 +2322,7 @@ function render() {
   if (!loaded) return;
   $("#schoolLine").textContent = db.school.name; $("#mSchool").textContent = db.school.name;
   const bn = $("#demoBanner");
+  $("#judgeStrip").hidden = DEMO;
   if (DEMO) { bn.innerHTML = DEMO_NOTE; bn.classList.remove("hidden"); }
   else if (db.demo) bn.innerHTML = `<span>Hệ thống còn <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…). Hãy xoá trước khi nhập dữ liệu thật.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
   else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Vào <b>Danh sách CB-GV-NV</b> để thêm người hoặc nhập danh sách từ Excel.</span><span class="spacer"></span><button class="btn sm primary" data-tab-go="staff">Mở danh sách CB-GV-NV</button>`;
