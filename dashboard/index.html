@@ -531,6 +531,8 @@
   table.multi th, table.multi td { padding-left: 5px; padding-right: 5px; }
   table.multi th { font-size: 10.5px; letter-spacing: 0; }
   table.multi .rank, table.multi td { font-size: 13.5px; }
+  .demo-acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; font-size: 14px; }
+  .demo-acc b { width: 100%; }
   .flow { list-style: none; display: flex; gap: 6px; padding: 0; margin: 0 0 12px; flex-wrap: wrap; }
   .flow li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: var(--surface-2); color: var(--text-muted); font-size: 14px; }
   .flow li span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--border); color: var(--text-primary); font-size: 12px; font-weight: 700; }
@@ -722,7 +724,9 @@ const RANKS = [
 //   dashboard/truong   – 1 bản ghi: tên trường, cơ quan chủ quản
 //   dashboard/nhan-su  – mỗi CB-GV-NV một bản ghi
 //   dashboard/phieu    – mỗi người mỗi tháng một phiếu (kèm danh sách minh chứng đã upload)
-const APP = "dashboard";
+// Bản trình diễn cho Ban Giám khảo: cùng phần mềm, dữ liệu minh họa để riêng (mở bằng ?minhhoa)
+const DEMO = new URLSearchParams(location.search).has("minhhoa");
+const APP = DEMO ? "dashboard-minhhoa" : "dashboard";
 const COL = { school: "truong", staff: "nhan-su", rec: "phieu" };
 let db = { school: { name: "Trường Tiểu học Bà Nà", donVi: "UBND xã Bà Nà" }, staff: [], records: {}, demo: false };
 const remote = { school: null, staff: new Map(), recs: new Map() };
@@ -818,7 +822,7 @@ async function reload(quiet) {
 // ---- Tài khoản đăng nhập (chỉ để phân biệt ai đang làm việc) & nhật ký hoạt động
 //   dashboard/tai-khoan – mỗi tài khoản một bản ghi (mật khẩu lưu dạng băm SHA-256 kèm muối, không lưu chữ thật)
 //   dashboard/nhat-ky   – mỗi người mỗi ngày một bản ghi, chứa danh sách việc đã làm
-const COL_ACC = "tai-khoan", COL_LOG = "nhat-ky", SESSION_KEY = "tdgv-session";
+const COL_ACC = "tai-khoan", COL_LOG = "nhat-ky", SESSION_KEY = DEMO ? "tdgv-session-minhhoa" : "tdgv-session";
 let accounts = [], me = null;
 // SHA-256: dùng Web Crypto khi có (trang https), dự phòng bản JavaScript thuần (trang http).
 function sha256Js(bytes) {
@@ -1941,7 +1945,7 @@ function renderData() {
     <div class="row">
       <button class="btn" data-act="backup">⬇ Xuất bản sao lưu (.json)</button>
     </div>
-    ${db.demo ? `<h2 style="margin-top:20px">Dữ liệu mẫu còn sót</h2>
+    ${db.demo && !DEMO ? `<h2 style="margin-top:20px">Dữ liệu mẫu còn sót</h2>
     <p class="small muted">Hệ thống vẫn còn dữ liệu mẫu (tên giả Giáo viên A, B…). Xoá đi trước khi nhập dữ liệu thật.</p>
     <div class="row" style="margin-top:8px"><button class="btn danger" data-act="clearDemo">Xoá dữ liệu mẫu</button></div>` : ""}
   </div>
@@ -2122,6 +2126,12 @@ Chỉ dựa trên số liệu trên, không suy đoán thêm.`;
 const ROLE = { admin: "Quản trị (Hiệu trưởng)", tt: "Tổ trưởng", gv: "Giáo viên" };
 let logsCache = null, logFilter = { email: "", from: "", to: "", q: "" }, newPwNotice = null;
 
+const DEMO_NOTE = `<span>🎬 <b>BẢN TRÌNH DIỄN</b> – dữ liệu minh họa tháng 9/2026: đúng cơ cấu 109 CB-GV-NV, 6 tổ của trường nhưng tên được ẩn danh; điểm số dựng để minh họa quy trình 3 cấp, không phải kết quả đánh giá thật.</span>`;
+const DEMO_ACC = `<div class="demo-acc"><b>Tài khoản dùng thử</b> (mật khẩu chung <code>123456@</code>)
+  <button type="button" class="btn sm" data-demo="hieutruong@minhhoa.vn">Hiệu trưởng</button>
+  <button type="button" class="btn sm" data-demo="totruong1@minhhoa.vn">Tổ trưởng Tổ 1</button>
+  <button type="button" class="btn sm" data-demo="gvlop1.3@minhhoa.vn">Giáo viên lớp 1.3</button>
+  <span class="small muted">Tổ trưởng các tổ khác: totruong2 … totruong6@minhhoa.vn</span></div>`;
 function loginScreen(bootstrap) {
   document.querySelector(".app").hidden = true;
   let el = $("#login");
@@ -2130,6 +2140,7 @@ function loginScreen(bootstrap) {
     <div class="brand-row"><span class="logo" aria-hidden="true"><img src="logo.webp" alt="" width="256" height="256"></span><div><b>Theo dõi nhiệm vụ</b><div class="small muted">${esc(db.school.name)}</div></div></div>
     <div><h1>${bootstrap ? "Tạo tài khoản quản trị" : "Đăng nhập"}</h1>
     <p class="sub" style="margin-top:4px">${bootstrap ? "Chưa có tài khoản nào. Tạo tài khoản quản trị đầu tiên để cấp tài khoản cho giáo viên." : "Dùng email và mật khẩu nhà trường đã cấp cho bạn."}</p></div>
+    ${DEMO ? `<div class="banner" style="margin:0">${DEMO_NOTE}</div>${DEMO_ACC}` : ""}
     <form id="loginForm" novalidate>
       ${bootstrap ? `<label class="field">Họ và tên<input type="text" id="lgName" autocomplete="name" required></label>` : ""}
       <label class="field">Email<input type="email" id="lgEmail" autocomplete="username" required></label>
@@ -2294,7 +2305,7 @@ function setTab(t) {
   const pg = t === "eval" && isTT() ? ["Tổ đánh giá", `Đánh giá phiếu tự đánh giá của giáo viên ${myTo() ? toName(myTo()) : "trong tổ"}`] : PAGES[t];
   $("#pageTitle").textContent = pg[0]; $("#pageDesc").textContent = pg[1]; $("#mTitle").textContent = pg[0];
   $(".tabbar .more").classList.toggle("on", t === "data" || t === "accounts");
-  document.title = pg[0] + " · Theo dõi nhiệm vụ · TH Bà Nà";
+  document.title = (DEMO ? "[Trình diễn] " : "") + pg[0] + " · Theo dõi nhiệm vụ · TH Bà Nà";
   try { sessionStorage.setItem("tdgv-tab", t); } catch (e) {}
   $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
   render();
@@ -2304,9 +2315,10 @@ function render() {
   if (!loaded) return;
   $("#schoolLine").textContent = db.school.name; $("#mSchool").textContent = db.school.name;
   const bn = $("#demoBanner");
-  if (db.demo) bn.innerHTML = `<span>Hệ thống còn <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…). Hãy xoá trước khi nhập dữ liệu thật.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
+  if (DEMO) { bn.innerHTML = DEMO_NOTE; bn.classList.remove("hidden"); }
+  else if (db.demo) bn.innerHTML = `<span>Hệ thống còn <b>dữ liệu mẫu</b> (tên giả: Giáo viên A, B…). Hãy xoá trước khi nhập dữ liệu thật.</span><span class="spacer"></span><button class="btn sm" data-act="clearDemo">Xoá dữ liệu mẫu</button>`;
   else if (!db.staff.length) bn.innerHTML = `<span>Chưa có dữ liệu. Vào <b>Danh sách CB-GV-NV</b> để thêm người hoặc nhập danh sách từ Excel.</span><span class="spacer"></span><button class="btn sm primary" data-tab-go="staff">Mở danh sách CB-GV-NV</button>`;
-  bn.classList.toggle("hidden", !isAdmin() || !(db.demo || !db.staff.length));
+  if (!DEMO) bn.classList.toggle("hidden", !isAdmin() || !(db.demo || !db.staff.length));
   ({ overview: renderOverview, eval: renderEval, person: renderPerson, staff: renderStaff, data: renderData, accounts: renderAccounts, self: renderSelf })[ui.tab]();
 }
 
@@ -2380,6 +2392,7 @@ document.addEventListener("change", async e => {
 });
 
 document.addEventListener("click", async e => {
+  const da = e.target.closest("[data-demo]"); if (da) { $("#lgEmail").value = da.dataset.demo; $("#lgPw").value = "123456@"; $("#loginForm button[type=submit], #loginForm button")?.focus(); return; }
   if (ui.tab === "overview" && !e.target.closest("button, select, input") && onOverviewClick(e)) return;
   if (ui.tab === "person") { const tr = e.target.closest("[data-month]"); if (tr) { if (isAdmin() || (isTT() && canReview(ui.person))) { ui.evalStaff = ui.person; ui.evalMonth = tr.dataset.month; setTab("eval"); } else { ui.selfMonth = tr.dataset.month; setTab("self"); } return; } }
   const qb = e.target.closest("[data-qsid]"); if (qb) { ui.evalStaff = qb.dataset.qsid; renderEval(); return; }
