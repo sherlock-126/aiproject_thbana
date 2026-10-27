@@ -613,7 +613,7 @@
         </div>
       </header>
 
-      <a id="judgeStrip" class="judge-link strip" href="?minhhoa"><span>🏆</span><span><b>Ban Giám khảo cuộc thi AI 2026: xem bản trình diễn</b><small>Đủ 3 cấp đánh giá, có tài khoản dùng thử. Dữ liệu minh họa, tên ẩn danh.</small></span><span class="go">Xem →</span></a>
+      <a id="judgeStrip" class="judge-link strip" href="?minhhoa"><span>🏆</span><span><b>Ban Giám khảo cuộc thi AI 2026: xem bản trình diễn</b><small>Đủ 3 cấp đánh giá, có tài khoản dùng thử. Điểm số minh họa.</small></span><span class="go">Xem →</span></a>
       <div id="demoBanner" class="banner hidden"></div>
 
       <main id="view"><div class="loading">Đang tải dữ liệu chung của trường…</div></main>
@@ -2133,12 +2133,12 @@ Chỉ dựa trên số liệu trên, không suy đoán thêm.`;
 const ROLE = { admin: "Quản trị (Hiệu trưởng)", tt: "Tổ trưởng", gv: "Giáo viên" };
 let logsCache = null, logFilter = { email: "", from: "", to: "", q: "" }, newPwNotice = null;
 
-const DEMO_NOTE = `<span>🎬 <b>BẢN TRÌNH DIỄN</b> – dữ liệu minh họa tháng 9/2026: đúng cơ cấu 109 CB-GV-NV, 6 tổ của trường nhưng tên được ẩn danh; điểm số dựng để minh họa quy trình 3 cấp, không phải kết quả đánh giá thật.</span>`;
+const DEMO_NOTE = `<span>🎬 <b>BẢN TRÌNH DIỄN</b> – dữ liệu minh họa tháng 9/2026 phục vụ dự thi: danh sách 109 CB-GV-NV, 6 tổ của trường (các thầy cô đã đồng ý); điểm số, nhận xét dựng để minh họa quy trình 3 cấp, không phải kết quả đánh giá thật.</span>`;
 const DEMO_ACC = `<div class="demo-acc"><b>Tài khoản dùng thử</b> (mật khẩu chung <code>123456@</code>)
   <button type="button" class="btn sm" data-demo="hieutruong@minhhoa.vn">Hiệu trưởng</button>
-  <button type="button" class="btn sm" data-demo="totruong1@minhhoa.vn">Tổ trưởng Tổ 1</button>
-  <button type="button" class="btn sm" data-demo="gvlop1.3@minhhoa.vn">Giáo viên lớp 1.3</button>
-  <span class="small muted">Tổ trưởng các tổ khác: totruong2 … totruong6@minhhoa.vn</span></div>`;
+  <button type="button" class="btn sm" data-demo="totruong1@minhhoa.vn">Tổ trưởng Tổ 1 (Nguyễn Thị Hòa)</button>
+  <button type="button" class="btn sm" data-demo="gvlop1.3@minhhoa.vn">GVCN lớp 1.3 (Cao Thị Minh Nguyệt)</button>
+  <span class="small muted">Tổ trưởng khác: Tổ 2 – totruong2@minhhoa.vn · Tổ 3 – totruong3@ · Tổ 4 – totruong5@ · Tổ 5 – totruong4@ · Tổ bộ môn – totruong6@minhhoa.vn</span></div>`;
 function loginScreen(bootstrap) {
   document.querySelector(".app").hidden = true;
   let el = $("#login");
@@ -2147,7 +2147,7 @@ function loginScreen(bootstrap) {
     <div class="brand-row"><span class="logo" aria-hidden="true"><img src="logo.webp" alt="" width="256" height="256"></span><div><b>Theo dõi nhiệm vụ</b><div class="small muted">${esc(db.school.name)}</div></div></div>
     <div><h1>${bootstrap ? "Tạo tài khoản quản trị" : "Đăng nhập"}</h1>
     <p class="sub" style="margin-top:4px">${bootstrap ? "Chưa có tài khoản nào. Tạo tài khoản quản trị đầu tiên để cấp tài khoản cho giáo viên." : "Dùng email và mật khẩu nhà trường đã cấp cho bạn."}</p></div>
-    ${DEMO ? `<div class="banner" style="margin:0">${DEMO_NOTE}</div>${DEMO_ACC}` : `<a class="judge-link" href="?minhhoa"><span>🏆</span><span><b>Dành cho Ban Giám khảo cuộc thi AI 2026</b><small>Xem bản trình diễn đủ 3 cấp đánh giá (giáo viên → tổ trưởng → Hiệu trưởng), có tài khoản dùng thử. Dữ liệu minh họa.</small></span><span class="go">Xem →</span></a>`}
+    ${DEMO ? `<div class="banner" style="margin:0">${DEMO_NOTE}</div>${DEMO_ACC}` : `<a class="judge-link" href="?minhhoa"><span>🏆</span><span><b>Dành cho Ban Giám khảo cuộc thi AI 2026</b><small>Xem bản trình diễn đủ 3 cấp đánh giá (giáo viên → tổ trưởng → Hiệu trưởng), có tài khoản dùng thử. Điểm số minh họa.</small></span><span class="go">Xem →</span></a>`}
     <form id="loginForm" novalidate>
       ${bootstrap ? `<label class="field">Họ và tên<input type="text" id="lgName" autocomplete="name" required></label>` : ""}
       <label class="field">Email<input type="email" id="lgEmail" autocomplete="username" required></label>
