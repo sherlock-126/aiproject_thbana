@@ -531,6 +531,11 @@
   table.multi th, table.multi td { padding-left: 5px; padding-right: 5px; }
   table.multi th { font-size: 10.5px; letter-spacing: 0; }
   table.multi .rank, table.multi td { font-size: 13.5px; }
+  .judge-link { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 12px; background: #fff6e0; border: 1.5px solid #f0b429; color: #5a3d00; text-decoration: none; }
+  .judge-link:hover { background: #ffefc4; }
+  .judge-link > span:first-child { font-size: 26px; }
+  .judge-link b { display: block; font-size: 14.5px; } .judge-link small { display: block; font-size: 13px; margin-top: 2px; color: #6b5214; }
+  .judge-link .go { margin-left: auto; font-weight: 700; white-space: nowrap; }
   .demo-acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; font-size: 14px; }
   .demo-acc b { width: 100%; }
   .flow { list-style: none; display: flex; gap: 6px; padding: 0; margin: 0 0 12px; flex-wrap: wrap; }
@@ -2140,7 +2145,7 @@ function loginScreen(bootstrap) {
     <div class="brand-row"><span class="logo" aria-hidden="true"><img src="logo.webp" alt="" width="256" height="256"></span><div><b>Theo dõi nhiệm vụ</b><div class="small muted">${esc(db.school.name)}</div></div></div>
     <div><h1>${bootstrap ? "Tạo tài khoản quản trị" : "Đăng nhập"}</h1>
     <p class="sub" style="margin-top:4px">${bootstrap ? "Chưa có tài khoản nào. Tạo tài khoản quản trị đầu tiên để cấp tài khoản cho giáo viên." : "Dùng email và mật khẩu nhà trường đã cấp cho bạn."}</p></div>
-    ${DEMO ? `<div class="banner" style="margin:0">${DEMO_NOTE}</div>${DEMO_ACC}` : ""}
+    ${DEMO ? `<div class="banner" style="margin:0">${DEMO_NOTE}</div>${DEMO_ACC}` : `<a class="judge-link" href="?minhhoa"><span>🏆</span><span><b>Dành cho Ban Giám khảo cuộc thi AI 2026</b><small>Xem bản trình diễn đủ 3 cấp đánh giá (giáo viên → tổ trưởng → Hiệu trưởng), có tài khoản dùng thử. Dữ liệu minh họa.</small></span><span class="go">Xem →</span></a>`}
     <form id="loginForm" novalidate>
       ${bootstrap ? `<label class="field">Họ và tên<input type="text" id="lgName" autocomplete="name" required></label>` : ""}
       <label class="field">Email<input type="email" id="lgEmail" autocomplete="username" required></label>
